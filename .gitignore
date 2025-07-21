@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+
+/target/
+
+# OS/편집기 임시파일
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

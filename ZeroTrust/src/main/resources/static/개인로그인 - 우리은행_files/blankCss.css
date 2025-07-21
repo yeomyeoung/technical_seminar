@@ -1,0 +1,53 @@
+@charset 'UTF-8';
+/** ---------------------------------------------------------
+  * @ 파일 :blankCss.css
+  * @ 구분 :UI공통
+  * ---------------------------------------------------------
+  */
+  
+
+/* 
+[20900153] : 스크롤 미적용 문제로 삭제
+body{
+  	margin: 0px;  
+	overflow: hidden;
+}*/
+  
+.pcc_frame{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow-y: auto;
+    z-index: 30001}
+
+.pcc_frame.for_pc:before{
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 100%;
+    vertical-align: middle;}
+
+.pcc_frame.for_pc:after {
+   	z-index: -1;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;      
+   /* background: rgba(0, 0, 0, 0.5);*/}
+
+.pcc_frame.for_pc .pcc_frame_inner{
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+   /*  max-width: 600px;
+    max-height: 700px; */
+}

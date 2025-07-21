@@ -1,0 +1,1799 @@
+var Ntm = window.Ntm || {};
+
+Ntm.Settings = {"tags":[{"type":"PLUGIN","id":"TAG-33500","name":"NL_페이지 수집","enabled":true,"operator":"AND","triggers":["TRG-00001"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"etype":"VAR-17926","withyou":"VAR-99654","nth_canc_pdcd":"VAR-99655","nth_canc_pdnm":"VAR-99656","nth_pddt":"VAR-99657"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"SCRIPT","id":"TAG-53170","name":"SC_01.스크롤 감지","enabled":true,"operator":"OR","triggers":["TRG-27397"],"exceptions":[],"code":"function() {\ntry {\nvar maxScrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;\nvar percentagesArr = [50,75,90]; //스와이프를 감지 할 퍼센티지 설정\nvar showed = {};\nvar timeout;\nvar previousPercentage;\nwindow.addEventListener(\"scroll\", function (event) {\n    var scrollVal = this.scrollY;\n    var scrollPercentage = Math.round((scrollVal + document.documentElement.clientHeight) / document.documentElement.scrollHeight * 100);\n    var currentPercentage = 0;\n    var i = 0;\n    while(percentagesArr[i] <= scrollPercentage) {\n      currentPercentage = percentagesArr[i++];\n    }\n    if (previousPercentage !== currentPercentage) {\n        clearTimeout(timeout);\n        timeout = currentPercentage !== 0 && !showed[currentPercentage]\n          ? setTimeout(() => {\n              showed[currentPercentage] = true;\n          Ntm.Event.fireUserDefined('scroll', {\"pos\": currentPercentage});\n            }, 10) //스크롤을 감지 할 최소 체류 시try {간 설정 (ms)\n          : null;\n        previousPercentage = currentPercentage;\n    }\n});\n\nwindow.addEventListener(\"resize\", () => {\n  maxScrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;\n});\n  \n  /*\nvar timeout,previousPercentage,maxScrollHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight,percentagesArr=[25,50,75,90],showed={};window.addEventListener(\"scroll\",function(e){for(var t=this.scrollY,r=Math.round(t/maxScrollHeight*100),n=0,o=0;percentagesArr[o]<=r;)n=percentagesArr[o++];previousPercentage!==n&&(clearTimeout(timeout),timeout=0===n||showed[n]?null:setTimeout(()=>{showed[n]=!0,Ntm.Event.fireUserDefined(\"scroll\",{scrollPercentage:n})},1e3),previousPercentage=n)}),window.addEventListener(\"resize\",()=>{maxScrollHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight});  \n  */\n    } catch (err) {\n      Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n      console.log(err);\n    }\n}","approval":"DONE","logs":[{"time":1675650513271,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"PLUGIN","id":"TAG-83221","name":"SC_02.스크롤","enabled":true,"operator":"AND","triggers":["TRG-68666"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"nth/scroll_event","parameters":{"etype":"VAR-99653","nth_pos":"VAR-15393","withyou":"VAR-99654"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-97232","name":"CK_01.A TAG 클릭","enabled":true,"operator":"AND","triggers":["TRG-75426"],"exceptions":["TRG-21418"],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"etype":"VAR-17683","nth_cktext":"VAR-55808","nth_ckid":"VAR-00009","nth_xpath":"VAR-83868","nth_div_class":"VAR-46231","withyou":"VAR-99654"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-32261","name":"CK_01.A TAG 클릭(특정요소)","enabled":true,"operator":"AND","triggers":["TRG-87111"],"exceptions":["TRG-21418"],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"etype":"VAR-17683","nth_cktext":"VAR-55808","nth_ckid":"VAR-00009","nth_xpath":"VAR-83868","nth_div_class":"VAR-46231","withyou":"VAR-99654"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-67654","name":"CK_02.BUTTON TAG 클릭","enabled":true,"operator":"AND","triggers":["TRG-21418"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"etype":"VAR-17683","nth_cktext":"VAR-55808","nth_ckid":"VAR-00009","nth_xpath":"VAR-83868","nth_div_class":"VAR-46231","withyou":"VAR-99654"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-85213","name":"CK_03.LABEL TAG 클릭","enabled":true,"operator":"AND","triggers":["TRG-37613"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"etype":"VAR-17683","nth_cktext":"VAR-55808","nth_ckid":"VAR-00009","nth_xpath":"VAR-83868","nth_div_class":"VAR-46231","withyou":"VAR-99654"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-97363","name":"CK_04.공인인증서 로그인 클릭","enabled":true,"operator":"AND","triggers":["TRG-21954"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"","parameters":{"etype":"VAR-17683","nth_cktext":"VAR-55808","nth_ckid":"VAR-00009","nth_xpath":"VAR-83868","nth_div_class":"VAR-46231","withyou":"VAR-99654"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-73729","name":"CE_01.로그인","enabled":true,"operator":"AND","triggers":["TRG-56007"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"login","parameters":{"login":"VAR-76948","etype":"VAR-80892"},"cookies":{"nth_inflow":"VAR-32552","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389","nth_session":"VAR-74698"}},{"type":"SCRIPT","id":"TAG-65348","name":"UT_클릭 요소 확인","enabled":false,"operator":"AND","triggers":["TRG-51710"],"exceptions":[],"code":"function() {\n   window.addEventListener('click', function(e){\n    var allAtts = [];\n    var len = e.path.length - 4;\n    e.path.forEach((el, i) => {\n       function getAtts(el){\n          if (el.hasAttributes()) {\n            var attrs = el.attributes;\n            var attr = {'Tag Name' : el.tagName, 'innerText': el.innerText};\n            for(var i=0; i<attrs.length; i++){\n              attr[attrs[i].name] = attrs[i].value;\n            }\n            return attr;\n          } else {\n            var attr = {'innerText': el.innerText};\n            return attr;\n          }\n        }\n\n        if (i < len){\n        var atts = getAtts(el);\n        allAtts.push(atts);\n        }\n    });\n        console.table(allAtts);\n  });\n}","approval":"DONE","logs":[{"time":1645428259390,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"TAG-27503","name":"UT_페이지 이탈 방지","enabled":true,"operator":"AND","triggers":["TRG-51710"],"exceptions":[],"code":"function() {\ntry {\n  window.addEventListener('beforeunload',(ev) => {ev.preventDefault(); return ev.returnValue = \"\"; });\n} catch (err) {\n    Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n    console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1645410965592,"userId":"admin","action":"CONFIRM","comment":""},{"time":1645410968739,"userId":"admin","action":"RESET","comment":""},{"time":1645410979028,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"TAG-83644","name":"UT_개발 모드 ON/OFF","enabled":false,"operator":"AND","triggers":["TRG-51710"],"exceptions":[],"code":"function() {\n  Ntm.Cookie.set(\"ntmSetupMode\",\"on\",{path :\"/\"}); // 개발 모드 실행\n  Ntm.Cookie.set(\"ntmSetupMode\",\"\",{path :\"/\"});  // 중지\n}","approval":"DONE","logs":[{"time":1645499083455,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"TAG-89148","name":"UT_하이라이트","enabled":false,"operator":"AND","triggers":["TRG-51710"],"exceptions":[],"code":"function() {\n  var css = [\"a\", \"button\"]; //(다른 값으로 응용) 하이라이트 할 css 선택자를 입\n \n  css.forEach(t);\n  function t(et, ci){\n    aryMenu = [];\n    var sel = document.querySelectorAll(et);\n    sel.forEach(p);\n    function p(el, i){\n      var bcolor = [ \"solid blue\", \"dashed red\", \"dashed yellow\" ];\n      el.style.border = bcolor[ci]; //보더 색상 지정\n      //el.style.border = \"dashed red\";\n      var t0 = i; //인덱스 넘버\n      var t1 = el.tagName; //TAG 명\n      var t2 = el.innerText; //텍스트 값\n      aryJoin = [t0, t1, t2]; //위에서 사용한 t1, t2 등을 모두 배열에 저장\n      aryMenu.push(aryJoin.join(',')); //배열 결합\n    }\n    console.table(aryMenu); //테이블로 출력\n  }\n}","approval":"DONE","logs":[{"time":1645499087819,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"PLUGIN","id":"TAG-37538","name":"이벤트함수호출","enabled":true,"operator":"AND","triggers":["TRG-38771"],"exceptions":[],"pluginType":"nlogger","logType":"CUSTOM","path":"nth/event_complete","parameters":{"etype":"VAR-44349","withyou":"VAR-79158"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389"}},{"type":"PLUGIN","id":"TAG-59701","name":"로그인세션타임아웃","enabled":true,"operator":"AND","triggers":["TRG-80341"],"exceptions":[],"pluginType":"nlogger","logType":"EVENT","path":"nth/event_complete","parameters":{"etype":"VAR-48910"},"cookies":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389","nth_withyou":"VAR-99654"}},{"type":"SCRIPT","id":"TAG-97364","name":"plmPdcd변수셋팅","enabled":true,"operator":"AND","triggers":["TRG-87112"],"exceptions":[],"code":"function() {\n  var pdcd = Ntm.Variable.get(\"customData\");\n  if ( pdcd ) {\n    sessionStorage.setItem(\"ntm_plmPdcd\", pdcd);\n    window.ntm_plmPdcd = pdcd;\n  }\n}","approval":"DONE","logs":[{"time":1695171256810,"userId":"admin","action":"CONFIRM","comment":""}]}],"triggers":[{"type":"GENERAL","id":"TRG-00001","name":"DOM_페이지 이동","event":"WINDOWLOADED","desc":"","conditions":[]},{"type":"CUSTOM","id":"TRG-68666","name":"SC_스크롤","event":"CUSTOM","desc":"","conditions":[],"eventName":"scroll"},{"type":"GENERAL","id":"TRG-51710","name":"UT_개발자 모드","event":"DOMREADY","desc":null,"conditions":[{"operator":"EQUALS","variable":"VAR-51908","value":"on"}]},{"type":"CLICK","id":"TRG-75426","name":"CK_01.A TAG 클릭","event":"CLICKED","desc":"모든 a 태크에 대한 수집","conditions":[{"operator":"EQUALS","variable":"VAR-99658","value":"true"}],"target":"a"},{"type":"GENERAL","id":"TRG-27397","name":"SC_스크롤  적용(필터)","event":"DOMREADY","desc":"","conditions":[{"operator":"EQUALS","variable":"VAR-28056","value":"true"}]},{"type":"CLICK","id":"TRG-21418","name":"CK_02.BUTTON TAG 클릭","event":"CLICKED","desc":"","conditions":[{"operator":"EQUALS","variable":"VAR-99658","value":"true"}],"target":"button"},{"type":"ELEMENTCLICK","id":"TRG-87111","name":"CK_03.비교함담기","event":"ELEMENTCLICKED","desc":"예금 리스트 화면에서 비교함 담기 클릭시","conditions":[],"selector":"a.js-display-on-off"},{"type":"CUSTOM","id":"TRG-56007","name":"LO_01.로그인","event":"CUSTOM","desc":"로그인","conditions":[],"eventName":"login"},{"type":"ELEMENTCLICK","id":"TRG-37613","name":"LABEL TAG 클릭","event":"ELEMENTCLICKED","desc":"","conditions":[{"operator":"EQUALS","variable":"VAR-99658","value":"true"}],"selector":"label, input[type=checkbox]"},{"type":"ELEMENTCLICK","id":"TRG-21954","name":"CK_04.구 공동인증서 로그인클릭","event":"ELEMENTCLICKED","desc":"","conditions":[{"operator":"CONTAINS","variable":"VAR-00004","value":"CMLGN0001"}],"selector":"#cert_login"},{"type":"CUSTOM","id":"TRG-38771","name":"이벤트호출함수","event":"CUSTOM","desc":"","conditions":[],"eventName":"eventEntry"},{"type":"CUSTOM","id":"TRG-80341","name":"로그인세션타임아웃","event":"CUSTOM","desc":"로그인세션타임아웃 자동 로그아웃","conditions":[],"eventName":"loginSessionTimeOut"},{"type":"CUSTOM","id":"TRG-87112","name":"plmPdcd변수셋팅","event":"CUSTOM","desc":"상품가입 완료 마지막 페이지에서 plmpdcd 정보를 가져오기 위한 함수","conditions":[],"eventName":"plmPdcdVarSet"}],"variables":[{"type":"BUILTIN","id":"VAR-00001","name":"url","description":"페이지 전체 URL"},{"type":"BUILTIN","id":"VAR-00002","name":"host","description":"페이지 URL 호스트"},{"type":"BUILTIN","id":"VAR-00003","name":"path","description":"페이지 URL 경로"},{"type":"BUILTIN","id":"VAR-00004","name":"params","description":"페이지 URL 파라미터"},{"type":"BUILTIN","id":"VAR-00005","name":"paramDict","description":"페이지 URL 파라미터 (객체)"},{"type":"BUILTIN","id":"VAR-00006","name":"hash","description":"페이지 URL 해시"},{"type":"BUILTIN","id":"VAR-00007","name":"referrer","description":"이전 방문 페이지 주소"},{"type":"BUILTIN","id":"VAR-00008","name":"title","description":"페이지 제목"},{"type":"BUILTIN","id":"VAR-00009","name":"clickId","description":"클릭 항목 ID"},{"type":"BUILTIN","id":"VAR-00010","name":"clickClass","description":"클릭 항목 클래스명"},{"type":"BUILTIN","id":"VAR-00011","name":"clickText","description":"클릭 항목 텍스트"},{"type":"BUILTIN","id":"VAR-00012","name":"clickTag","description":"클릭 항목 태그명"},{"type":"BUILTIN","id":"VAR-00013","name":"customData","description":"커스텀 이벤트 변수"},{"type":"PLUGIN","id":"VAR-00014","name":"nlogger","description":"넷스루 로깅 모듈"},{"type":"COOKIE","id":"VAR-51908","name":"UT_개발모드","description":null,"key":"ntmSetupMode","decode":false},{"type":"SCRIPT","id":"VAR-28056","name":"SC_01_스크롤_페이지","description":null,"code":"function() {\n  //스크롤 적용 페지이 withyou\n  try {\n  var params = [ \"ps\",\n                \"PSDEP0010\",\n                \"PSDEP0001\",\n                \"POLON0053\",\n                \"POEDP0022\",\n                \"CMCOM0007\",\n                \"HBHSS0019\"\n                ];\n  \n  for ( var withyou of params ){\n    var tmp = new RegExp('withyou=([^&]+)').exec(location.search);\n    if ( tmp ){ \n      if ( tmp[1] == withyou ){\n        return true;\n      }\n    }\n  }\n  \n  //금융 상품 상세 페이지\n  if ( location.search.indexOf(\"PRD_CD\") != -1 ){\n    return true;\n  }\n  \n  return false;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1645434583995,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-15393","name":"SC_02_스크롤_위치","description":null,"code":"function() {\n  try {\n  var ce_data = {{customData}};\n  var pos = ce_data.pos + \"%\";\n \n  console.log('%c스크롤 위치 >>', 'color:blue', pos );\n  \n  return pos;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1645434303413,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-83868","name":"CK_02_XPATH","description":null,"code":"function() {\n  try {\n    var target = Ntm.Variable.get(\"clickElement\");\n    var xpath = getXPath(target);\n\n    function getXPath(node) {\n      var comp, comps = [];\n      var parent = null;\n      var xpath = '';\n      var getPos = function(node) {\n        var position = 1, curNode;\n        if (node.nodeType == Node.ATTRIBUTE_NODE) {\n            return null;\n        }\n        for (curNode = node.previousSibling; curNode; curNode = curNode.previousSibling) {\n            if (curNode.nodeName == node.nodeName) {\n                ++position;\n            }\n        }\n        return position;\n      };\n\n      if (node instanceof Document) {\n        return '/';\n      }\n\n      for (; node && !(node instanceof Document); node = node.nodeType == Node.ATTRIBUTE_NODE ? node.ownerElement : node.parentNode) {\n        comp = comps[comps.length] = {};\n        switch (node.nodeType) {\n            case Node.TEXT_NODE:\n                comp.name = 'text()';\n                break;\n            case Node.ATTRIBUTE_NODE:\n                comp.name = '@' + node.nodeName;\n                break;\n            case Node.PROCESSING_INSTRUCTION_NODE:\n                comp.name = 'processing-instruction()';\n                break;\n            case Node.COMMENT_NODE:\n                comp.name = 'comment()';\n                break;\n            case Node.ELEMENT_NODE:\n                comp.name = node.nodeName;\n                break;\n        }\n        comp.position = getPos(node);\n      }\n\n      for (var i = comps.length - 1; i >= 0; i--) {\n        comp = comps[i];\n        xpath += '/' + comp.name;\n        if (comp.position != null) {\n            xpath += '[' + comp.position + ']';\n        }\n      }\n\n      return xpath;\n\n    }\n  return xpath;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n }\n}","approval":"DONE","logs":[{"time":1673849459991,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-74698","name":"TO_08_세션쿠키","description":null,"code":"function() {\n  try {\n  var date = new Date();\n  var domain = document.domain.split(\".\");\n  var n_sess = Ntm.Cookie.get(\"nth_session\");\n  \n  domain.shift(); //서브도메인 제거\n  // 유입 파라미터 검사 파라미터 검사\n  if( ! n_sess ){\n    n_sess = Ntm.Plugin.nlogger.generateUuid();\n    Ntm.Cookie.set(\"nth_session\", n_sess, {path: \"/\", domain: domain.join(\".\")});\n  }\n  \n  return n_sess;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675237200316,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"STRING","id":"VAR-17926","name":"ET_01_PAGE","description":null,"value":"page"},{"type":"STRING","id":"VAR-17683","name":"ET_02_CLICK","description":null,"value":"click"},{"type":"STRING","id":"VAR-99653","name":"ET_02_SCROLL","description":null,"value":"scroll"},{"type":"SCRIPT","id":"VAR-63655","name":"TO_01_PLM_PDCD","description":null,"code":"function() {\n  try {\n  var params = [ \"PLM_PDCD\",\n                \"PRD_CD\"\n                ];   // 상품 파라미터\n  var prd = '';\n  var ntm_pdcd = window.ntm_plmPdcd ? window.ntm_plmPdcd :'';\n    \n  var s_pdcd = '';\n    \n  //상품 코드 스토리지에서 가져오기\n    var n_wy = [ \"\"\n                  ];\n    if ( sessionStorage.getItem(\"ntm_plmPdcd\") ){\n      for ( var withyou of n_wy ){\n        var tmp = new RegExp('withyou=([^&]+)').exec(location.search);\n        if ( tmp ){ \n          if ( tmp[1] == withyou ){\n            s_pdcd = sessionStorage.getItem(\"ntm_plmPdcd\");\n          }\n        }\n      }\n    }\n   //=================================================\n    \n  function getParam(key){\n    var tmp = new RegExp(key + '=([^&|#]+)').exec(location.search);\n    if( tmp ) {\n      return tmp[1];\n    }\n  }\n  \n  for ( var param of params ){\n    var ntm_value = getParam(param);\n    if( ntm_value ){\n      break;\n    }\n  }\n  \n  if ( document.querySelector(\"#PLM_PDCD\") ){\n    prd = document.querySelector(\"#PLM_PDCD\").value;\n  }else if (document.querySelector(\"#PRD_CD\")){\n    prd = document.querySelector(\"#PRD_CD\").value;\n  } \n  \n  return ntm_value || prd || ntm_pdcd || s_pdcd;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675673102035,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-75648","name":"TO_02_EVENTNO","description":null,"code":"function() {\n  try {\n  var evtno = '';\n  if ( location.search.indexOf('EVEVT0001') != -1 ){\n    var el = document.querySelector('dd.f > a');\n  \n    if ( document.querySelector(\"#evtform > input[name=EVT_DIS]\") ){\n      evtno = document.querySelector(\"#evtform > input[name=EVT_DIS]\").value;\n    }else if (el){\n      var tmp = new RegExp('NO=([^\\']+)').exec(el.getAttribute('onclick'));\n      if ( tmp ){\n        evtno = tmp[1];\n      }\n    } \n    return evtno;\n  }\n  }  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675673104543,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-68128","name":"TO_03_내부검색어","description":null,"code":"function() {\n  try {\n  var query = '';\n  if ( location.search.indexOf('CMCOM0007') != -1 ){\n    var el = document.querySelector('#search > input[name=realQuery]');\n  \tif (el){\n      query = el.value;\n    } \n    return query;\n  }\n  }  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675406011189,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-32552","name":"TO_04_제휴사유입","description":null,"code":"function() {\n  try {\n  var param = \"CDP_PARM\";   // 제휴사 파라미터\n  var domain = document.domain.split(\".\");\n  var inflow = ''; \n  var c_inflow = decodeURIComponent(Ntm.Cookie.get('nth_inflow'));\n  \n  var tmp = new RegExp(param + '=([^&|#]+)').exec(location.search);\n  if( tmp ) {\n    inflow = tmp[1];\n    domain.shift();\n    Ntm.Cookie.set(\"nth_inflow\", inflow , {path: \"/\", domain: domain.join(\".\")});\n  }\n  \n  return inflow || c_inflow;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675673107566,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"ELEMENT","id":"VAR-11130","name":"TO_05_ARTICLE_ID","description":null,"selector":"ENTIRE","value":"form input[name=ARTICLE_ID]","attribute":"value","order":0},{"type":"SCRIPT","id":"VAR-93081","name":"TO_06_유입레퍼러","description":null,"code":"function() {\n  try {\n  var n_ref = document.referrer;\n  var ref_domain = '';\n  var domain = document.domain.split(\".\");\n  var nth_referre = decodeURIComponent(Ntm.Cookie.get('nth_ref'));\n  \n  domain.shift();\n  \n  if ( n_ref ){\n    ref_domain = n_ref.split(\"/\")[2];\n  }\n  \n  if ( n_ref && ref_domain.indexOf('wooribank.com') == -1 ){\n    Ntm.Cookie.set('nth_ref', n_ref, {path: \"/\", domain: domain.join(\".\")});\n    return n_ref;\n  }\n  \n  return nth_referre;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675673110776,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-66499","name":"TO_07_UserAgent","description":null,"code":"function() {\n  try {\n  var ua = navigator.userAgent;\n  var tmp = new RegExp('And[^;]+').exec(ua);\n  var aos = tmp ? tmp[0] : '';\n  tmp = new RegExp('Windows[^;]+').exec(ua);\n  var win = tmp ? tmp[0] : '';\n  tmp = new RegExp('(OS[^;]+) like Mac').exec(ua);\n  var ios = tmp ? \"i\"+ tmp[1].replace(/_/g,'.') : '';\n  \n  return aos || win || ios || '';\n  }  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675673096485,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-55808","name":"CK_01_텍스트","description":null,"code":"function() {\n  try {\n  var el = Ntm.Variable.get(\"clickElement\"); \n  var SetupMode = Ntm.Cookie.get('ntmSetupMode');\n  var ck_text = '';\n  var text = el.title ? el.title : el.innerText;\n  var img = el.querySelector('img'); \n  var imgtext = '';\n  if ( text == '선택됨' || el.className == 'pdf' ){\n    text = el.innerText;\n  }\n  if ( el.closest('.btn-prd-join-area') && el.querySelector('span.hidden') ){\n     text = text.replace(el.querySelector('span.hidden').innerText,'');\n  }\n  if ( el.className.indexOf('js-tab-header') != -1){\n    text = el.innerText;\n  }\n   \n   // 상품 리스트 페이지 버튼 클릭 \n   if ( el.closest('.prd-info') ){\n     if ( el.closest('.prd-btn-area') || el.closest('.foot')){\n       text = el.innerText;\n       if ( el.closest('.btn-prd-join-area') && el.querySelector('span.hidden') ){\n           text = text.replace(el.querySelector('span.hidden').innerText,'');\n       }\n       if ( el.closest('.prd-info').querySelector('dt.name')){\n         text = el.closest('.prd-info').querySelector('dt.name').innerText + ' ' + text;\n       }\n     }\n   }else if( el.closest('.prd-btn-area.mr40') ){\n     text = el.title ? el.title + ' ' + el.innerText : el.innerText;\n   }\n  \n  if (  location.search.indexOf('EVEVT0001') != -1 && el.closest('dt') ){\n    if ( el.closest('dt').closest('.list-set') && el.closest('dt').querySelector('span.hidden') ){\n      text = el.closest('dt').querySelector('span.hidden').innerText;\n    }\n  }   // 이벤트 클릭\n\n  if ( img){\n    imgtext = img.getAttribute('alt');\n  }\n  \n  //개행 문자 및 연속된 빈문자 제거\n  function nth_replace(rtxt){\n    rtxt = rtxt.replace(/\\n|\\r/g,'');\n    rtxt = rtxt.replace(/  +/g,' ');\n    rtxt = rtxt.replace(/[0-9][0-9][0-9]+/g,'***');\n    rtxt = rtxt.replace(/<\\/?h2>|<\\/?p>/g,'');\n    rtxt = rtxt.substring(0,200);\n    rtxt = rtxt.replace(/비교함담기비교함담기/g,' 비교함담기');\n    rtxt = rtxt.replace(/관심상품등록관심상품등록/g,' 관심상품등록');\n    rtxt = rtxt.replace(/상품비교하기상품비교하기/g,' 상품비교하기');\n    rtxt = rtxt.replace(/[\\u0000-\\u001F]/g,'');\n    return rtxt;\n  }\n  \n  ck_text = imgtext || text;\n  \n  if ( location.href === 'https://www.wooribank.com/' && el.closest('.mid_cont_card_menu')){\n    ck_text = text;\n  }\n      \n  ck_text = nth_replace(ck_text);\n  //상단 고객 클릭 처리\n  if (el.closest('.login-name') ){\n        ck_text = '고객님';\n  }\n  \n  if (el.closest('div.all-menu')){\n    ck_text = '전체메뉴 > ' + ck_text;\n  }else if(el.closest('div#lnb')){\n    ck_text = 'LNB > ' + ck_text;\n  }else if(el.closest('div#gnb')){\n    ck_text = 'GNB > ' + ck_text;\n  }\n\n  \n//    console.log('%c클릭 텍스트명2 >>', 'color:blue', ck_text );\n\n  return ck_text;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675411713836,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"ELEMENT","id":"VAR-46231","name":"CK_03_DIV_CLASS","description":null,"selector":"ASCENDANT","value":"div","attribute":"class","order":1},{"type":"SCRIPT","id":"VAR-67777","name":"TO_09_AR_CD","description":null,"code":"function() {\n  try {\n  var ar_cd = '';\n  var search = location.search;\n  var hash = location.hash;\n  \n  function getParam(key, param){\n    var tmp = new RegExp(key + '=([^&]+)').exec(param);\n    if( tmp ) {\n      return tmp[1];\n    }\n  }\n  \n  ar_cd = getParam(\"AR_CD\", hash) || getParam(\"AR_CD\", search );\n  \n  return ar_cd;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1675752119964,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-76948","name":"CE_01_로그인성공여부","description":null,"code":"function() {\n  var login = '';\n  var cdata = Ntm.Variable.get('customData');\n  \n  if ( cdata.login ) {\n    login = cdata.login;\n  }\n  \n  return login;\n}","approval":"DONE","logs":[{"time":1677473172480,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"STRING","id":"VAR-80892","name":"ET_04_LOGIN","description":null,"value":"login"},{"type":"SCRIPT","id":"VAR-45177","name":"TO_13_timestamp","description":null,"code":"function() {\n  var date = new Date();\n  var tmp = String(date).split(' ');\n  var MM = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) :  (date.getMonth() + 1) ;\n\n  var Time = tmp[3] + \"-\" + MM + \"-\" + tmp[2] + \" \" + tmp[4] + \":\" + String(date.getTime()).substr(10,3) + \" \" + tmp[5].replace(/GMT/g,'');\n\n  return Time;\n}","approval":"DONE","logs":[{"time":1679385313822,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-33389","name":"TO_15_유입도메인","description":null,"code":"function() {\n  try {\n  var n_ref = document.referrer;\n  var ref_domain = '';\n  var nth_referre = decodeURIComponent(Ntm.Cookie.get('nth_ref'));\n   \n  var tmp = n_ref || nth_referre;\n \n  if ( (n_ref && n_ref.indexOf('wooribank.com') == -1) || nth_referre ){\n    var tmp = n_ref || nth_referre;\n    if ( tmp ){\n      ref_domain = tmp.split(\"/\")[2];\n    }\n    return ref_domain;\n  }\n  \n  return '';\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1681967323585,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"STRING","id":"VAR-79158","name":"이벤트함수호출withyou","description":null,"value":"NPCOM0603"},{"type":"STRING","id":"VAR-96603","name":"로그인세션타임아웃withyou","description":null,"value":"WEB_LSTO"},{"type":"STRING","id":"VAR-48910","name":"ET_03_AUTOLOGOUT","description":null,"value":"autologout"},{"type":"STRING","id":"VAR-44349","name":"ET_05_EVENT","description":null,"value":"event"},{"type":"SCRIPT","id":"VAR-99654","name":"TO_16_withyou","description":null,"code":"function() {\n  try {\n    var param = 'withyou';\n    var params = location.search.match(/withyou/g) ? location.search.match(/withyou/g) : [] ;\n    var n_withyou = '';\n  \n    if ( params.length > 1 ) {\n      var tmp = new RegExp('.+' + param + '=([^&|#|?]+)').exec(location.search);\n      if( tmp ) {\n        n_withyou = tmp[1].substr(0,10);\n      }\n    }else if( params.length == 1 ){\n      var tmp = new RegExp(param + '=([^&|#|?]+)').exec(location.search);\n      if( tmp ) {\n        n_withyou = tmp[1].length > 10 ? tmp[1].substr(0,10) : '';\n      }\n    }\n    return n_withyou ;\n  }catch (err) {\n     Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n     console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1695003251752,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-99655","name":"CL_01_PDCD","description":null,"code":"function() {\n  try {\n    var prd = '';\n    var wy = new RegExp('withyou=([^&|#|?]+)').exec(location.search) != null ? new RegExp('withyou=([^&|#|?]+)').exec(location.search)[1] : '';\n    var n_withyou = '';\n    \n    if ( wy == 'PSDEP0018' && document.querySelector('input[name=PDCD]') ){\n      prd = document.querySelector('input[name=PDCD]').value;\n    }\n    \n    return prd;\n}    catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1696401134986,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-99656","name":"CL_02_PDNM","description":null,"code":"function() {\n  try {\n    var prdnm = '';\n    var wy = new RegExp('withyou=([^&|#|?]+)').exec(location.search) != null ? new RegExp('withyou=([^&|#|?]+)').exec(location.search)[1] : '';\n    var n_withyou = '';\n    \n    if ( wy == 'PSDEP0018' && document.querySelector('input[name=PRD_KORL_NM]') ){\n      prdnm = document.querySelector('input[name=PRD_KORL_NM]').value;\n    }\n    \n    return prdnm;\n}    catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1696401137496,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-99657","name":"CL_03_PDDT","description":null,"code":"function() {\n  try {\n    var prddt = '';\n    var wy = new RegExp('withyou=([^&|#|?]+)').exec(location.search) != null ? new RegExp('withyou=([^&|#|?]+)').exec(location.search)[1] : '';\n    var n_withyou = '';\n    \n    if ( wy == 'PSDEP0018' && document.querySelector('input[name=NEW_RCKN_DT]') ){\n      prddt = document.querySelector('input[name=NEW_RCKN_DT]').value;\n    }\n    \n    return prddt;\n}    catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1696401140808,"userId":"admin","action":"CONFIRM","comment":""}]},{"type":"SCRIPT","id":"VAR-99658","name":"CK_00_클릭페이지관리","description":null,"code":"function() {\n  //클릭 텍스트 제외 적용 페지이 withyou\n  try {\n  var params = [ \"\"\n                ];\n  \n  for ( var withyou of params ){\n    var tmp = new RegExp('withyou=([^&]+)').exec(location.search);\n    if ( tmp ){ \n      if ( tmp[1] == withyou ){\n        return false;\n      }\n    }\n  }\n   \n  return true;\n}  catch (err) {\n   Ntm.Event.fireUserDefined('jsError_all', {\"jsErrorHref\": window.location.href, \"jsErrorMessage\": err.toString()});\n   console.log(err);\n  }\n}","approval":"DONE","logs":[{"time":1697505290073,"userId":"admin","action":"CONFIRM","comment":""}]}],"variableGroups":[{"id":"VRG-73082","name":"공통 변수","desc":"모든 이벤트에서 공통적으로 수집하는 변수","values":{"nth_session":"VAR-74698","nth_pdcd":"VAR-63655","nth_evtno":"VAR-75648","nth_kw":"VAR-68128","nth_inflow":"VAR-32552","nth_article_id":"VAR-11130","nth_ref":"VAR-93081","nth_sdk":"VAR-66499","nth_arcd":"VAR-67777","nth_timestamp":"VAR-45177","nth_start_host":"VAR-33389","nth_withyou":"VAR-99654"}},{"id":"VRG-51125","name":"클릭 변수","desc":"클릭 이벤트 변수","values":{"nth_cktext":"VAR-55808","nth_ckid":"VAR-00009","nth_xpath":"VAR-83868","nth_ckclass":"VAR-46231","etype":"VAR-17683"}},{"id":"VRG-73083","name":"해지예상상품 변수","desc":"","values":{"nth_canc_pdcd":"VAR-99655","nth_canc_pdnm":"VAR-99656","nth_pddt":"VAR-99657"}}],"lastModified":"2023-11-28 17:49:41","plugins":[{"type":"PLUGIN","id":"VAR-00014","name":"nlogger","description":"넷스루 로깅 모듈"}]};
+
+Ntm.Console = function() {
+    var _this = {};
+
+    _this.log = function() {
+        if(!Ntm.Preview.isPreviewMode()) return;
+        console.log.apply(this, arguments);
+    };
+
+    return {
+        log: _this.log
+    }
+}();
+
+Ntm.Cookie = function() {
+    var _this = {};
+
+    _this.get = function(key, decode) {
+        var map = _this.map(decode);
+        var value = map[key];
+
+        return value ? value : "";
+    };
+
+    _this.set = function(key, value, options) {
+        if(!options) options = {};
+
+        document.cookie = key + '=' + encodeURIComponent(value) + ';' +
+            (options.expires ? 'expires=' + options.expires + ';' : '') +
+            (options.path ? 'path=' + options.path + ';' : '') +
+            (options.domain ? 'domain=' + options.domain : '');
+    };
+
+    _this.remove = function(key, options) {
+        _this.set(key, "", Ntm.Helper.extend({
+            expires: "Thu, 01-Jan-1970 00:00:01 GMT",
+            path: "/"
+        }, options));
+    };
+
+    _this.map = function(decode) {
+        var cookies = document.cookie.split(';');
+        var cookieMap = {};
+
+        for (var index = 0; index < cookies.length; index++) {
+            var cookie = cookies[index].trim();
+            if(cookie.length === 0) continue;
+
+            var token = cookie.split('=');
+            var key = token.shift();
+            var value = token.join("=");
+
+            if(decode) value = decodeURIComponent(value);
+
+            cookieMap[key] = value;
+        }
+
+        return cookieMap;
+    };
+
+    return {
+        get: _this.get,
+        set: _this.set,
+        remove: _this.remove
+    }
+}();
+
+Ntm.Variable = function() {
+    var _this = {};
+
+    _this.activeTag = null;
+    _this.clickEvent = {};
+    _this.customData = {};
+    _this.addOnData = {
+        param: {},
+        cookie: {}
+    };
+
+    _this.setActiveTag = function(tag) {
+        _this.activeTag = tag;
+    };
+
+    _this.getActiveTriggers = function() {
+        if(!_this.activeTag) return [];
+
+        return _this.activeTag.triggers.map(function(id) {
+                return Ntm.Trigger.getById(id);
+            }).filter(function(trigger) {
+                return trigger.fired;
+            });
+    };
+
+    _this.setClickEvent = function(event, target, noOverride) {
+        if(noOverride && _this.clickEvent.target) return;
+
+        _this.clickEvent = Ntm.Helper.extend(event, {
+            target: target
+        });
+    };
+
+    _this.setClickTarget = function(target) {
+        _this.clickEvent = Ntm.Helper.extend(_this.clickEvent, {
+            target: target
+        });
+    };
+
+    _this.setCustomData = function(customData) {
+        _this.customData = customData;
+    };
+
+    _this.clearClickEvent = function() {
+        _this.clickEvent = {};
+    };
+
+    _this.clearCustomData = function() {
+        _this.customData = {};
+    };
+
+    _this.getBuiltinVariable = function(name) {
+        switch(name) {
+            case "url":
+                return window.location.href;
+
+            case "host":
+                return window.location.origin;
+
+            case "path":
+                return window.location.pathname;
+
+            case "referrer":
+                return _this.getReferer();
+
+            case "params":
+                return _this.getUrlParams();
+
+            case "paramDict":
+                return _this.getUrlParamsAsDict();
+
+            case "title":
+                return document.title;
+
+            case "clickElement":
+                return _this.getClickElement();
+
+            case "clickId":
+                return _this.getClickId();
+
+            case "clickClass":
+                return _this.getClickClass();
+
+            case "clickText":
+                return _this.getClickText();
+
+            case "clickTag":
+                return _this.getClickTag();
+
+            case "hash":
+                return window.location.hash;
+
+            case "activeTag":
+                return _this.activeTag;
+
+            case "activeTriggers":
+                return _this.getActiveTriggers();
+
+            case "customData":
+                return _this.customData;
+        }
+
+        return null;
+    };
+
+    _this.getReferer = function() {
+        var ref = self.document.referrer;
+        var parentHref = "";
+        var parentRef = "";
+
+        try {
+            parentHref = top.document.location.href;
+            parentRef = top.document.referrer;
+        } catch (e) {
+            return ref;
+        }
+
+        if(ref === parentHref) return parentRef;
+
+        return ref;
+    };
+
+    _this.getPlugin = function(name) {
+        return "Ntm.Plugin." + name;
+    };
+
+    _this.getUrlParams = function() {
+        return decodeURI(window.location.search.substr(1));
+    };
+
+    _this.getUrlParamsAsDict = function() {
+        var urlParams = _this.getUrlParams();
+        return urlParams ? JSON.parse('{"' + decodeURI(urlParams).replace(/&/g, '","').replace(/=/g, '":"') + '"}') : ''
+    };
+
+    _this.getCookie = function(key, decode) {
+        return Ntm.Cookie.get(key, decode);
+    };
+
+    _this.getClickElement = function() {
+        return _this.clickEvent.target;
+    };
+
+    _this.getClickId = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.id || "";
+        return "";
+    };
+
+    _this.getClickClass = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.className || "";
+        return "";
+    };
+
+    _this.getClickText = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.innerText || "";
+        return "";
+    };
+
+    _this.getClickTag = function() {
+        if(_this.clickEvent.target) return _this.clickEvent.target.tagName || "";
+        return "";
+    };
+
+    _this.getElementValue = function(variable) {
+        var element;
+        var clickTarget = _this.clickEvent.target;
+
+        switch (variable.selector) {
+            case "CLICK":
+                element = clickTarget;
+                break;
+
+            case "ENTIRE":
+                element = document.querySelector(variable.value);
+                break;
+
+            case "DESCENDANT":
+                if(clickTarget) element = clickTarget.querySelector(variable.value);
+                break;
+
+            case "ASCENDANT":
+                if(clickTarget) {
+                    var tagName = variable.value.toUpperCase();
+                    var target = clickTarget.parentElement;
+                    var order = 0;
+
+                    while(target) {
+                        if(target.tagName.toUpperCase() === tagName) {
+                            order++;
+
+                            if(order == variable.order) {
+                                element = target;
+                                break;
+                            }
+                        }
+
+                        target = target.parentElement;
+                    }
+                }
+                break;
+        }
+
+        return element ? (variable.attribute ? element.getAttribute(variable.attribute) : element.innerText) : undefined;
+    };
+
+    _this.addOnParam = function(data) {
+        _this.addOnData.param = Ntm.Helper.extend(_this.addOnData.param, data);
+    };
+
+    _this.addOnCookie = function(data) {
+        _this.addOnData.cookie = Ntm.Helper.extend(_this.addOnData.cookie, data);
+    };
+
+    _this.getAddOnData = function() {
+        return _this.addOnData;
+    };
+
+    _this.clearAddOnData = function() {
+        _this.addOnData = {
+            param: {},
+            cookie: {}
+        };
+    };
+
+    return {
+        get: _this.getBuiltinVariable,
+        getPlugin: _this.getPlugin,
+        getCookie: _this.getCookie,
+        getElementValue: _this.getElementValue,
+        setActiveTag: _this.setActiveTag,
+        setClickEvent: _this.setClickEvent,
+        setClickTarget: _this.setClickTarget,
+        setCustomData: _this.setCustomData,
+        clearClickEvent: _this.clearClickEvent,
+        clearCustomData: _this.clearCustomData,
+        addOnParam: _this.addOnParam,
+        addOnCookie: _this.addOnCookie,
+        getAddOnData: _this.getAddOnData,
+        clearAddOnData: _this.clearAddOnData
+    }
+}();
+
+Ntm.Helper = function() {
+    var _this = {};
+
+    _this.stringify = function(obj) {
+        return obj.toJSON ? obj.toJSON() : JSON.stringify(obj);
+    };
+
+    _this.find = function (values, key, match) {
+        for (var index = 0; index < values.length; index++) {
+            var value = values[index];
+            if (value[key] === match) {
+                return value;
+            }
+        }
+
+        return undefined;
+    };
+
+    _this.getVariableById = function (id) {
+        return _this.find(Ntm.Settings.variables, "id", id);
+    };
+
+    _this.getVariableByName = function(name) {
+        return _this.find(Ntm.Settings.variables, "name", name);
+    };
+
+    _this.copy = function(obj) {
+        if(obj === null || typeof obj !== 'object') return obj;
+
+        const cloned = Array.isArray(obj) ? [] : {};
+
+        for(var key in obj) {
+            if(Object.prototype.hasOwnProperty.call(obj, key)) {
+                cloned[key] = _this.copy(obj[key]);
+            }
+        }
+
+        return cloned;
+    };
+
+    _this.extend = function() {
+        var extended = {};
+
+        for(var index = 0; index < arguments.length; index++) {
+            var source = arguments[index];
+
+            for(var prop in source) {
+                if(Object.prototype.hasOwnProperty.call(source, prop))
+                    extended[prop] = source[prop];
+            }
+        }
+
+        return extended;
+    };
+
+    _this.length = function(obj) {
+        var count = 0;
+
+        for(key in obj) {
+            count++;
+        }
+
+        return count;
+    };
+
+    _this.replaceAll = function(text, find, replace) {
+        return text ? text.split(find).join(replace) : text;
+    };
+
+    _this.isValidSettings = function() {
+        return Ntm.Settings.hasOwnProperty("tags") &&
+            Ntm.Settings.hasOwnProperty("triggers") &&
+            Ntm.Settings.hasOwnProperty("variables");
+    };
+
+    return {
+        stringify: _this.stringify,
+        extend: _this.extend,
+        copy: _this.copy,
+        length: _this.length,
+        find: _this.find,
+        replaceAll: _this.replaceAll,
+        getVariableById: _this.getVariableById,
+        getVariableByName: _this.getVariableByName,
+        isValidSettings: _this.isValidSettings
+    }
+}();
+
+Ntm.Evaluator = function() {
+    var _this = {};
+
+    _this.forbiddenChars = "";
+
+    _this.evaluate = function(variable) {
+        switch(variable.type) {
+            case "BUILTIN":
+                return Ntm.Variable.get(variable.name);
+
+            case "PLUGIN":
+                return Ntm.Variable.getPlugin(variable.name);
+
+            case "STRING":
+            case "NUMBER":
+                return variable.value;
+
+            case "COOKIE":
+                return Ntm.Variable.getCookie(variable.key);
+
+            case "ELEMENT":
+                return Ntm.Variable.getElementValue(variable);
+
+            case "SCRIPT": {
+                var result = _this.runScript(_this.evaluateNested(variable.code));
+                if(variable.approval && _this.forbiddenChars) {
+                    result = result.replace(new RegExp(_this.forbiddenChars, "g"), "");
+                }
+                return result;
+            }
+
+            case "VARIABLE":
+                return _this.runScript('function(){return ' + variable.value + '}');
+        }
+
+        return null;
+    };
+
+    _this.evaluateNested = function(script) {
+        var variables = _this.gatherAllVariables(script);
+
+        if(Ntm.Helper.length(variables) > 0) {
+            script = _this.replaceVariables(script, variables);
+        }
+
+        return script;
+    };
+
+    _this.gatherAllVariables = function(script) {
+        var regex = /{{([^{}]+)}}/g;
+        var variables = {};
+
+        while(true) {
+            var match = regex.exec(script);
+            if(!match) break;
+
+            var expression = match[0];
+            if(variables[expression]) continue;
+            var name = match[1];
+
+            variables[expression] = Ntm.Helper.getVariableByName(name) ? name : "";
+        }
+
+        return variables;
+    };
+
+    _this.replaceVariables = function(script, variables) {
+        for(var key in variables) {
+            var name = variables[key];
+            var expression = name ? ("Ntm.Evaluator.evaluate(Ntm.Helper.getVariableByName('" + name + "'))") : "undefined";
+            var variable = Ntm.Helper.getVariableByName(name);
+
+            if(variable && variable.type == "PLUGIN") expression = Ntm.Evaluator.evaluate(variable);
+            script = Ntm.Helper.replaceAll(script, key, expression);
+        }
+
+        return script;
+    };
+
+    _this.runScript = function(script) {
+        try {
+            return eval("(" + script + ")()");
+        }
+        catch(e) {
+            Ntm.Console.log(e, script);
+        }
+    };
+
+    return {
+        evaluate: _this.evaluate,
+        parse: _this.gatherAllVariables
+    }
+}();
+
+Ntm.Matcher = function() {
+    var _this = {};
+
+    _this.matchAll = function(conditions) {
+        return !conditions.some(function(condition) {
+            var variable = Ntm.Helper.getVariableById(condition.variable);
+            var operand1 = Ntm.Evaluator.evaluate(variable);
+            var operand2 = condition.value;
+
+            return !_this.match(condition.operator, operand1, operand2);
+        });
+    };
+
+    _this.match = function(operator, operand1, operand2) {
+        switch (operator) {
+            case "EQUALS":
+                return equals(operand1, operand2);
+
+            case "NOTEQUALS":
+                return !equals(operand1, operand2);
+
+            case "CONTAINS":
+                return contains(operand1, operand2);
+
+            case "NOTCONTAINS":
+                return !contains(operand1, operand2);
+
+            case "STARTSWITH":
+                return startsWith(operand1, operand2);
+
+            case "NOTSTARTSWITH":
+                return !startsWith(operand1, operand2);
+
+            case "ENDSWITH":
+                return endsWith(operand1, operand2);
+
+            case "NOTENDSWITH":
+                return !endsWith(operand1, operand2);
+
+            case "MATCHES":
+                return match(operand1, operand2);
+
+            case "NOTMATCHES":
+                return !match(operand1, operand2);
+
+            case "LESSTHAN":
+                return lessThan(operand1, operand2);
+
+            case "LESSTHANOREQUALS":
+                return lessThan(operand1, operand2) || equals(operand1, operand2);
+
+            case "GREATERTHAN":
+                return greaterThan(operand1, operand2);
+
+            case "GREATERTHANOREQUALS":
+                return greaterThan(operand1, operand2) || equals(operand1, operand2);
+
+            case "VALID":
+                return !isInvalid(operand1);
+
+            case "INVALID":
+                return isInvalid(operand1);
+
+            default:
+                return false;
+        }
+
+        function equals(operand1, operand2) {
+            switch(typeof operand1) {
+                case "number":
+                    return isNumber(operand2) && operand1 === Number(operand2);
+
+                case "string":
+                    return isString(operand2) && operand1.toUpperCase() === operand2.toUpperCase();
+
+                case "boolean":
+                    return isBoolean(operand2) && operand1 === toBoolean(operand2);
+            }
+
+            return false;
+        }
+
+        function contains(operand1, operand2) {
+            return isString(operand1) && isString(operand2) &&
+                operand1.toUpperCase().indexOf(operand2.toUpperCase()) >= 0;
+        }
+
+        function startsWith(operand1, operand2) {
+            return isString(operand1) && isString(operand2) &&
+                operand1.toUpperCase().indexOf(operand2.toUpperCase()) == 0;
+        }
+
+        function endsWith(operand1, operand2) {
+            return isString(operand1) && isString(operand2) &&
+                operand1.toUpperCase().lastIndexOf(operand2.toUpperCase()) == operand1.length - operand2.length;
+        }
+
+        function match(operand1, operand2) {
+            if(isNumber(operand1)) operand1 = operand1 + "";
+            return isString(operand1) && isString(operand2) && operand1.match(operand2);
+        }
+
+        function lessThan(operand1, operand2) {
+            return isNumber(operand1) && isNumber(operand2) && Number(operand1) < Number(operand2);
+        }
+
+        function greaterThan(operand1, operand2) {
+            return isNumber(operand1) && isNumber(operand2) && Number(operand1) > Number(operand2);
+        }
+
+        function isNumber(operand) {
+            return !isNaN(Number(operand));
+        }
+
+        function isString(operand) {
+            return typeof operand === "string";
+        }
+
+        function isBoolean(operand) {
+            return operand === "true" || operand === "false";
+        }
+
+        function toBoolean(operand) {
+            return operand === "true";
+        }
+
+        function isInvalid(operand) {
+            return operand === undefined || operand === null || operand.trim() === "";
+        }
+    };
+
+    return {
+        matchAll: _this.matchAll
+    }
+}();
+
+Ntm.Tag = function() {
+    var _this = {};
+
+    _this.isExecutable = function(tag) {
+        var triggersFired;
+
+        if (tag.operator === "OR") {
+            triggersFired = tag.triggers.some(function (id) {
+                return Ntm.Trigger.getById(id).fired;
+            });
+        } else {
+            triggersFired = tag.triggers.every(function (id) {
+                return Ntm.Trigger.getById(id).fired;
+            });
+        }
+
+        var allExceptionsNotFired = tag.exceptions.every(function(id) {
+            return !Ntm.Trigger.getById(id).fired;
+        });
+
+        return triggersFired && allExceptionsNotFired;
+    };
+
+    _this.run = function(tag) {
+        if(!tag.enabled || !_this.isExecutable(tag)) return;
+
+        switch(tag.type) {
+            case "PLUGIN":
+                _this.runPlugin(tag);
+                break;
+
+            case "SCRIPT":
+                Ntm.Variable.setActiveTag(tag);
+                Ntm.Evaluator.evaluate({
+                    type: "SCRIPT",
+                    code: tag.code
+                });
+                Ntm.Variable.clearAddOnData();
+                break;
+        }
+    };
+
+    _this.runPlugin = function(t) {
+        var tag = Ntm.Helper.copy(t);
+        var addOnData = Ntm.Variable.getAddOnData();
+        var parameters = variable(Ntm.Helper.extend(tag.parameters, addOnData.param));
+        var cookies = variable(Ntm.Helper.extend(tag.cookies, addOnData.cookie));
+
+        tag.type = "SCRIPT";
+        tag.code = "function() { {{" + tag.pluginType + "}}.";
+
+        switch(tag.logType) {
+            case "EVENT":
+                tag.code += "event(" + parameters + "," + cookies + ");";
+                break;
+
+            case "USER":
+                tag.code += "user(" + parameters + ");";
+                break;
+
+            case "ORDER":
+                tag.code += "order(" + parameters + ");";
+                break;
+
+            case "CANCEL":
+                tag.code += "cancel(" + parameters + ");";
+                break;
+
+            case "CANCELALL":
+                tag.code += "cancelAll(" + parameters + ");";
+                break;
+
+            case "CUSTOM":
+                tag.code += "log('" + evaluate(tag.path) + "'," + parameters + "," + cookies + ");";
+                break;
+        }
+
+        tag.code += "}";
+
+        _this.run(tag);
+
+        function variable(obj) {
+            var result = '{';
+
+            for(key in obj) {
+                var v = Ntm.Helper.getVariableById(obj[key]);
+                result += result.length > 1 ? ',' : '';
+                result += '"' + key + '":';
+                result += v ? ('{{' + v.name + '}}') : Ntm.Helper.stringify(obj[key]);
+            }
+
+            result += '}';
+
+            return result;
+        }
+
+        function evaluate(script) {
+            var variables = Ntm.Evaluator.parse(script);
+
+            for(var key in variables) {
+                var variable = Ntm.Helper.getVariableByName(variables[key]);
+
+                if(variable) {
+                    var expression = Ntm.Evaluator.evaluate(variable);
+                    script = Ntm.Helper.replaceAll(script, key, expression);
+                }
+            }
+
+            return script;
+        }
+    };
+
+    _this.runAll = function() {
+        Ntm.Settings.tags.forEach(function(tag) {
+            _this.run(tag);
+        });
+    };
+
+    _this.hasTriggerByType = function(tag, event) {
+        return tag.triggers.some(function(id) {
+            return Ntm.Trigger.getById(id).event === event;
+        });
+    };
+
+    _this.hasTriggerByField = function(tag, key, value) {
+        return tag.triggers.some(function(id) {
+            var trigger = Ntm.Trigger.getById(id);
+            return trigger[key] == value;
+        });
+    };
+
+    _this.getAllTriggerIds = function(tag) {
+        var result = tag.exceptions ? tag.exceptions : [];
+        return result.concat(tag.triggers);
+    };
+
+    return {
+        run: _this.run,
+        runAll: _this.runAll,
+        hasTriggerByType: _this.hasTriggerByType,
+        hasTriggerByField: _this.hasTriggerByField,
+        getAllTriggerIds: _this.getAllTriggerIds
+    }
+}();
+
+Ntm.Trigger = function() {
+    var _this = {};
+
+    _this.settings = Ntm.Settings;
+
+    _this.init = function(event) {
+        _this.settings.triggers.forEach(function(trigger) {
+            if(event && event !== trigger.event) return;
+            trigger.fired = false;
+        });
+    };
+
+    _this.getById = function(id) {
+        return Ntm.Helper.find(_this.settings.triggers, "id", id);
+    };
+
+    _this.listByEvent = function(event) {
+        var result = [];
+
+        _this.settings.triggers.forEach(function(trigger) {
+            if(trigger.event === event) result.push(trigger);
+        });
+
+        return result;
+    };
+
+    return {
+        init: _this.init,
+        getById: _this.getById,
+        listByEvent: _this.listByEvent
+    }
+}();
+
+Ntm.Event = function() {
+    var _this = {};
+
+    _this.NTM_READY = "NTMREADY";
+    _this.PAGE_LOADED = "PAGELOADED";
+    _this.WINDOW_LOADED = "WINDOWLOADED";
+    _this.DOM_READY = "DOMREADY";
+    _this.ELEMENT_CLICKED = "ELEMENTCLICKED";
+    _this.CLICKED = "CLICKED";
+    _this.URL_CHANGED = "URLCHANGED";
+    _this.HASH_CHANGED = "HASHCHANGED";
+    _this.CUSTOM = "CUSTOM";
+
+    _this.CUSTOM_HANDLING_DELAY = 100;
+    _this.clickHandlingDelay = 10;
+
+    _this.eventBindings = [];
+    _this.rebindTimer = null;
+    _this.timoutId = null;
+
+    _this.init = function() {
+        _this.register();
+
+        if(document.readyState === 'interactive' || document.readyState === 'complete') _this.onDomReady();
+        else {
+            document.addEventListener("DOMContentLoaded", function() {
+                _this.onDomReady();
+            });
+        }
+
+        window.addEventListener("load", function() {
+            _this.onWindowLoaded();
+        });
+
+        window.addEventListener("unload", function() {
+            _this.onWindowUnloaded();
+        });
+
+        window.addEventListener("hashchange", function(event) {
+            _this.onHashChanged(event);
+        });
+
+        window.addEventListener("pushstate", function(event) {
+            _this.onUrlChanged(event);
+        });
+
+        window.addEventListener("popstate", function(event) {
+            _this.onUrlChanged(event);
+        });
+    };
+
+    _this.register = function() {
+        window.history.pushState = overrideHistoryState(window.history.pushState);
+        window.history.replaceState = overrideHistoryState(window.history.replaceState);
+
+        function overrideHistoryState(func) {
+            var _func = func;
+
+            return function(state, title, url) {
+                var result = _func.apply(history, arguments);
+                var event = new CustomEvent("pushstate", {
+                    detail: {
+                        state: state,
+                        title: title,
+                        url: url
+                    }
+                });
+
+                window.dispatchEvent(event);
+                return result;
+            };
+        }
+    };
+
+    _this.registerObserver = function() {
+        var interval = 0;
+        
+        if(interval <= 0 && window.MutationObserver) {
+            var observer = new MutationObserver(function(mutations) {
+                clearTimeout(_this.rebindTimer);
+                _this.rebindTimer = setTimeout(_this.rebind, 100);
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+        else setInterval(_this.rebind, interval > 0 ? interval : 1000);
+    };
+
+    _this.bind = function() {
+        document.addEventListener("click", function(event) {
+            _this.handleForClick(event, event.target);
+        });
+    };
+
+    _this.rebind = function() {
+        _this.eventBindings.forEach(function(binding) {
+            binding.handler(null, binding.target);
+        });
+
+        _this.eventBindings = [];
+
+        var triggers = Ntm.Trigger.listByEvent(_this.ELEMENT_CLICKED);
+
+        triggers.forEach(function(trigger) {
+            var elements = _this.querySelectorAll(trigger.selector);
+
+            for (var i = 0; i < elements.length; i++) {
+                var handler = function(event, target) {
+                    if(target) target.removeEventListener("click", arguments.callee);
+                    else _this.handleForElementClick(event, event.currentTarget, trigger);
+                };
+
+                elements[i].addEventListener("click", handler);
+
+                _this.eventBindings.push({
+                    "target": elements[i],
+                    "handler": handler
+                });
+            }
+        });
+
+        //Ntm.Console.log("rebinded: " + _this.eventBindings.length);
+    };
+
+    _this.querySelectorAll = function(selector) {
+        var elements = [];
+
+
+        _this.querySelectorAllAsArray(document, selector).forEach(function(element) {
+            elements.push(element);
+        });
+
+        _this.querySelectorAllAsArray(document, "iframe").forEach(function(iframe) {
+            try {
+                _this.querySelectorAllAsArray(iframe.contentWindow.document, selector).forEach(function (element) {
+                    elements.push(element);
+                });
+            }
+            catch(e) {
+                Ntm.Console.log("cannot bind events because of CORS problems");
+            }
+        });
+
+        return elements;
+    };
+
+    _this.querySelectorAllAsArray = function(documentBase, selector) {
+        var elements = documentBase.querySelectorAll(selector);
+        if(elements.forEach === undefined) elements = Array.prototype.slice.call(elements);
+        return elements ? elements : [];
+    };
+
+    _this.onNtmReady = function() {
+        Ntm.Console.log('%c EVENT >> NTMREADY ', 'background:#2196F3;color:white');
+        window.dispatchEvent(new Event(_this.NTM_READY));
+    };
+
+    _this.onPageLoaded = function() {
+        Ntm.Console.log('%c EVENT >> PAGELOADED ', 'background:#2196F3;color:white');
+        _this.handle(_this.PAGE_LOADED);
+    };
+
+    _this.onDomReady = function() {
+        Ntm.Console.log('%c EVENT >> DOMREADY ', 'background:#2196F3;color:white');
+        _this.registerObserver();
+        _this.bind();
+        _this.rebind();
+        _this.handle(_this.DOM_READY);
+    };
+
+    _this.onWindowLoaded = function() {
+        Ntm.Console.log('%c EVENT >> WINDOWLOADED ', 'background:#2196F3;color:white');
+        _this.handle(_this.WINDOW_LOADED);
+    };
+
+    _this.onWindowUnloaded = function() {
+        Ntm.Console.log('%c EVENT >> WINDOWUNLOADED ', 'background:#2196F3;color:white');
+        Ntm.Event.windowUnloaded = true;
+    };
+
+    _this.onUrlChanged = function() {
+        Ntm.Console.log('%c EVENT >> URLCHANGED ', 'background:#2196F3;color:white');
+        _this.handle(_this.URL_CHANGED);
+    };
+
+    _this.onHashChanged = function() {
+        Ntm.Console.log('%c EVENT >> HASHCHANGED ', 'background:#2196F3;color:white');
+        _this.handle(_this.HASH_CHANGED);
+    };
+
+    _this.handle = function(eventType, trigger) {
+        var triggers = trigger ? [trigger] : Ntm.Trigger.listByEvent(eventType);
+
+        triggers.forEach(function(trigger) {
+            if(Ntm.Matcher.matchAll(trigger.conditions)) trigger.fired = true;
+        });
+
+        if(!trigger) {
+            Ntm.Settings.tags.forEach(function(tag) {
+                if(!Ntm.Tag.hasTriggerByType(tag, eventType)) return;
+                Ntm.Tag.run(tag);
+            });
+        }
+    };
+
+    _this.handleForElementClick = function(event, target, trigger) {
+        Ntm.Console.log('%c EVENT >> %s ', 'background:#2196F3;color:white', _this.ELEMENT_CLICKED, event.clientX, event.clientY, target);
+
+        Ntm.Variable.setClickEvent(event, target);
+        _this.handle(_this.ELEMENT_CLICKED, trigger);
+
+        if(_this.clickHandlingDelay > 0) _this.timoutId = setTimeout(_this.runForClick, _this.clickHandlingDelay);
+        else _this.runForClick();
+    };
+
+    _this.handleForClick = function(event, target) {
+        Ntm.Console.log('%c EVENT >> %s ', 'background:#2196F3;color:white', _this.CLICKED, event.clientX, event.clientY, target);
+
+        Ntm.Variable.setClickEvent(event, target, true);
+
+        Ntm.Settings.tags.forEach(function(tag) {
+            Ntm.Tag.getAllTriggerIds(tag).forEach(function(triggerId) {
+                var trigger = Ntm.Trigger.getById(triggerId);
+
+                if(!trigger.event || trigger.event !== _this.CLICKED) return;
+                if(_this.match(trigger.target) && Ntm.Matcher.matchAll(trigger.conditions)) trigger.fired = true;
+            });
+        });
+
+        _this.runForClick();
+    };
+
+    _this.runForClick = function() {
+        if(_this.timoutId) {
+            clearTimeout(_this.timoutId);
+            _this.timoutId = null;
+        }
+
+        Ntm.Settings.tags.forEach(function(tag) {
+            if(!Ntm.Tag.hasTriggerByType(tag, _this.CLICKED) && !Ntm.Tag.hasTriggerByType(tag, _this.ELEMENT_CLICKED)) return;
+            Ntm.Tag.run(tag);
+        });
+
+        Ntm.Trigger.init(_this.CLICKED);
+        Ntm.Trigger.init(_this.ELEMENT_CLICKED);
+        Ntm.Variable.clearClickEvent();
+    };
+
+    _this.handleForUserDefined = function(name, data) {
+        Ntm.Console.log('%c EVENT >> CUSTOM : ', 'background:#2196F3;color:white', name, data);
+
+        Ntm.Trigger.init(_this.CUSTOM);
+        Ntm.Variable.setCustomData(data);
+
+        Ntm.Trigger.listByEvent(_this.CUSTOM).forEach(function(trigger) {
+            if(trigger.eventName === name && Ntm.Matcher.matchAll(trigger.conditions)) trigger.fired = true;
+        });
+
+        Ntm.Settings.tags.forEach(function(tag) {
+            if(!Ntm.Tag.hasTriggerByField(tag, "eventName", name)) return;
+            Ntm.Tag.run(tag);
+        });
+
+        Ntm.Variable.clearCustomData();
+    };
+
+    _this.match = function(tagName) {
+        if(tagName) {
+            var target = Ntm.Variable.get("clickElement");
+
+            while(target) {
+                if(target.tagName.toUpperCase() === tagName.toUpperCase()) {
+                    Ntm.Variable.setClickTarget(target);
+                    return true;
+                }
+
+                target = target.parentElement;
+            }
+
+            return false;
+        }
+
+        return true;
+    };
+
+    return {
+        init: _this.init,
+        fireNtmReady: _this.onNtmReady,
+        firePageLoaded: _this.onPageLoaded,
+        fireClicked: function(event) {
+            _this.handleForClick(event, event.target);
+        },
+        fireUserDefined: function(name, data) {
+            setTimeout(function() {
+                _this.handleForUserDefined(name, data);
+            }, _this.CUSTOM_HANDLING_DELAY);
+        }
+    }
+}();
+
+Ntm.Preview = function() {
+    var _this = {
+        previewMode: false,
+        containerId: ""
+    };
+
+    _this.init = function(preview, id) {
+        if(!preview) Ntm.Cookie.remove(id);
+
+        _this.previewMode = preview;
+        _this.containerId = id;
+
+        if(!preview) return;
+
+        _this.showPreviewBanner();
+    };
+
+    _this.showPreviewBanner = function() {
+        var frame = _this.makeFrame();
+
+        var lastNode = document.body && document.body.lastChild || document.body || document.head;
+        lastNode.parentNode.insertBefore(frame, lastNode);
+
+        var frameDocument = frame.document;
+        if (frame.contentDocument) frameDocument = frame.contentDocument;
+        else if (frame.contentWindow) frameDocument = frame.contentWindow.document;
+
+        if(frameDocument) {
+            var html =
+                '<p style="float:left; padding-left:20px; font-size:15px; font-weight: bold; margin-top:12px">미리보기 모드</p>' +
+                '<p style="float:right; padding-right:20px; font-size:12px; margin-top:15px">최근 수정: ' + Ntm.Settings.lastModified + '</p>';
+
+            frameDocument.open();
+            frameDocument.writeln(html);
+            frameDocument.close();
+        }
+
+        Ntm.Console.log('%c PREVIEW MODE ', 'background:#F44336;color:white');
+    };
+
+    _this.isPreviewMode = function() {
+        return _this.previewMode;
+    };
+
+    _this.getContainerId = function() {
+        return _this.containerId;
+    };
+
+    _this.makeFrame = function() {
+        var iframe = document.createElement('iframe');
+        iframe.src = 'about:blank';
+        iframe.style.position = 'fixed';
+        iframe.style.width = '100%';
+        iframe.style.height = '60px';
+        iframe.style.bottom = '0';
+        iframe.style.borderTop = '1px solid #eee';
+        iframe.style.borderRight = '0';
+        iframe.style.borderLeft = '0';
+        iframe.style.borderBottom = '0';
+        iframe.style.margin = '0';
+        iframe.style.padding = '0';
+        iframe.style.visibility = 'visible';
+        iframe.style.backgroundColor = '#fffacc';
+        iframe.style.visible = '1';
+        iframe.style.zIndex = '2147483647';
+        return iframe;
+    };
+
+    return {
+        init: _this.init,
+        isPreviewMode: _this.isPreviewMode,
+        getContainerId: _this.getContainerId
+    }
+}();
+
+Ntm.Plugin = {};
+
+Ntm.Plugin.nlogger = (function() {
+    var _this = {};
+
+    _this.serviceId = "wb-pc";
+    _this.baseUrlHttp = "http://wcdplp.wooribank.com/nlog";
+    _this.baseUrlHttps = "https://wcdplp.wooribank.com/nlog";
+    _this.previewServiceId = "wcpreview";
+    _this.previewCotainerKey = "nth_cid";
+    _this.previewTimeKey = "nth_time";
+    _this.cookieKeys = [ {
+  "cookie" : "nth_pcid",
+  "logging" : "nth_pcid",
+  "removable" : false,
+  "required" : true,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "nth_bkid",
+  "logging" : "nth_bkid",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "nth_tuid",
+  "logging" : "nth_tuid",
+  "removable" : true,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "nth_loginType",
+  "logging" : "nth_loginType",
+  "removable" : true,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "nth_adid",
+  "logging" : "nth_adid",
+  "removable" : true,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "nth_idfa",
+  "logging" : "nth_idfa",
+  "removable" : true,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "SSO_JSESSION",
+  "logging" : "SSO_JSESSION",
+  "removable" : true,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : "nth_esns_mbh_no",
+  "logging" : "nth_esns_mbh_no",
+  "removable" : true,
+  "required" : false,
+  "always" : false,
+  "builtin" : false
+}, {
+  "cookie" : null,
+  "logging" : "nth_sdk2",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_locale_lang",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_locale_country",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_resolution",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_screen_id",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+}, {
+  "cookie" : null,
+  "logging" : "nth_screen_title",
+  "removable" : false,
+  "required" : false,
+  "always" : false,
+  "builtin" : true
+} ];
+    _this.cookieDomain = "";
+
+    _this.loggingByXhr = true;
+    _this.withCredentials = false;
+    _this.requestMethod = "post";
+    _this.requestTimeout = 1000;
+    _this.requestDelay = 150;
+    _this.requestQueueSize = 10;
+    _this.requestRetry = true;
+    _this.sessionStorageKey = "__nlogger__";
+
+    _this.log = function(path, params, cookies, options, serviceId) {
+        _this.send(_this.makeUrl("/log/event", path, params, cookies, serviceId), options);
+    };
+
+    _this.event = function(params, cookies, serviceId) {
+        _this.send(_this.makeUrl("/log/event", null, params, cookies, serviceId));
+    };
+
+    _this.user = function(params) {
+        _this.send(_this.makeUrl("/user", null, params));
+    };
+
+    _this.order = function(params) {
+        _this.send(_this.makeUrl("/order/request", null, params));
+    };
+
+    _this.cancel = function(params) {
+        _this.send(_this.makeUrl("/order/cancel", null, params));
+    };
+
+    _this.cancelAll = function(params) {
+        _this.send(_this.makeUrl("/order/cancel-all", null, params));
+    };
+
+    _this.send = function(url, options) {
+        
+        if(_this.loggingByXhr) _this.sendByXhr(url);
+        else {
+            options = _this.extend({
+                async: true,
+                onSuccess: null,
+                onError: null,
+                callBackTimeOutAsMillis: 400
+            }, options);
+
+            _this.sendByTag(url, options);
+        }
+    };
+
+    _this.makeUrl = function(action, path, params, cookies, serviceId) {
+        var preview = Ntm.Preview.isPreviewMode();
+        var baseUrl = window.location.protocol === "https:" ? _this.baseUrlHttps : _this.baseUrlHttp;
+        var query = _this.toQueryString(params, true);
+        var url = window.location.protocol + "//" + _this.getDomainWithPort();
+        var hash;
+
+        if(path) url += "/" + path;
+        else {
+            url += window.location.pathname + window.location.search;
+
+            if(window.location.hash) {
+                if(!window.location.search || window.location.hash.indexOf("?") >=0) url = window.location.href;
+                else hash = window.location.hash;
+            }
+        }
+
+        if(query) {
+            url += url.indexOf("?") < 0 ? "?" : "&";
+            url += query;
+        }
+
+        if(hash) url += hash;
+
+        cookies = _this.extend(cookies, _this.getCookies());
+
+        addCookie('nth_sdk', 'WEB');
+        addCookie('nth_locale_lang', _this.getLocaleLanguage());
+        addCookie('nth_locale_country', _this.getLocaleCountry());
+        addCookie('nth_resolution', _this.getResolution());
+        addCookie('nth_screen_id', document.location.pathname);
+        addCookie('nth_screen_title', document.title);
+
+        
+
+        if(preview) {
+            addCookie(_this.previewCotainerKey, Ntm.Preview.getContainerId());
+            addCookie(_this.previewTimeKey, new Date().getTime());
+        }
+
+        params = {
+            s: preview ? _this.previewServiceId : (serviceId ? serviceId : _this.serviceId),
+            u: url,
+            r: _this.getReferer(),
+            a: navigator.userAgent.replace(/\"/gi, ""),
+            c: _this.toCookieString(cookies, true),
+            v: _this.cacheBuster()
+        };
+
+        return baseUrl + action + "?" + _this.toQueryString(params, true);
+
+        function addCookie(key, value) {
+            if(!isReserved(key) && !isRequired(key)) return;
+
+            var cookie = {};
+            cookie[key] = value;
+
+            cookies = _this.extend(cookie, cookies);
+        }
+
+        function isReserved(loggingKey) {
+            return loggingKey === _this.previewCotainerKey || loggingKey === _this.previewTimeKey;
+        }
+
+        function isRequired(loggingKey) {
+            for (var index = 0; index < _this.cookieKeys.length; index++) {
+                var cookieKey = _this.cookieKeys[index];
+                if (cookieKey.logging === loggingKey) return cookieKey.required;
+            }
+
+            return false;
+        }
+    };
+
+    _this.getReferer = function() {
+        var ref = self.document.referrer;
+        var parentHref = "";
+        var parentRef = "";
+
+        try {
+            parentHref = top.document.location.href;
+            parentRef = top.document.referrer;
+        } catch (e) {
+            return ref;
+        }
+
+        if(ref === parentHref) return parentRef;
+
+        return ref;
+    };
+
+    _this.getDomainWithPort = function() {
+        var port = location.port;
+        if (port === undefined || port === "" || port === "0" || port === 0) return document.domain;
+        return document.domain + ":" + port;
+    };
+
+    _this.getDomain = function() {
+        var domain = document.domain;
+        if(_this.isIpType(domain)) return domain;
+
+        var tokens = domain.split('.');
+        var length = tokens.length;
+        if(length !== 4 && length !== 3) return domain;
+
+        var dm = tokens[length - 2] + '.' + tokens[length - 1];
+        return tokens[length - 1].length === 2 ? tokens[length - 3] + '.' + dm : dm;
+    };
+
+    _this.isIpType = function(domain) {
+        var ipRegex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        return ipRegex.test(domain);
+    };
+
+    _this.getResolution = function() {
+        var screenSize = "";
+        var screen = window.screen;
+
+        if(screen != null && typeof screen === "object") {
+            screenSize = screen.width + "x" + screen.height;
+        }
+
+        return screenSize;
+    };
+
+    _this.getLocaleLanguage = function() {
+        var tokens = _this.getLanguage().split("-");
+        return tokens.length > 0 ? tokens[0] : "";
+    };
+
+    _this.getLocaleCountry = function() {
+        var tokens = _this.getLanguage().split("-");
+        return tokens.length > 1 ? tokens[1] : "";
+    };
+
+    _this.getLanguage = function() {
+        var language = "-";
+        var navigator = window.navigator;
+
+        if(navigator.language) language = navigator.language.toLowerCase();
+        else if(navigator.userLanguage) language = navigator.userLanguage.toLowerCase();
+
+        return language;
+    };
+
+    _this.getCookies = function() {
+        var result = {};
+
+        for(var index = 0; index < _this.cookieKeys.length; index++) {
+            var keyPair = _this.cookieKeys[index];
+
+            if(keyPair.builtin) continue;
+
+            var value = _this.getCookie(keyPair.cookie);
+
+            if(!value) {
+                if(!keyPair.required) continue;
+                value = _this.generateUuid();
+                setUuid(keyPair.cookie, value);
+                if(!keyPair.always) continue;
+            }
+
+            if(keyPair.required) setUuid(keyPair.cookie, value);
+
+            result[keyPair.logging] = value;
+        }
+
+        return result;
+
+        function setUuid(key, value) {
+            var date = new Date();
+            var options = {
+                path: "/",
+                expires: date
+            };
+
+            if(!_this.cookieDomain) options.domain = _this.getDomain();
+            else if(_this.cookieDomain !== "default") options.domain = _this.cookieDomain;
+
+            date.setFullYear(date.getFullYear() + 10);
+            _this.setCookie(key, value, options);
+        }
+    };
+
+    _this.getCookie = function(key) {
+        var result = new RegExp('(?:^|; )' + key + '=([^;]*)').exec(document.cookie);
+        return (result != null) ? decodeURIComponent(result[1]) : null;
+    };
+
+    _this.setCookie = function(key, value, options) {
+        if(!options) options = {};
+
+        var expires = options.expires;
+        var path = options.path;
+        var domain = options.domain;
+
+        document.cookie = key + '=' + encodeURIComponent(value) + ';' +
+            (expires ? 'expires=' + expires.toUTCString() + ';' : '') +
+            (path ? 'path=' + path + ';' : '') +
+            (domain ? 'domain=' + domain : '');
+    };
+
+    _this.deleteCookie = function(key) {
+        document.cookie = key + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT;';
+    };
+
+    _this.generateUuid = function() {
+        var result = "";
+
+        if(typeof window.crypto != 'undefined' && typeof window.crypto.getRandomValues != 'undefined') {
+            var buf = new Uint16Array(8);
+            window.crypto.getRandomValues(buf);
+            var S4 = function (num) {
+                var ret = num.toString(16);
+                while (ret.length < 4) {
+                    ret = "0" + ret;
+                }
+                return ret;
+            };
+
+            result = (S4(buf[0]) + S4(buf[1]) + "-" + S4(buf[2]) + "-"
+            + S4(buf[3]) + "-" + S4(buf[4]) + "-" + S4(buf[5])
+            + S4(buf[6]) + S4(buf[7]));
+        }
+        else {
+            result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r
+                        : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+        }
+
+        return result + '-' + new Date().getTime();
+    };
+
+    _this.sendByTag = function(url, options) {
+        var element = _this.createScriptElement(url, options);
+        _this.appendElement(element);
+        _this.removeElement(element);
+    };
+
+    _this.sendByXhr = function(url) {
+        try {
+            _this.addRequest(url);
+            _this.sendAllRequests();
+        } catch(e) {
+            console.log("send error", e);
+        }
+    };
+
+    _this.createScriptElement = function(src, options) {
+        var element = document.createElement('script');
+        element.type = 'text/javascript';
+        element.src = src;
+        element.async = options.async;
+        element.charset = 'UTF-8';
+
+        if(options.onSuccess) {
+            if(typeof element.onreadystatechange !== 'undefined') {
+                element.onreadystatechange = function() {
+                    if(this.readyState === 'complete' || this.readyState === 'loaded')
+                        setTimeout(options.onSuccess, options.callBackTimeOutAsMillis);
+                };
+            }
+            else {
+                element.onload = function() {
+                    setTimeout(options.onSuccess, options.callBackTimeOutAsMillis);
+                };
+            }
+        }
+
+        if(options.onError) {
+            element.onerror = function() {
+                setTimeout(options.onError, options.callBackTimeOutAsMillis);
+            };
+        }
+
+        return element;
+    };
+
+    _this.appendElement = function(element) {
+        var ssc = document.getElementsByTagName('script')[0];
+        ssc.parentNode.insertBefore(element, ssc);
+    };
+
+    _this.removeElement = function(element) {
+        if(typeof element.remove === 'function') element.remove();
+        else element.parentNode.removeChild(element);   // For IE
+    };
+
+    _this.sendAllRequests = function() {
+        setTimeout(function() {
+            if(Ntm.Event.windowUnloaded) return;
+
+            while(true) {
+                var request = _this.takeRequest();
+                if(!request) break;
+                _this.sendRequest(request);
+            }
+        }, _this.requestDelay);
+    };
+
+    _this.sendRequest = function(url) {
+        var xhr = _this.createXmlHttpRequest();
+        if (!xhr) return false;
+
+        xhr.withCredentials = _this.withCredentials;
+
+        var timer = setTimeout(function() {
+            xhr.abort();
+        }, _this.requestTimeout);
+
+        if(_this.requestMethod.trim().toLowerCase() === "post") {
+            var parts = url.split("?");
+            xhr.open("POST", parts[0], true);
+            if(xhr.setRequestHeader) xhr.setRequestHeader("Content-type", "text/plain");
+            xhr.send(parts[1]);
+        }
+        else {
+            xhr.open("GET", url, true);
+            xhr.send(null);
+        }
+
+        xhr.onload = function () {
+            clearTimeout(timer);
+        };
+
+        xhr.onerror = xhr.onabort = function () {
+            clearTimeout(timer);
+            if(_this.requestRetry) _this.addRequest(url);
+        };
+    };
+
+    _this.createXmlHttpRequest = function() {
+        var xhr;
+        var xhrs = [
+            function() {return new XDomainRequest()},
+            function() {return new XMLHttpRequest()},
+            function() {return new ActiveXObject("Msxml2.XMLHTTP")},
+            function() {return new ActiveXObject("Msxml3.XMLHTTP")},
+            function() {return new ActiveXObject("Microsoft.XMLHTTP")}
+        ];
+
+        for (var i = 0; i < xhrs.length; i++) {
+            try {
+                xhr = xhrs[i]();
+            }
+            catch (e) {
+                continue;
+            }
+            break;
+        }
+
+        return xhr;
+    };
+
+    _this.addRequest = function(url) {
+        var requests = _this.getRequests();
+        if(requests instanceof Array === false || requests.length >= _this.requestQueueSize) return;
+        requests.push(url);
+        _this.setRequests(requests);
+    };
+
+    _this.takeRequest = function() {
+        var requests = _this.getRequests();
+        var request = (requests instanceof Array && requests.length > 0) ? requests.shift() : undefined;
+        _this.setRequests(requests);
+        return request;
+    }
+
+    _this.clearRequests = function() {
+        _this.setRequests([]);
+    };
+
+    _this.getRequests = function() {
+        var data = sessionStorage.getItem(_this.sessionStorageKey);
+        return JSON.parse(data ? data : "[]");
+    };
+
+    _this.setRequests = function(requests) {
+        sessionStorage.setItem(_this.sessionStorageKey, Ntm.Helper.stringify(requests));
+    };
+
+    _this.cacheBuster = function() {
+        return Math.round(Math.random() * 1999083012);
+    };
+
+    _this.extend = function() {
+        var extended = {};
+
+        for(var index = 0; index < arguments.length; index++) {
+            var source = arguments[index];
+
+            for(var prop in source) {
+                if(Object.prototype.hasOwnProperty.call(source, prop))
+                    extended[prop] = source[prop];
+            }
+        }
+
+        return extended;
+    };
+
+    _this.toQueryString = function(obj, skipNull) {
+        return _this.objectToString(obj, "&", skipNull);
+    };
+
+    _this.toCookieString = function(obj, skipNull) {
+        return _this.objectToString(obj, "; ", skipNull);
+    };
+
+    _this.objectToString = function(obj, delimeter, skipNull) {
+        var result = "";
+
+        for(var prop in obj) {
+            if(Object.prototype.hasOwnProperty.call(obj, prop)) {
+                if(skipNull && !obj[prop]) continue;
+
+                if(result.length > 0) result += delimeter;
+                result += prop + "=" + encodeURIComponent(obj[prop]);
+            }
+        }
+
+        return result;
+    };
+
+    return {
+        
+        log: _this.log,
+        event: _this.event,
+        user: _this.user,
+        order: _this.order,
+        cancel: _this.cancel,
+        cancelAll: _this.cancelAll,
+        generateUuid: _this.generateUuid
+    };
+})();
+
+
+
+Ntm.Main = function() {
+    var disabled = false;
+    var preview = false;
+    var id = 11111;
+
+    if(disabled) return;
+    if(!Ntm.Helper.isValidSettings()) return;
+
+    Ntm.Preview.init(preview, id);
+    Ntm.Event.fireNtmReady();
+    Ntm.Event.firePageLoaded();
+    Ntm.Event.init();
+}();

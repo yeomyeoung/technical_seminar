@@ -1,0 +1,53 @@
+//callback
+ml4web_service.ML_Callback = function (code,data){
+	//은행내 인터넷 뱅킹 시스템 처리 함수 정의 부분
+	//console.log(code);
+	formAction(data);
+}
+
+//서버에서 리턴되는 데이터의 형태가 아래의 형태와 같지 않은 경우 ml4web_service.ML_HttpCallback 함수에서  data값을 변형하여 callback 처리 필요
+//아래의 ml4web_service.ML_HttpCallback 함수의 두번째 파라미터인 data가 서버에서 리턴된 데이터임.
+//{"responseCode" :"0000","responseMessage" :"SUCCESS","tid" :"aasdf","encQrInfo" :"MDEyMDk2My","pushCertificationNumber" :"7777","certificationNumber" :"777733"}
+ml4web_service.ML_HttpCallback = function (code,data,callback){
+
+	/* 아래의 예제 소스는 Kbank에서 리턴되는 데이터를 예제로 작성.
+	 * var orgData = JSON.parse(ML4Web_BS$.trim(data));   //리턴된 데이터를 JSON 객체로 파씽 후 value 획득
+	 * var returnData = JSON.stringify(orgData._msg_);    //획득한 value 를 JSON string으로 파싱
+	 * 
+	 */
+	var returnData = ML4Web_BS$.trim(data);
+	
+	if(returnData != null && returnData.length > 0) {
+		callback(code, returnData);
+	}
+}
+
+function formAction(data) {
+	var jsonObj = JSON.parse(window.decodeURIComponent(data));
+	
+	if(jsonObj.signDoc != null && jsonObj.vidR != null) {
+		bankSignLogin(data);
+	}
+	
+	/*if(jsonObj.signDoc != null && jsonObj.vidR != null) {
+		var form = document.createElement("form");
+		form.setAttribute("method", "post");
+		form.setAttribute("action", "jcc?withyou=CMLGN0001&__ID=c027711&target=&withyou=CMLGN0001&isCertLoginYN=Y");
+		
+		var CERT_SIGN = document.createElement("input");
+		CERT_SIGN.setAttribute("type", "hidden");
+		CERT_SIGN.setAttribute("name", "_CERT_SIGN");
+		CERT_SIGN.setAttribute("value", jsonObj.signDoc);
+		
+		var RANDOM_NUM = document.createElement("input");
+		RANDOM_NUM.setAttribute("type", "hidden");
+		RANDOM_NUM.setAttribute("name", "_RANDOM_NUM");
+		RANDOM_NUM.setAttribute("value", jsonObj.vidR);
+		
+		form.appendChild(CERT_SIGN);
+		form.appendChild(RANDOM_NUM);
+		
+		document.body.appendChild(form);
+		form.submit();
+	}*/
+}

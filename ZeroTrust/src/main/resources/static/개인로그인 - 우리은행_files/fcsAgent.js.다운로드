@@ -1,0 +1,289 @@
+var fcsAgent = fcsAgent || (function(){
+	var Class = {};  
+	var finCertSdkBASE64 = {
+		_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",   // base64 dictionary
+		_decodeUrl: function(input, isToHex) {
+			var output = "";
+			var chr1, chr2, chr3;
+			var enc1, enc2, enc3, enc4;
+			var i = 0;			
+			input = input.replace(/-/g, '+').replace(/_/g, '/');
+			input = input.replace(/[^A-Za-z0-9\+\/\=]/g,"");		
+			while( i < input.length ) {
+				enc1 = this._keyStr.indexOf(input.charAt(i++));
+				enc2 = this._keyStr.indexOf(input.charAt(i++));
+				enc3 = this._keyStr.indexOf(input.charAt(i++));
+				enc4 = this._keyStr.indexOf(input.charAt(i++));				
+				chr1 = (enc1 << 2) | (enc2 >> 4);
+				chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+				chr3 = ((enc3 & 3) << 6) | enc4;				
+				output = output + String.fromCharCode(chr1);				
+				if(enc3 != 64) {
+					output = output + String.fromCharCode(chr2);
+				}		
+				if(enc4 != 64) {
+					output = output + String.fromCharCode(chr3);
+				}
+			} // while		
+			if (isToHex != undefined && isToHex != null && isToHex == true){
+				output = finCertSdkBASE64._encodeToHex(output);
+			}		
+			return output;
+		}, // decodeUrl
+		_encodeToHex: function(base64) {
+			var rval = '';
+			for(var i = 0; i < base64.length; i++) {
+				var b = base64.charCodeAt(i);
+				if(b < 16) {
+					rval += '0';
+				}
+				rval += b.toString(16);
+			}
+			return rval;
+		}
+	}
+	
+	var _Class = {
+			_fcsOID : "1.2.410.200005.1.1.1.10",
+			_fcsOrgCode : (document.location.hostname.indexOf("wn") > -1) ? "DB00200000" : "RB00200000",
+			_fcsUrl : (document.location.hostname.indexOf("wn") > -1) ? "https://t-4user.yeskey.or.kr/v1/fincert.js?dt=" : "https://4user.yeskey.or.kr/v1/fincert.js?dt=",
+			_fcsApiKey : (document.location.hostname.indexOf("wn") > -1) ? "47df59c5-d7d0-497f-8d02-a96b24b72144" : "fde350aa-23e8-46f4-a2b7-0caf2c6d63ff",
+			_fcs_load_retryCount : 0,
+			_fcs_maxRetryCount : 1,
+			_initErrorCode : '',
+			_initErrorMsg : '',
+			_initSuccess : false,
+			load: function(callback){
+				var date  = new Date();
+				var year  = date.getFullYear();
+				var month = new String(date.getMonth() + 1);
+				var day   = new String(date.getDate());
+				if (month.length == 1) {
+					month = "0" + month;
+				}
+				if (day.length == 1) {
+					day = "0" + day;
+				}
+				var finCertSdkDate  = year + month + day;
+				var scriptElem = document.createElement('script');
+				scriptElem.src = _Class._fcsUrl + finCertSdkDate;
+				document.querySelector('body').appendChild(scriptElem);
+				scriptElem.onerror = function() {
+					//금융인증서SDK loading 재시도
+					if(_Class._fcs_load_retryCount < _Class._fcs_maxRetryCount) {
+						setTimeout(function() {
+							_Class.load(callback); 
+						}, 300);
+						_Class._fcs_load_retryCount++;
+						return;
+					}
+					//금융인증서SDK loading 재시도 초과시
+					else{
+						if (typeof callback == "function") {
+							callback();
+						}	
+					}
+				}
+				scriptElem.onload = function() {
+					_Class.init(callback); //금융인증서SDK 초기화
+				}
+			},
+			init: function(callback){
+				try {
+					// 금융인증서 초기화		
+					FinCert.Sdk.init({
+						orgCode: _Class._fcsOrgCode,
+						apiKey: _Class._fcsApiKey,
+						locale: 'kor',
+						success: function() {
+							_initSuccess = true;
+							_initErrorCode = '';
+							_initErrorMsg = '';
+							if (typeof callback == "function") {
+								callback();
+							}
+						},
+						fail: function(error) {
+							_initSuccess = false;
+							_initErrorCode = error.code;
+							_initErrorMsg = error.message;
+							if (typeof callback == "function") {
+								callback();
+							}
+						}
+					});
+				} catch(e) {
+					console.log("fcsAgent init 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback();
+					}
+				}
+			},
+			issue: function(refNum, authCode){
+				_Class.issueCallbak(refNum, authCode, function(){
+					ReCertCallback(arguments[1],arguments[2])
+				});
+			},
+			issueCallbak: function(refNum, authCode, callback){
+				try{
+					if (typeof FinCert == 'undefined' || FinCert == null || FinCert == '') {
+						callback('ERROR', '금융인증서SDK를 로드하지 못하였습니다. 방화벽/네트워크 상태를 확인해주세요.', '10011');
+						return;
+					}
+					
+					if (typeof _initSuccess == 'undefined' || _initSuccess == false){
+						callback('ERROR', '금융인증서SDK를 로딩이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.', '10011');
+						return;
+					}
+					
+					if (_initErrorCode != '') {
+						alert('[' + _initErrorCode + "] " +  _initErrorMsg);
+						return;
+					}
+					
+					FinCert.Sdk.issue({
+						refNum: refNum,
+						authCode: authCode,
+						success: function(result) {
+							callback(result.certificate, result.certSeqNum);
+						},
+						fail: function(error) {
+							callback('ERROR', error.message);
+						}
+					});
+				} catch(e) {
+					console.log("fcsAgent issueCallbak 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', '금융인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				}
+			},
+			sign: function(plainText, signType, callback){
+				try {
+					if (typeof FinCert == 'undefined' || FinCert == null || FinCert == '') {
+						callback('ERROR', '금융인증서SDK를 로드하지 못하였습니다. 방화벽/네트워크 상태를 확인해주세요.', '10011');
+						return;
+					}
+					
+					if (typeof _initSuccess == 'undefined' || _initSuccess == false){
+						callback('ERROR', '금융인증서SDK를 로딩이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.', '10011');
+						return;
+					}
+					
+					if (_initErrorCode != '') {
+						alert('[' + _initErrorCode + "] " +  _initErrorMsg);
+						return;
+					}
+					
+					if( signType == null || typeof signType == "undefined" || signType == "" ) {
+						signType = '99'; // 기타
+					}
+
+					FinCert.Sdk.sign({
+						signFormat: {
+							CMSInfo: {
+								ssn: 'dummy'
+							}
+						},
+						content: {
+							plainText: {
+								plainTexts: [plainText],
+							}
+						},
+						algorithm: 'RSASSA-PKCS1-v1_5_SHA256',
+						view : {
+							lastAccessCert: false,
+							oid: {
+								'1.2.410.200005.1.1.1.10': true
+							},
+							enableTextView: false,
+							renewShow: false,
+							renewRequest: true
+						},
+						info: {
+							signType: signType,
+						},
+						success: function(result) {
+							var certSignVal = finCertSdkBASE64._decodeUrl(result.signedVals[0], true); // 전사서명 데이터 To Hex
+							callback('SUCCESS', result.certSeqNum, certSignVal, result.renewRequired, result.renewSelected); // 전자서명 검증 요청
+						},
+						fail: function(error) {
+							if('800000' != error.code){ //창닫기 이외의 오류발생시 에러메세지 전달
+								callback('ERROR', error.message , error.code);
+							}else {
+								callback('CLOSE');
+							}			
+						}
+					});
+				} catch(e) {
+					console.log("fcsAgent sign 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', '금융인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				}
+			},
+			manage: function(){
+				try {
+					FinCert.Sdk.manage({
+						success: function() {
+						},
+						fail: function(error) {
+						}
+					});
+				} catch(e) {
+					console.log("fcsAgent manage 처리중 예외발생 :" + e);
+				}
+			},
+			check: function(callback){
+				try{
+					if (typeof callback == "function") {
+						if (typeof FinCert == 'undefined' || FinCert == null || FinCert == '') {
+							callback('ERROR', '금융인증서SDK를 로드하지 못하였습니다. 방화벽/네트워크 상태를 확인해주세요.', '10011');
+							return;
+						}else if (typeof _initSuccess == 'undefined' || _initSuccess == false){
+							callback('ERROR', '금융인증서SDK를 로딩이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.', '10011');
+							return;
+						}else{
+							callback('SUCCESS',"성공", '0000');
+						}
+					}
+				} catch(e) {
+					console.log("fcsAgent check 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', '금융인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				}
+			},
+			renew: function(certSeqNum, callback){
+				try{
+					console.log("certSeqNum : "+certSeqNum);
+					FinCert.Sdk.renew({
+						certSeqNum : certSeqNum,
+						showComplete : true,
+						success: function(result){
+							callback('SUCCESS', result.certificate, result.certSeqNum);
+						},
+						fail: function(error){
+							if('800000' != error.code){ //창닫기 이외의 오류발생시 에러메세지 전달
+								callback('ERROR', error.message , error.code);
+								}
+						}
+					});	
+				} catch(e){
+					console.log("fcsAgent check 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', '금융인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				
+				}
+			}			
+	};
+	
+	for (var member in _Class) {
+		if (member.indexOf('_') != 0) {
+			Class[member] = _Class[member];
+		}
+	}
+	
+	return Class;
+})();

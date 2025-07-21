@@ -1,0 +1,51 @@
+iTracerAFCfg = {
+	siteid:'.wooribank.com',                            // 우리카드 서브도메인 입력
+	flexModule : {
+		path:'/js/sec/af/',                           // flexModule path
+		loadCheck : {
+			timeout:1000,
+			interval:100
+		},
+		policyRequest:{                                 // policy request timeout
+			timeout:1500,
+			interval:100
+		},
+		debug : false                                     // set flex module debug mode
+	},
+	collServer : {                                       // collector server info
+		ip:'ipcs.wooribank.com',                  // 수집서버 주소 입력
+		flexPort:843,
+		webPort:443,
+		timeout:3000,
+		interval:1000,
+		secure:true
+	},
+	getPrivateIP: {
+		timeout: 500
+	},
+	loadingView : {
+		isUseAFLoadingView: false,                       // 해당 고객사에서 사용중인 로딩이미지가 있다면 false.
+		path: '/js/sec/af/ajax-loader.gif'             // gif 파일은 flexModule의 path에 위치
+	},
+	policyInfo : [203,313,301,303,204,112,201,605,205,101],       // policy customizing
+	androidPolicyInfo: {                                     // android policy customizing
+	 	staticKey : [203,203,313,204,504,605,205],
+	 	dynamicKey : [203,203,203,203,313,204,504,605,205,101]
+	},
+	otherPolicyInfo: {                                       // other mobile policy customizing
+		staticKey : [203,313,204,112,612,605,205],
+		dynamicKey : [203,313,301,303,204,112,612,605,205,101]
+	},
+	cryptoType : "reversible",
+	sKeyValidation : true,
+	debug : false,                                          // set debug mode
+	useFlash : false,
+	cookieExpire : 356,
+	isTest : false,
+	isKeyNecessary : false,
+	isUseUAParserInMobile : true,
+	// isInicis: true
+	packetVersion: 2,
+	ukeyEncrypt: true,
+	ukeycryptoType: "reversible"
+};

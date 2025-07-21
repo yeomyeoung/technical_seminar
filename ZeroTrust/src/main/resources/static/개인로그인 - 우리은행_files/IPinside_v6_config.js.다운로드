@@ -1,0 +1,70 @@
+﻿var eventcode = "EventCode";
+var NPIv6 = new Object();
+NPIv6.version = 0.014;
+NPIv6.cfg_ver = 0.004;
+NPIv6.Config = {
+	//설명 완료
+    cHostInfo: {
+        dev_ip: ["http://ipcs.wooribank.com"],
+        dev_config: "WWQtAAAAAC1oaGF3a2hhd2hgbXduYGNhaWN2Lzs4NzIGaWh3Myo6YwYQFwoQHRwGGAEGEWTp",
+		real_config: "WWQtAAAAAC1oaGF3a2hhd2hgbXduYGNhaWN2Lzs4NzIGaWh3Myo6YwYQFwoQHRwGGAEGEWTp"
+    },
+    downloadpath: {
+    		win_x86 : "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/I3GSvcManager_3.0.0.7.exe?temp_url_sig=718ea373f1541d048d63a07e88cd2b3c508a926f&temp_url_expires=1557204482",
+    		mac: "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/macOS_ipinside_3.0.0.5.dmg?temp_url_sig=d0a6155ae103ade4306c370f79f46eab2da9f811&temp_url_expires=1557636124",mac_pkg: "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/macOS_ipinside_3.0.0.5.pkg?temp_url_sig=29204558d9365f2a3a6396268a0a0499379b07a9&temp_url_expires=1557636169",
+    		linux_ubuntu_x64: "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/ipinside-lws-3.0.0.6-1.i686.rpm?temp_url_sig=e739b5a80b2fb9f4666c6588b9a674532500e76d&temp_url_expires=1557204675",
+    		linux_ubuntu_x86: "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/ipinside-lws-3.0.0.6-1.x86_64.rpm?temp_url_sig=043ed1ce889bac3b608dfced0b8ba88994b473b2&temp_url_expires=1557204691",
+    		linux_fedora_x86: "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/ipinside-lws_3.0.0.6_amd64.deb?temp_url_sig=23a6007a01e6e5bcddaf8ec0e2e91bfc00849350&temp_url_expires=1557204707",
+    		linux_fedora_x64: "https://ssproxy.ucloudbiz.olleh.com/v1/AUTH_4dd595c9-c268-4a9b-b8df-c7f6c0d0bb00/ipinsideLWS/ipinside-lws_3.0.0.6_i386.deb?temp_url_sig=03d71274e1969e1b8c8f0f32d061e0d350a4dff7&temp_url_expires=1557204721"
+    },
+    versionWin: "3.0.0.7",
+    versionLix: "3,0,0,6",
+    versionMac: "3.0.0.6",
+    sRunWeb: "",
+    sRunKey: "",
+    sRunPC: "",
+    sRunVPN: true,
+    //인증서 키보드 방화벽
+    cSecuCd: {
+        win: ["1101", "2101", "3101"],
+        linux: ["11", "21", "31"],
+        mac: ["11", "21", "31"]
+    },
+    sUdata: {
+        win: 13,
+        linux: 13,
+        mac: 13
+    },
+    //sGetNATLoopCnt: "200", //sGetNATLoopSec 가 있을경우 해당 값은 없어도 됨
+	sGetNATLoopSec: 3000, //sGetNATLoopSec 가 있을경우 이 값을 sGetNATLoopCnt 보다 우선적으로 본다.
+    isAutoDownload: false, //자동 다운로드 여부
+    isTighten_security: false,//보안성 강화
+    isLinuxAutodownload: false,//리눅스 메세지 출력후 자동다운로드
+    isFrameTopOption: true, // 프레임이용 사이트의 경우
+    isHSNRevers: true, //Banking true 1, //card false 0
+    isChangeModule:true, //기존 사이트에서 교체일경우 true 신규 사이트 일경우 false 2
+    cOpt: "fUgCAAAAAAJMSMw=",
+    cWinRemote: "qcxIAAAAAEj9zMjE/8DM3szb9u3M2sLdxtmHzNHM1dvK2szEztvch8zRzNXbyszHzsTO29yHzNHM1d3MyMTfwMzezNv27czawt3G2YfM0cxE",
+    cKey: "30820122300d06092a864886f70d01010105000382010f003082010a0282010100a5803559c1dbe885c16a497de17b8576323cff26aabab92403c0f8fffd70a5ebb093b54745917757e73a2053aa7de284942039c59922c9682d6a126622ca2414f497d76dfe0862db37f5bfdfd0c1050f838a54acd543ef759cafd2d37552b36741c662c9d5f22a33648ccacbb8ad16787822e04bf35c6cca898464cbb4d5e6e1964e4986b761e75465faeb556ccca7d0021a702118a08dc3fefaed4c275b2f56db860abf8237582a6c8b49677888193e0c5c4c1994cdc508d20d5e800eac4a92607ebaad51ceab381368895271bfd245670d9222ba0f3263a45c641c25f70598a0eac8418cc6701161d524b93f48e698d8f6d87ef29e9661965043a3d2c5cc5f0203010001",
+    cSetupPage : "",
+    cAjaxLodingimg: "images/ajax-loader.gif",
+    //cInstallTimeOut: 4000,//default 4초
+    //cInfoTimeOut: 30000,
+    cDataType: "A",
+    linuxConfirmMsg:"Ubuntu를 사용하시면 예,Fedora를 사용하시면 아니오를 눌러주세요.",
+    ajaxSync: false,
+    isNecessary: true, // 필수인지 선택인지 확인. Card false, Banking true
+    skipExpire: 1, // 일 단위 값 입력
+    retryCount: 3, // skip count
+    isAllTightenSecurity: true, //230424 팔란트취약점 패치관련
+};
+IPinsideInstallCheckResultType = {
+    NotInstalled: "T",
+    UpdateRequired: "U",
+    LatestInstalled: "I"
+};
+IPinsideInstallType = {
+    directDownload: 1,
+    redirectPage: 2,
+    nothing: 0
+};

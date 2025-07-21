@@ -1,0 +1,364 @@
+(function (global) {
+  "use strict";
+
+  var loadUtil = {};
+  var cryptoObj = global.crypto || global.msCrypto;
+  var subtleObj = cryptoObj
+    ? cryptoObj.subtle || cryptoObj.webkitSubtle
+    : undefined;
+
+  /**
+   * 웹 표준을 준수하는 브라우저에서 JS를 가져오는 함수
+   * @param {string} tagId
+   * @param {string} hash
+   * @param {string} fileName
+   * @param {domElement} iframeDocument
+   * @param {function} onloadFunc
+   * @param {boolean} isBackupCdn
+   */
+  loadUtil.getValidJSForWebStandardComplianceBroswer = function (
+    tagId,
+    hash,
+    fileName,
+    iframeDocument,
+    onloadFunc,
+    isBackupCdn
+  ) {
+    var scriptTag = document.createElement("script");
+    scriptTag.id = tagId;
+    scriptTag.type = "text/javascript";
+
+    var currentCdnUrl;
+    if (isBackupCdn) {
+      currentCdnUrl = "https://sdk2.yeskey.or.kr";
+    } else {
+      currentCdnUrl = "https://sdk.yeskey.or.kr";
+    }
+
+    scriptTag.src = currentCdnUrl + "/v1/" + fileName + "?2025-07-15T07_41_16.539Z";
+    scriptTag.charset = "utf-8";
+    scriptTag.integrity = "sha256-" + hash;
+    scriptTag.crossOrigin = "anonymous";
+
+    if (onloadFunc) {
+      scriptTag.onload = onloadFunc;
+    }
+
+    scriptTag.onerror = function () {
+      if (isBackupCdn) {
+        // 해시값 오류시 결제원에서 다운로드
+        console.log(
+          "'" +
+            fileName +
+            "' 파일의 해시값 오류로 결제원 WEB서버에서 다운로드 합니다."
+        );
+
+        _appendKftcWebServerJs(fileName, iframeDocument, onloadFunc);
+      } else {
+        // 백업 CDN으로 다시 시도
+        loadUtil.getValidJSForWebStandardComplianceBroswer(
+          tagId,
+          hash,
+          fileName,
+          iframeDocument,
+          onloadFunc,
+          true
+        );
+      }
+    };
+
+    iframeDocument &&
+      iframeDocument.body &&
+      iframeDocument.body.appendChild(scriptTag);
+  };
+
+  /**
+   * 웹 표준을 준수하지 않는 브라우저에서 JS를 가져오는 함수
+   * @param {string} hash
+   * @param {string} fileName
+   * @param {domElement} iframeDocument
+   * @param {function} onloadFunc
+   * @param {boolean} isBackupCdn
+   */
+  loadUtil.getValidJSForNonWebStandardComplianceBroswer = function (
+    hash,
+    fileName,
+    iframeDocument,
+    onloadFunc,
+    isBackupCdn
+  ) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === xhr.DONE) {
+        var hashValResult;
+
+        if (xhr.responseText == "") {
+          // IE에서 방화벽에 의해 차단되었을 때 케이스
+          if (isBackupCdn) {
+            console.log(
+              "방화벽 등으로 responseText가 없음 - 결제원 웹서버로 시도"
+            );
+            _appendKftcWebServerJs(fileName, iframeDocument, onloadFunc);
+            return;
+          } else {
+            console.log(
+              "방화벽 등으로 responseText가 없음 - 백업 CDN으로 재시도"
+            );
+            loadUtil.getValidJSForNonWebStandardComplianceBroswer(
+              hash,
+              fileName,
+              iframeDocument,
+              onloadFunc,
+              true
+            );
+          }
+        }
+
+        var buffer = new Uint8Array(_utf8ToBytes(xhr.responseText));
+
+        if (global.crypto) {
+          // Non-IE이거나 IE면서 promise를 지원하는 상태
+          try {
+            subtleObj.digest("SHA-256", buffer).then(function (e) {
+              hashValResult = _bytesToString(e);
+              _checkAndAppendJSForNonWebStandardComplianceBroswer(
+                hashValResult,
+                hash,
+                xhr.responseText,
+                fileName,
+                iframeDocument,
+                onloadFunc,
+                isBackupCdn
+              );
+            });
+          } catch (e) {
+            // 에러가 날 경우에는 무조건 결제원 서버에서 받아가도록 한다.
+            // (backup CDN은 어차피 해시 검증 때문에 동일한 에러일 것이므로)
+            console.log(
+              "WebCrypto 객체에 subtle 또는 webkitSubtle 객체에 digest 함수 없음!!"
+            );
+            _appendKftcWebServerJs(fileName, iframeDocument, onloadFunc);
+          }
+        } else {
+          // IE이면서 promise를 지원하지 않는 상태
+          try {
+            subtleObj.digest("SHA-256", buffer).oncomplete = function (e) {
+              hashValResult = _bytesToString(e.target.result);
+              _checkAndAppendJSForNonWebStandardComplianceBroswer(
+                hashValResult,
+                hash,
+                xhr.responseText,
+                fileName,
+                iframeDocument,
+                onloadFunc,
+                isBackupCdn
+              );
+            };
+          } catch (e) {
+            // 에러가 날 경우에는 무조건 결제원 서버에서 받아가도록 한다.
+            // (backup CDN은 어차피 해시 검증 때문에 동일한 에러일 것이므로)
+            console.log(
+              "WebCrypto 객체에 subtle 또는 webkitSubtle 객체에 digest 함수 없음!!"
+            );
+            _appendKftcWebServerJs(fileName, iframeDocument, onloadFunc);
+          }
+        }
+      }
+    };
+
+    var scriptSrc;
+    if (isBackupCdn) {
+      scriptSrc = "https://sdk2.yeskey.or.kr";
+    } else {
+      scriptSrc = "https://sdk.yeskey.or.kr";
+    }
+
+    scriptSrc = scriptSrc + "/v1/" + fileName + "?2025-07-15T07_41_16.539Z";
+    xhr.open("GET", scriptSrc);
+    xhr.send();
+  };
+
+  /**
+   * 웹표준을 준수하지 않는 브라우저에서 JS를 append 하는 소스코드
+   * @param {string} hashVal
+   * @param {string} wantedHashVal
+   * @param {string} jsCode
+   * @param {string} fileName
+   * @param {domElement} iframeDocument
+   * @param {function} onloadFunc
+   * @param {boolean} isBackupCdn
+   */
+  function _checkAndAppendJSForNonWebStandardComplianceBroswer(
+    hashVal,
+    wantedHashVal,
+    jsCode,
+    fileName,
+    iframeDocument,
+    onloadFunc,
+    isBackupCdn
+  ) {
+    if (hashVal === wantedHashVal) {
+      // CDN JS 사용
+      var script = document.createElement("script");
+      script.innerHTML = jsCode;
+
+      if (onloadFunc) {
+        script.onload = onloadFunc;
+      }
+      iframeDocument.getElementsByTagName("head")[0].appendChild(script);
+    } else {
+      if (isBackupCdn) {
+        console.log(
+          "'" +
+            fileName +
+            "' 파일의 해시값 오류로 결제원 WEB서버에서 다운로드 합니다."
+        );
+
+        // CDN이 조작되었으므로 결제원 웹서버에서 직접 JS 로딩!
+        _appendKftcWebServerJs(fileName, iframeDocument, onloadFunc);
+      } else {
+        console.log(
+          "'" +
+            fileName +
+            "' 파일의 해시값 오류로 Backup CDN서버에서 다운로드 합니다."
+        );
+
+        loadUtil.getValidJSForNonWebStandardComplianceBroswer(
+          wantedHashVal,
+          fileName,
+          iframeDocument,
+          onloadFunc,
+          true
+        );
+      }
+    }
+  }
+
+  function _appendKftcWebServerJs(fileName, iframeDocument, onloadFunc) {
+    var kftcScriptElem = document.createElement("script");
+
+    kftcScriptElem.src = "https://4user.yeskey.or.kr/v1/" + fileName + "?2025-07-15T07_41_16.539Z";
+    kftcScriptElem.charset = "utf-8";
+    kftcScriptElem.type = "text/javascript";
+    if (onloadFunc) {
+      kftcScriptElem.onload = onloadFunc;
+    }
+
+    iframeDocument &&
+      iframeDocument.body &&
+      iframeDocument.body.appendChild(kftcScriptElem);
+  }
+
+  /**
+   * ArrayBuffer를 String으로 변경
+   * @param {*} buf
+   */
+  function _bytesToString(buf) {
+    var arrayBuffer = new Uint8Array(buf);
+    return btoa(String.fromCharCode.apply(null, arrayBuffer));
+  }
+
+  // text-encoder-polyfill.min.js에서 정의되어 있는
+  // utf-8 string을 arrayBuffer로 바꾸는 코드만 발췌
+  // (용량 절감을 위해 전체 include 안함)
+  function _utf8ToBytes(string, units) {
+    units = units || Infinity;
+    var codePoint;
+    var length = string.length;
+    var leadSurrogate = null;
+    var bytes = [];
+    var i = 0;
+
+    for (; i < length; i++) {
+      codePoint = string.charCodeAt(i);
+
+      // is surrogate component
+      if (codePoint > 0xd7ff && codePoint < 0xe000) {
+        // last char was a lead
+        if (leadSurrogate) {
+          // 2 leads in a row
+          if (codePoint < 0xdc00) {
+            if ((units -= 3) > -1) {
+              bytes.push(0xef, 0xbf, 0xbd);
+            }
+            leadSurrogate = codePoint;
+            continue;
+          } else {
+            // valid surrogate pair
+            codePoint =
+              ((leadSurrogate - 0xd800) << 10) | (codePoint - 0xdc00) | 0x10000;
+            leadSurrogate = null;
+          }
+        } else {
+          // no lead yet
+
+          if (codePoint > 0xdbff) {
+            // unexpected trail
+            if ((units -= 3) > -1) {
+              bytes.push(0xef, 0xbf, 0xbd);
+            }
+            continue;
+          } else if (i + 1 === length) {
+            // unpaired lead
+            if ((units -= 3) > -1) {
+              bytes.push(0xef, 0xbf, 0xbd);
+            }
+            continue;
+          } else {
+            // valid lead
+            leadSurrogate = codePoint;
+            continue;
+          }
+        }
+      } else if (leadSurrogate) {
+        // valid bmp char, but last char was a lead
+        if ((units -= 3) > -1) {
+          bytes.push(0xef, 0xbf, 0xbd);
+        }
+        leadSurrogate = null;
+      }
+
+      // encode utf8
+      if (codePoint < 0x80) {
+        if ((units -= 1) < 0) {
+          break;
+        }
+        bytes.push(codePoint);
+      } else if (codePoint < 0x800) {
+        if ((units -= 2) < 0) {
+          break;
+        }
+        bytes.push((codePoint >> 0x6) | 0xc0, (codePoint & 0x3f) | 0x80);
+      } else if (codePoint < 0x10000) {
+        if ((units -= 3) < 0) {
+          break;
+        }
+        bytes.push(
+          (codePoint >> 0xc) | 0xe0,
+          ((codePoint >> 0x6) & 0x3f) | 0x80,
+          (codePoint & 0x3f) | 0x80
+        );
+      } else if (codePoint < 0x200000) {
+        if ((units -= 4) < 0) {
+          break;
+        }
+        bytes.push(
+          (codePoint >> 0x12) | 0xf0,
+          ((codePoint >> 0xc) & 0x3f) | 0x80,
+          ((codePoint >> 0x6) & 0x3f) | 0x80,
+          (codePoint & 0x3f) | 0x80
+        );
+      } else {
+        throw new Error("Invalid code point");
+      }
+    }
+
+    return bytes;
+  }
+
+  if (!global.FinCert) {
+    global.FinCert = {};
+  }
+
+  global.FinCert.loadUtil = loadUtil;
+})(window);

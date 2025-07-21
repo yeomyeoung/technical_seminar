@@ -1,0 +1,296 @@
+/**
+ ***************************************************************************
+ * Wooribank Client Device Package Invoker, 0.8.4
+ *
+ * For more information on this product, please see
+ * https://www.wooribank.com/
+ *
+ * Copyright (c) Wooribank Co.,Ltd  All Rights Reserved.
+ *
+ ***************************************************************************
+ */
+var wbagent = wbagent || (function(){
+	var Class = {};
+	var _Class = {
+				_setupPageUrl : gSetupPageUrl ? gSetupPageUrl : "https://spib.wooribank.com/pib/Dream?withyou=CMCOM0127",
+				_notInstalledMsg : gNotInstalledMsg ? gNotInstalledMsg : "고객님의 안전한 거래를 위하여 인터넷뱅킹 이용 시 보안프로그램 설치가 필요합니다. 설치 페이지로 이동하시겠습니까?",
+				_notInstallDetectMsg : typeof gNotDetectInstallMsg != "undefined" ? gNotDetectInstallMsg : "이(가) 설치되었지만 동작이 확인되지 않고 있습니다. 보안프로그램 설치/동작 FAQ에서 자세한 해결방법을 찾아보시겠습니까?",
+				_nameKeyboard : typeof gRepresentNameKeyboard != "undefined" ? gRepresentNameKeyboard : "키보드보안 프로그램",
+				_nameFirewall : typeof gRepresentNameFirewall != "undefined" ? gRepresentNameFirewall : "개인방화벽 프로그램",
+				_nameIpLog : typeof gRepresentNameIpLog != "undefined" ? gRepresentNameIpLog : "보안로그 수집기",
+				_faqPageUrl : typeof gFaqUrl != "undefined" ? gFaqUrl : "https://spot.wooribank.com/pot/Dream?withyou=CQCCS0047",
+				_cookie : function (name) {
+					var search = name + "=";
+				    if (document.cookie.length > 0){
+				        var offset = document.cookie.indexOf(search);
+				        if (offset != -1){
+							offset += search.length;
+							var end = document.cookie.indexOf(";", offset);
+							if(end == -1){
+								end = document.cookie.length;
+							}
+							return unescape(document.cookie.substring(offset, end));
+				        }
+				    }
+				    return "";
+				},
+				_isInstalledByVeraport : function (name) {
+					var val = _Class._cookie(name);
+					if (val == "installed") {
+						return true;
+					}
+					return false;
+				},
+				iplog : {
+						type : "iplog",
+						name : "",
+						isInstalled : false, 
+						isSync : function() {
+								if (typeof realip != "undefined") {
+									return false;
+								}else if(this.name == "IPinsideLWS"){
+									return false;
+								}
+								return true;
+						},
+						check : function (){
+							var that = this;
+							if (typeof IPinside != "undefined"){
+								that.name = "IPinsideLWS";
+								var object = {
+										before:function(data) {
+						    				
+						    				},
+									    installCheckCallback:function(installCheckResult) {
+									        if(installCheckResult == IPinsideInstallCheckResultType.NotInstalled){
+									         	if (confirm(_Class._notInstalledMsg + " (" +_Class._nameIpLog+ ")")) {
+									         		document.location.href = _Class._setupPageUrl + "&P_name=" + that.name + "&url=" + encodeURIComponent(window.location.href);
+									         	}else{
+									         		switch (wbUI.lang) {
+														case "ko" :
+															alert(_Class._nameIpLog + "를 설치하지 않으시는 경우, 단말기지정서비스와 단말기의 정보를 이용하는 거래에 제한이 있을 수 있으니 "
+																	+"편리한 인터넷뱅킹 이용을 위해 설치를 권고 드립니다.");
+															break;
+														default :
+															alert("If you don't want to install " + _Class._nameIpLog + " program, transactions using the device information may be limited. "+
+																	"For your convenience, the program to install is recommended.");
+													}
+									         	}
+											} else if(installCheckResult == IPinsideInstallCheckResultType.UpdateRequired){
+												if (confirm(_Class._notInstalledMsg + " (" +_Class._nameIpLog+ ")")) {
+									         		document.location.href = _Class._setupPageUrl + "&P_name=" + that.name + "&url=" + encodeURIComponent(window.location.href);
+									         	}else{
+									         		switch (wbUI.lang) {
+														case "ko" :
+															alert(_Class._nameIpLog + "를 설치하지 않으시는 경우, 단말기지정서비스와 단말기의 정보를 이용하는 거래에 제한이 있을 수 있으니 "
+																	+"편리한 인터넷뱅킹 이용을 위해 설치를 권고 드립니다.");
+															break;
+														default :
+															alert("If you don't want to install " + _Class._nameIpLog + " program, transactions using the device information may be limited. "+
+																	"For your convenience, the program to install is recommended.");
+													}
+									         	}
+											} else if(installCheckResult == IPinsideInstallCheckResultType.LatestInstalled) {
+												that.isInstalled = true;
+												return  true;
+												
+											}
+										}
+									};
+								IPinside.launchAgent(object);
+							}
+							return that;
+						},
+						initialize: function(){
+						},
+						run: function() {}
+					}, 
+				keyboard : {
+							type : "keyboard",
+							name : "",
+							isInstalled : false,
+							isSync : function() {
+								if (typeof npPfsStartup == "function") {
+									return false;
+								}
+								return true;
+							},
+							check : function() {
+								var that = this;
+								if (typeof PrintTouchEnKeyTag == "function") {
+									that.name = "TouchEnKey";
+								} else if (typeof npPfsStartup == "function") {
+									that.name = "NOS";
+									
+									$(function(){
+										if (typeof console != "undefined") {
+											console.log("[wbagent.js] enc=on :" + $(document).find("input[enc=on]").length);
+										}
+										
+										if ($(document).find("input[enc=on]").length > 0) {
+											if (wbUI.lang != "ko") {
+												wbUI.showLoading();
+											} else {
+												wbUI.showLoading({type: 4});
+											}
+										}
+										npPfsCtrl.isInstall({
+											success: function(){
+												that.isInstalled=true;
+												npPfsStartup(null, false, true, false, false, "enc", "on");
+												npPfsCtrl.isVirtualMachine(function(result){
+													if(result) {
+														if (typeof setOnlyuseTransKey == "function") {
+															setOnlyuseTransKey(true);
+														}
+														if (typeof AnySign != "undefined") {
+															AnySign.mIsVirtualMachine = result;
+														}
+													}
+												});
+											}, 
+										fail: function(){
+												that.isInstalled=false;
+												wbUI.hideLoading();
+												if ($(document).find("input[enc=on]").length > 0) {
+													if (_Class._isInstalledByVeraport(that.name)) {
+														if (confirm(_Class._nameKeyboard + "(" + that.name + ")" + _Class._notInstallDetectMsg)) {
+															document.location.href = _Class._faqPageUrl;
+														}
+													} else {
+														if(confirm(_Class._notInstalledMsg + " (" + _Class._nameKeyboard + ")")) {
+															document.location.href = _Class._setupPageUrl + "&P_name=" + that.name + "&url=" + encodeURIComponent(window.location.href);
+														} else {
+															switch (wbUI.lang) {
+															case "ko" :
+																alert(_Class._nameKeyboard + "를 설치하지 않으시는 경우, 물리적인 키보드를 이용한 중요 입력정보(비밀번호 등)를 보호할 수 없습니다."
+																		+"안전한 인터넷뱅킹 이용을 위해 설치를 권고 드리며, 설치를 원하지 않거나 불가능 하실 경우 거래 시 가상키보드를 이용해 주시기 바랍니다.");
+																break;
+															default :
+																alert("If you don't install " + _Class._nameKeyboard + " program, the informations that are highly important such as password, social security number, etc are not protected from "+
+																		"malicious key log and hook program. For your convenience and safety, the program to install is recommended. If you don't want or is impossible to install, use the screen keyboard when" + 
+																"you enter important informations proceeding the transaction.");
+															}
+														}
+													}
+												}
+											}
+										});
+									});
+								}
+								return that;
+							},
+							initialize: function(){
+								var that = this;
+								if (that.name == "TouchEnKey") {
+								} else if (that.name == "NOS") {
+									// TODO:
+								}
+							},
+							run: function(){
+								var that = this;
+								if (that.name == "TouchEnKey") {
+									TouchEnKey_ApplySecurity();
+								} else if (that.name == "NOS") {
+								}
+							}
+					}, 
+				firewall : {
+							type : "firewall",
+							name : "",
+							isInstalled : false,
+							isSync : function() {
+								if (typeof $ASTX2 != "undefined") {
+									return false;
+								}
+								return true;
+							},
+							check : function(fwOption) {
+								var that = this;
+								if (typeof aos_is_new == "function") {
+									that.name = "aos";
+									that.isInstalled = aos_is_new();
+								} else if (typeof checkInstallNetizenPlugin == "function") {
+									that.name = "Netizen";
+									that.isInstalled =  checkInstallNetizenPlugin();
+								} else if (typeof $ASTX2 != "undefined") {
+									that.name = "ASTx";
+									if (fwOption) {
+										$ASTX2.init(
+												function success() {
+													that.isInstalled = true;
+												},
+												function fail() {
+													if (_Class._isInstalledByVeraport(that.name)) {
+														if (confirm(_Class._nameFirewall + "(" + that.name + ")" + _Class._notInstallDetectMsg)) {
+															document.location.href = _Class._faqPageUrl;
+														}
+													} else {
+														if ($ASTX2.getLastError() == $ASTX2_CONST.ERROR_NOTSUPPORTED) {
+															// TODO: 미지원OS처리
+														} else if($ASTX2.getLastError() == $ASTX2_CONST.ERROR_NOTINST) {
+															that.isInstalled = false;
+															if(confirm(_Class._notInstalledMsg + " (" + _Class._nameFirewall + ")")) {
+																document.location.href = _Class._setupPageUrl + "&P_name=" + that.name + "&url=" + encodeURIComponent(window.location.href);
+															} else {
+																
+																switch (wbUI.lang) {
+																case "ko" :
+																	alert(_Class._nameFirewall + "을 설치하지 않으시는 경우, 해킹 및 악성코드로부터 고객님의 PC를 안전하게 보호할 수 없습니다." +
+																	" 우리은행 인터넷뱅킹에서 제공하는 개인방화벽 제품의 설치를 원하지 않으신다면, 별도로 상용 안티바이러스 프로그램을 설치하시어 고객님의 PC를 안전하게 보호하시기 바랍니다.");
+																	break;
+																default :
+																	alert("If you don't install " + _Class._nameFirewall + " program, your device does not protect from virus or malware. "+
+																			"If you don't want to install, please use anti-virus and firewall program to protect your device.");
+																}
+																
+															}
+														}
+													}
+												}
+										);
+									}
+								} else if (typeof runFirewall == "function") {
+									that.name = "ansimi";
+									that.isInstalled = true;
+								}
+								return that;
+							},
+							initialize: function(){
+								var that = this;
+								if (that.name == "aos") {
+									aos_set_authinfo( 'aosmgr_wooribank.com.html' );
+						       		aos_set_option( "asyncmode", true );
+						        	aos_set_option( "uimode", true );
+						        	aos_write_object();
+								} else if (that.name == "Netizen") {
+									
+								} else if (that.name == "ASTx") {
+								} else if (that.name == "ansimi") {
+									
+								}
+							},
+							run: function(){
+								var that = this;
+								if (that.name == "aos") {
+									aos_start('e5');
+								} else if (that.name == "Netizen") {
+									startNetizen();
+								} else if (that.name == "ASTx") {
+									
+								} else if (that.name == "ansimi") {
+									runFirewall("login");
+								}
+							}
+					}			
+	};
+	
+	for (var member in _Class) {
+		if (member.indexOf('_') != 0) {
+			Class[member] = _Class[member];
+		}
+	}
+	
+	return Class;
+})();
+

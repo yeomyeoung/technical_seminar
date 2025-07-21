@@ -1,0 +1,1573 @@
+/*
+ *  수정일 2016-08-03 : 로딩이미지 생성 EL 수정  
+ *	수정일 2016-08-11 : 선택일 경우 skip 처리 부분 추가. 쿠키처리
+ */
+NPIv6.Util = new Object();
+NPIv6.Web = new Object();
+NPIv6.engine_ver = 0.064;
+NPIv6.Util.getOS = function() {
+    var contact = new Object();
+    contact.iPlatform = "";
+    contact.iPlatformbit = "";
+    contact.iPlatformversion = "";
+    contact.isMobile = false;
+    contact.metrouisupported = false;
+    var userAgent = "";
+    var platform = "";
+    var platformbit = "";
+    var platformversion = "";
+    if (typeof(navigator.userAgent) !== "undefined" && typeof(navigator.platform) !== "undefined") {
+        userAgent = navigator.userAgent.toLowerCase();
+        platform = navigator.platform.toLowerCase();
+    }
+    if (userAgent.search("mobile") != -1) {
+        contact.isMobile = true;
+        if (match = userAgent.match(/android\s([0-9\.]*)/)) {
+            platform = "android";
+            platformversion = match[1];
+        } else if (/ip(hone|od|ad)/.test(platform)) {
+            var mac_version = "";
+            if (mac_version = (userAgent).match(/os (\d+(?:\.\d+){1,2})/)) {
+                platformversion = mac_version[1];
+            } else if (mac_version = (userAgent).match(/os (\d+(?:\_\d+){1,2})/)) {
+                platformversion = mac_version[1].replace(/_/g, ".");
+            }
+            contact.iPlatform = platform;
+        }
+    } else {
+        if (platform == "win16" || platform == "win32" || platform == "win64") {
+            platformbit = platform.substring(3, 5);
+        }
+        if (userAgent.indexOf("win64") != -1 || userAgent.indexOf("x64") != -1 || userAgent.indexOf("wow64") != -1) {
+            platformbit = "64";
+        }
+        if (userAgent.indexOf("nt 6.3") != -1) {
+            platform = "windows";
+            platformversion = "8.1";
+            contact.metrouisupported = true;
+        } else if (userAgent.indexOf("nt 6.2") != -1) {
+            platform = "windows";
+            platformversion = "8";
+            contact.metrouisupported = true;
+        } else if (userAgent.indexOf("nt 6.1") != -1) {
+            platform = "windows";
+            platformversion = "7/server 2008 r2";
+        } else if (userAgent.indexOf("nt 6.0") != -1) {
+            platform = "windows";
+            platformversion = "vista/server 2008";
+        } else if (userAgent.indexOf("nt 5.2") != -1) {
+            platform = "windows";
+            platformversion = "xp x64/server 2003/server 2003 r2";
+        } else if (userAgent.indexOf("nt 5.1") != -1) {
+            platform = "windows";
+            platformversion = "xp";
+        } else if (userAgent.indexOf("nt 5.01") != -1) {
+            platform = "windows";
+            platformversion = "2000 sp1";
+        } else if (userAgent.indexOf("nt 5.0") != -1) {
+            platform = "windows";
+            platformversion = "2000";
+        } else if (userAgent.indexOf("mac") != -1) {
+            platform = "macintosh";
+            var mac_version = "";
+            if (mac_version = (userAgent).match(/os x (\d+(?:\.\d+){1,2})/)) {
+                platformversion = mac_version[1];
+            } else if (mac_version = (userAgent).match(/os x (\d+(?:\_\d+){1,2})/)) {
+                platformversion = mac_version[1].replace(/_/g, ".");
+            }
+        } else if (userAgent.indexOf("linux") != -1) {
+            if (userAgent.indexOf("ubuntu") != -1) {
+                platformversion = "ubuntu";
+            }
+            if (userAgent.indexOf("fedora") != -1) {
+                platformversion = "fedora";
+            }
+            if (platform.indexOf("x86_64") != -1) {
+                platformbit = "64";
+            } else if (platform.indexOf("i686") != -1) {
+                platformbit = "32";
+            } else {
+                platformbit = "32";
+            }
+            platform = "linux";
+        } else if (userAgent.indexOf("nt 4.0") != -1) {
+            platform = "windows";
+            platformversion = "nt 4.0";
+        } else if (userAgent.indexOf("9x 4.90") != -1) {
+            platform = "windows";
+            platformversion = "me";
+        } else if (userAgent.indexOf("98") != -1) {
+            platform = "windows";
+            platformversion = "98";
+        } else if (userAgent.indexOf("95") != -1) {
+            platform = "windows";
+            platformversion = "95";
+        } else if (userAgent.indexOf("win16") != -1) {
+            platform = "windows";
+            platformversion = "3.x";
+        } else if (userAgent.indexOf("windows nt") != -1) {
+            if (userAgent.indexOf("nt 10") != -1) {
+                platform = "windows";
+                platformversion = "10";
+                contact.metrouisupported = true;
+            } else {
+                platform = "windows";
+                platformversion = "nt";
+            }
+        } else if (userAgent.indexOf("windows") != -1) {
+            platform = "windows";
+            platformversion = "unkown";
+        } else {
+            eventcode += ",E00002";
+            platform = "unkown";
+            platformbit = "unkown";
+            platformversion = "unkown";
+        }
+    }
+    contact.iPlatform = platform;
+    contact.iPlatformversion = platformversion;
+    contact.iPlatformbit = platformbit;
+    return contact;
+};
+NPIv6.Util.getBRinfo = function() {
+    var contact = new Object();
+    contact.iBrname = "";
+    contact.iBrver = "";
+    contact.iBrbit = "";
+    contact.iLang = "";
+    var userAgent = "";
+    if (typeof(navigator.userAgent) !== "undefined") {
+        userAgent = navigator.userAgent.toLowerCase();
+    }
+    var verOffset;
+    if (userAgent.indexOf("msie") != -1 || userAgent.indexOf('trident') != -1) {
+        contact.iBrname = "ie";
+        if ((verOffset = userAgent.indexOf("swing")) != -1) {
+            contact.iBrname = "swing";
+            contact.iBrver = userAgent.substring(verOffset + 6);
+            return contact;
+        }
+        if (userAgent.indexOf("win64") != -1 && userAgent.indexOf("x64") != -1) {
+            contact.iBrbit = "64";
+        } else {
+            if (userAgent.indexOf("wow64") != -1) {
+                contact.iBrbit = "32";
+            } else if (NPIv6.Util.getOS().iPlatformbit == "32") {
+                contact.iBrbit = "32";
+            }
+        }
+    }
+    if (userAgent.indexOf('trident/7.0') != -1 || userAgent.indexOf('trident/8.0') != -1) {
+        contact.iBrver = "11";
+    } else if (userAgent.indexOf('trident/6.0') != -1) {
+        contact.iBrver = "10";
+    } else if (userAgent.indexOf('trident/5.0') != -1) {
+        contact.iBrver = "9";
+    } else if (userAgent.indexOf('trident/4.0') != -1) {
+        contact.iBrver = "8";
+    } else if (userAgent.indexOf('msie 7') != -1) {
+        contact.iBrver = "7";
+    } else if (userAgent.indexOf('msie 6') != -1) {
+        contact.iBrver = "6";
+    } else if ((verOffset = userAgent.indexOf('navigator')) != -1) {
+        contact.iBrname = "netscape";
+        contact.iBrver = userAgent.substring(verOffset + 10);
+    } else if ((verOffset = userAgent.indexOf('firefox')) != -1) {
+        contact.iBrname = "firefox";
+        contact.iBrver = userAgent.substring(verOffset + 8);
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    } else if ((verOffset = userAgent.indexOf('opr')) != -1 || (verOffset = userAgent.indexOf('opera')) != -1) {
+        contact.iBrname = "opera";
+        contact.iBrver = userAgent.substring(verOffset + 4);
+        if ((verOffset = userAgent.indexOf("version")) != -1) {
+            contact.iBrver = userAgent.substring(verOffset + 8);
+        }
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    } else if ((verOffset = userAgent.indexOf('edge')) != -1) {
+        contact.iBrname = "edge";
+        contact.iBrver = userAgent.substring(verOffset + 5);
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    } else if ((verOffset = userAgent.indexOf('chromium')) != -1) {
+        contact.iBrname = "chrome";
+        contact.iBrver = userAgent.substring(verOffset + 8);
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    } else if ((verOffset = userAgent.indexOf('chrome')) != -1) {
+        contact.iBrname = "chrome";
+        contact.iBrver = userAgent.substring(verOffset + 7);
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    } else if ((verOffset = userAgent.indexOf('crios')) != -1) {
+        contact.iBrname = "chrome";
+        contact.iBrver = userAgent.substring(verOffset + 6);
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    } else if ((verOffset = userAgent.indexOf('safari')) != -1) {
+        contact.iBrname = "safari";
+        contact.iBrver = userAgent.substring(verOffset + 7);
+        if ((verOffset = userAgent.indexOf("version")) != -1) {
+            contact.iBrver = userAgent.substring(verOffset + 8);
+        }
+        if ((ix = contact.iBrver.indexOf(" ")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+        if ((ix = contact.iBrver.indexOf(";")) != -1) {
+            contact.iBrver = contact.iBrver.substring(0, ix);
+        }
+    }
+    
+    if (contact.iBrname == "ie" || contact.iBrname == "swing") {
+        temp = navigator.userLanguage.toLowerCase();
+        if ((ix = temp.indexOf('-')) != -1) {
+            temp = temp.substring(0, ix);
+        }
+        if ((ix = temp.indexOf(',')) != -1) {
+            temp = temp.substring(0, ix);
+        }
+        contact.iLang = temp;
+    } else if (navigator.language) {
+        temp = navigator.language.toLowerCase();
+        if ((ix = temp.indexOf('-')) != -1) {
+            temp = temp.substring(0, ix);
+        }
+        if ((ix = temp.indexOf(',')) != -1) {
+            temp = temp.substring(0, ix);
+        }
+        contact.iLang = temp;
+    }
+    //Metro UI Check
+    if (contact.iBrname == "ie" && NPIv6.Util.getOS().metrouisupported) {
+    	var brversiontmp = Number(contact.iBrver);
+    	if (brversiontmp >= 10) {
+    		try {
+            	contact.activexsupported = !!new ActiveXObject("htmlfile");
+            } catch (e) {
+            	contact.activexsupported = false;
+            }
+            if((window.screenY === 0 && (window.innerHeight+1) !== window.outerHeight) && !contact.activexsupported && !window.__IE_DEVTOOLBAR_CONSOLE_COMMAND_LINE) {
+            	contact.iBrname = "ie_metro";
+          	}	
+    	}	
+    }
+    return contact;
+};
+NPIv6.Util.getConversionOption = function(type) {
+    var data = "";
+    if (type == "web") {
+        if (NPIv6.Config.sRunWeb == true) {
+            data = "P";
+        } else if (NPIv6.Config.sRunWeb == false) {
+            data = "N";
+        } else {
+            data = "Z";
+        }
+    } else if (type == "pc") {
+        if (NPIv6.Config.sRunPC == true) {
+            data = "P";
+        } else if (NPIv6.Config.sRunPC == false) {
+            data = "N";
+        } else {
+            data = "Z";
+        }
+    } else if (type == "key") {
+        if (NPIv6.Config.sRunKey == true) {
+            data = "P";
+        } else if (NPIv6.Config.sRunKey == false) {
+            data = "N";
+        } else {
+            data = "Z";
+        }
+    } else if (type == "vpn") {
+        if (NPIv6.Config.sRunVPN == true) {
+            data = "2";
+        } else if (NPIv6.Config.sRunVPN == false) {
+            data = "0";
+        } else {
+            data = "1";
+        }
+    } else if (type == "release") {
+        var osobj = NPIv6.Util.getOS();
+        if (osobj.iPlatform == "windows") {
+            data = NPIv6.Config.versionWin;
+            NPIv6.Config.sSecuCdWeb = NPIv6.Config.cSecuCd.win[0];
+            NPIv6.Config.sSecuCdKey = NPIv6.Config.cSecuCd.win[1];
+            NPIv6.Config.sSecuCdPC = NPIv6.Config.cSecuCd.win[2];
+            NPIv6.Config.cUdata_code = NPIv6.Config.sUdata.win;
+        } else if (osobj.iPlatform == "macintosh") {
+            data = NPIv6.Config.versionMac;
+            NPIv6.Config.sSecuCdWeb = NPIv6.Config.cSecuCd.mac[0];
+            NPIv6.Config.sSecuCdKey = NPIv6.Config.cSecuCd.mac[1];
+            NPIv6.Config.sSecuCdPC = NPIv6.Config.cSecuCd.mac[2];
+            NPIv6.Config.cUdata_code = NPIv6.Config.sUdata.mac;
+        } else if (osobj.iPlatform == "linux") {
+            data = NPIv6.Config.versionLix;
+            NPIv6.Config.sSecuCdWeb = NPIv6.Config.cSecuCd.linux[0];
+            NPIv6.Config.sSecuCdKey = NPIv6.Config.cSecuCd.linux[1];
+            NPIv6.Config.sSecuCdPC = NPIv6.Config.cSecuCd.linux[2];
+            NPIv6.Config.cUdata_code = NPIv6.Config.sUdata.linux;
+        } else {
+        	eventcode += ",E00017";
+        }
+        data = data.replace(/\,/gi, ".");
+    } else if (typeof(type) !== 'undefined' && typeof(type) === 'object') {
+        if (type.type != "undefined" && type.code != "undefined" && type.secur != "undefined") {
+        	if (typeof(NPIv6.Config.cPurl) === 'undefined' || NPIv6.Config.cPurl == "") {
+        		data = "https://127.0.0.1:21300/?t=" + type.type + "&";
+        	}
+        	else {
+        		data = NPIv6.Config.cPurl + "?t=" + type.type + "&";
+        	}
+            var param01 = NPIv6.Util.getConversionOption("release");
+            var param02 = NPIv6.Config.cGathinfo;
+            var param03 = NPIv6.Util.getConversionOption("web");
+            var param04 = NPIv6.Util.getConversionOption("pc");
+            var param05 = NPIv6.Util.getConversionOption("key");
+            var param06 = NPIv6.Config.sSecuCdWeb;
+            var param07 = NPIv6.Config.sSecuCdPC;
+            var param08 = NPIv6.Config.sSecuCdKey;
+            var param09 = NPIv6.Util.getConversionOption("vpn");
+			//sGetNATLoopSec 가 있을경우 우선적으로 본다
+            if (typeof (NPIv6.Config.sGetNATLoopSec) !== 'undefined') {
+            	//수집시간보다 NAT 수집이 클 경우 디폴트로 변경
+            	if (NPIv6.Config.sGetNATLoopSec >= NPIv6.Config.cInfoTimeOut) {
+            		NPIv6.Config.sGetNATLoopCnt = "200";
+            	}
+            	NPIv6.Config.sGetNATLoopCnt = parseInt(NPIv6.Config.sGetNATLoopSec / 20);
+            	if (NPIv6.Config.sGetNATLoopCnt <= 0) {
+            		NPIv6.Config.sGetNATLoopCnt = 1;
+            	}
+            	NPIv6.Config.sGetNATLoopCnt = ""+NPIv6.Config.sGetNATLoopCnt;
+            }
+            //sGetNATLoopCnt 값이 없을경우 기본값으로 설정
+            if (typeof (NPIv6.Config.sGetNATLoopCnt) === 'undefined') {
+            	NPIv6.Config.sGetNATLoopCnt = "200";
+            }
+            var param10 = NPIv6.Config.sGetNATLoopCnt;
+            var param11 = "3000";
+            var param12 = NPIv6.Config.cWinRemote;
+            var param13 = NPIv6.Config.isHSNRevers ? "1" : "0";
+            if (typeof (NPIv6.Config.isChangeModule) === 'undefined') {
+            	NPIv6.Config.isChangeModule = true;
+            }
+            if (NPIv6.Config.isChangeModule == false) {
+            	param13 = "2";
+            }
+            
+            var param14 = NPIv6.Config.cOpt;
+            var param15 = NPIv6.Config.cUdata_code;
+            var param16 = NPIv6.Config.isTighten_security ? "1" : "0";
+            var param17 = NPIv6.Config.cKey;
+			var param18 = NPIv6.Config.isAllTightenSecurity ? "1" : "0";
+            if (type.code != "") {
+                param15 = type.code;
+            }
+            if (type.secur == true) {
+                param16 = "1";
+            } else if (type.secur != "" && type.secur == false) {
+                param16 = "0";
+            }
+            var osobj = NPIv6.Util.getOS();
+            if (osobj.iPlatform == "windows") {
+                param17 = "";
+            }
+            if (type.type == "P") {
+                param14 = "";
+                param15 = "";
+                param16 = "";
+                param17 = "";
+            } else if (type.type == "U") {
+                param03 = "";
+                param04 = "";
+                param05 = "";
+                param06 = "";
+                param07 = "";
+                param08 = "";
+                param09 = "";
+                param10 = "";
+                param11 = "";
+            } else if (type.type == "V") {
+                param02 = "";
+                param03 = "";
+                param04 = "";
+                param05 = "";
+                param06 = "";
+                param07 = "";
+                param08 = "";
+                param09 = "";
+                param10 = "";
+                param11 = "";
+                param12 = "";
+                param13 = "";
+                param14 = "";
+                param15 = "";
+                param16 = "";
+                param17 = "";
+				param18 = "";
+            }
+            var parameters = param01 + ":";
+            parameters += param02 + ":";
+            parameters += param03 + ":";
+            parameters += param04 + ":";
+            parameters += param05 + ":";
+            parameters += param06 + ":";
+            parameters += param07 + ":";
+            parameters += param08 + ":";
+            parameters += param09 + ":";
+            parameters += param10 + ":";
+            parameters += param11 + ":";
+            parameters += param12 + ":";
+            parameters += param13 + ":";
+            parameters += param14 + ":";
+            parameters += param15 + ":";
+            parameters += param16 + ":";
+            parameters += param17 + ":";
+			parameters += param18 + ":";
+            data += "value=" + encodeURIComponent(parameters);
+        }
+    }
+    return data;
+}
+NPIv6.Web.core = function(url, timeoutsec,type, callback) {
+	
+//	console.log(type);
+//	if (type == "A") {
+//		timeoutsec = 1000;
+//	}
+	
+	var jquery_version = jQuery().jquery;
+	var ver_target = jquery_version.split(".");
+	var ver_local_arr = [1,5,2];
+	for (var i = 0; i < 3; i++) {
+        if (Number(ver_target[i]) < Number(ver_local_arr[i])) {
+        	NPIv6.Config.cJqueryOldversion = false;
+            i = 3;
+        } else if (Number(ver_target[i]) > Number(ver_local_arr[i])) {
+        	NPIv6.Config.cJqueryOldversion = true;
+            i = 3;
+        } else if (Number(ver_target[i]) == Number(ver_local_arr[i]) && i == 2) {
+        	NPIv6.Config.cJqueryOldversion = true;
+        }
+    }
+	if (typeof (NPIv6.Config.ajaxSync) === 'undefined') {
+		NPIv6.Config.ajaxSync = false;
+	}
+	if (NPIv6.Config.ajaxSync == "") {
+		NPIv6.Config.ajaxSync = false;
+	}
+	
+	if (NPIv6.Config.ajaxSync == true) {
+		if ( IPinside.browser == "ie" && parseInt(IPinside.browserversion) < "10" ) {
+			NPIv6.timeoutchecker = setTimeout( callback, timeoutsec );
+			jQuery.ajax({
+				url: url,
+				dataType: "jsonp",
+				cache: false,
+				async:false,
+				success: function(data) {
+					window.clearTimeout(NPIv6.timeoutchecker);
+					callback(data);
+				}
+			});
+		} else {
+			NPIv6.timeoutchecker = setTimeout( callback, timeoutsec );
+			jQuery.ajax({
+				url: url + "&callback= ",
+				cache: false,
+				crossDomain: true,
+				contentType: "application/javascript",
+				async:false,
+				success: function(data) {
+					window.clearTimeout(NPIv6.timeoutchecker);
+					data = data.replace(/ \(|\);/g,'');
+					callback(JSON.parse(data));
+				}
+			});
+		}
+	}
+	else {
+		if (NPIv6.Config.cJqueryOldversion == false) {
+			NPIv6.timeoutchecker = setTimeout( callback, timeoutsec );
+			jQuery.ajax({
+				url : url,
+				cache:false,
+				crossDomain: true,
+				dataType : "jsonp",
+				success : function(data){
+					window.clearTimeout(NPIv6.timeoutchecker);
+					callback(data);
+				}
+			});
+		}
+		else {
+			var params = {
+				onSuccess :function(data) {
+					callback(data);
+				},
+				onFailure:function(e) {
+					if (type == "V") {
+						params.retryCount++;
+						if (params.retryCount <= params.retryLimit && new Date().getTime() - params.created <  params.retryTimeout) { 
+							NPIv6.Web.Sendjsonpajax(params);
+						}
+						else if (params.retryLimit <= params.retryCount || params.retryLimit && new Date().getTime() - params.created > params.retryTimeout) {
+							var data = {
+								result: "T"
+							}
+							callback(data);
+						}
+					} else {
+						if ((e.status != 200 && e.statusText.indexOf("success") != -1) == false) {
+							//기업은행, 수협은행 적용
+							NPIv6.Web.core(NPIv6.Web.installCheckObject.url,
+									NPIv6.Web.installCheckObject.timeoutsec,
+									NPIv6.Web.installCheckObject.type, function (data) {
+								//console.log(data);
+								if (data.result == "I") {
+//									console.log(NPIv6.Web.launchData);
+									//에이전트가 설치됨 & 수집실패 
+									if (typeof (NPIv6.Web.launchData.collectFail) == 'function'
+										&& NPIv6.Web.launchData.collectFail !== "undefined") {
+										NPIv6.Web.launchData.collectFail();
+										NPIv6.Web.hideLoadingView();
+									} else {
+										//에이전트가 설치됨 & collectFail function 미사용 => 설치페이지 이동
+										var data = {
+							                    result: "T"
+										}
+//										alert("설치 & 수집실패 & collectFail 콜백 미사용");
+							            callback(data);
+									}
+								} else {
+									//에이전트가 미설치 => 설치페이지 이동
+									var data = {
+						                    result: "T"
+									}
+//									alert("미설치 & 수집실패 & collectFail 콜백 미사용");
+						            callback(data);
+								}
+							});
+			            }
+					}
+				},
+				url:url,
+				retryCount: 0, 
+				retryLimit: parseInt(timeoutsec/2000),
+				retryTimeout: timeoutsec,
+				timeout: timeoutsec,
+				created : new Date().getTime()
+			}
+			if (type == "V") {
+				params.timeout = 2000;
+			}
+			//console.log("ajax 요청");
+			NPIv6.Web.Sendjsonpajax(params);
+		}	
+	}
+	
+};
+NPIv6.Web.Sendjsonpajax = function(params) {
+    try {
+		if ( IPinside.browser == "ie" && parseInt(IPinside.browserversion) < "10" ) {
+			jQuery.ajax({
+				url: params.url,
+				timeout: params.timeout,
+				cache: false,
+				crossDomain: true,
+				dataType: "jsonp",
+				contentType: "application/javascript",
+				success: function(data) {
+					params.onSuccess(data);
+				},
+				error: function(xhr, textStatus, errorThrown) {
+					params.onFailure(xhr);
+				}
+			});
+		} else {
+			jQuery.ajax({
+				url: params.url + "&callback= ",
+				timeout: params.timeout,
+				cache: false,
+				crossDomain: true,
+				contentType: "application/javascript",
+				success: function(data) {
+					data = data.replace(/ \(|\);/g,'');
+					params.onSuccess(JSON.parse(data));
+				},
+				error: function(xhr, textStatus, errorThrown) {
+					params.onFailure(xhr);
+				}
+			});
+		}
+    } catch (e) {
+    	params.onFailure(e);
+    }
+}
+NPIv6.Web.LoadingAlignCenter = function() {
+	var left = (jQuery(window).scrollLeft() + (jQuery(window).width() - jQuery(".IPinsidev6-img").width()) / 2);
+	var top = (jQuery(window).scrollTop() + (jQuery(window).height() - jQuery(".IPinsidev6-img").height()) / 2);
+	if (top < 0) top = 0;
+	if (left < 0) left = 0;
+	jQuery(".IPinsidev6-img").css({
+		"left": left,
+		"top": top,
+		"z-index": 999
+	});
+    jQuery(".IPinsidev6-overlay").css({
+    	"width": jQuery(window).width(),
+    	"height": jQuery(window).height()
+    });
+};
+jQuery(window).resize(function() {
+    NPIv6.Web.LoadingAlignCenter();
+});
+/*메인 페이지 일경우 설치 페이지로 이동이 적절하나
+설치 페이지에서 또 설치 페이지로 이동 시킬 필요는 없다
+이따의 값의 비교가 필요하다.
+
+경우의 수를 보자
+메인페이지에서 미설치 일경우 - 페이지 이동 또는 Agnet 내려받기( 로그인 진입 X 밑 클릭 금지)
+메인페이지에서 업데이트 일경우 - 페이지 이동 또는 Agnet 내려받기( 로그인 진입 X 및 클릭 금지)
+메인페이지에서 설치일경우 - 페이지 이동 X Agent 내려받기 X ( 로그인 진입 및 클릭 가능)
+
+설치페이지에서 미설치일경우 - Agent 내려받기 또는 아무것도 안하기
+설치페이지에서 업데이트일경우 - Agnet 내려받기 또는 아무것도 안하기
+설치페이지에서 설치일경우 - 페이지 이동 또는 아무것도 안하기
+*/
+NPIv6.Web.Pagelocation = function(isBoolean) {
+    if (isBoolean != true) {
+        if (typeof(NPIv6.Config.cSetupPage) !== 'undefined' && NPIv6.Config.cSetupPage != "") {
+            if (NPIv6.Config.isFrameTopOption == true) {
+                top.location.href = NPIv6.Config.cSetupPage;
+            } else {
+                location.href = NPIv6.Config.cSetupPage;
+            }
+        }
+    }
+}
+NPIv6.Web.showLoadingView = function() {
+	if (jQuery("body").find(".IPinsidev6-loading").length >= 1) {
+        jQuery(".IPinsidev6-loading").each(function() {
+            jQuery(this).remove();
+        });
+    }
+	var ajaxloadingtags = "<div class='IPinsidev6-overlay IPinsidev6-loading' style='-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=10);";
+	ajaxloadingtags += "filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=10);opacity: 0.1;position:fixed; top:0;left:0;z-index:998;'></div>";
+    ajaxloadingtags += "<div class='IPinsidev6-img IPinsidev6-loading' style='position: fixed; opacity: 1;'><img src='" + NPIv6.Config.cAjaxLodingimg + "'></div>";
+    jQuery("body").prepend(ajaxloadingtags);
+    
+    //로딩이미지 수정 20160801 
+    jQuery(".IPinsidev6-overlay").css({
+    	//"width": jQuery('body').prop("scrollWidth"),
+    	//"height": jQuery('body').prop("scrollHeight"),
+    	"width": jQuery(window).width(),
+    	"height": jQuery(window).height(),
+    	//"background-color":"#ffffff"
+    	"background-color":"#gray"
+    });
+    NPIv6.Web.LoadingAlignCenter();
+};
+NPIv6.Web.hideLoadingView = function(){
+	jQuery('.IPinsidev6-loading').hide();
+};
+
+NPIv6.Web.installCheck = function(obj) {
+	var cParams = {type: "V",code: "",secur: ""};
+    var purl = NPIv6.Util.getConversionOption(cParams);
+    
+    //20160817 
+    //설치는 되었는데 수집시 특정 원인으로 ajax 통신이 끊겼을 시, 고의로 agent를 삭제하여 ajax가 끊긴건지에 대한 여부를 확인하기 위한 객체.
+    //해당 객체로 ajax 통신 실패 후 설치체크를 한번 더 하게됨.
+    NPIv6.Web.installCheckObject = {
+    		"url": purl,
+    		"timeoutsec" : NPIv6.Config.cInstallTimeOut,
+    		"type" : cParams.type
+    }
+    
+    NPIv6.Web.core(purl, NPIv6.Config.cInstallTimeOut,cParams.type, function(data) {
+    	if (typeof (data) === 'undefined') {
+    		data = new Object();
+    		data.result = "T";
+    	}
+    	if (data.result != "I" && data.result != "U") {
+			data.result = "T";
+		}
+    	if ((typeof (obj.installCheckCallback) === 'function') && (typeof (obj.after) === 'function')) {
+    		//유효성 체크로직 추가 160512
+    		if (typeof (data.isvalidate) === 'undefined') {
+    			data.isvalidate = "1";
+    		}
+    		
+    		if (data.result == "U" && data.isvalidate == "0") {
+    			NPIv6.Config.isValidate = false;
+    		}
+    		
+    		eventcode += ",E00031";
+    		//경남은행 케이스 현재 페이지에서 수집과 설치 체크를 할경우
+    		//페이지 이동 X agnet 다운로드
+    		var result = obj.installCheckCallback(data.result);
+            if (result != true) {
+            	eventcode += ",E00032";
+            	if (typeof (obj.before) !== 'function') {
+            		NPIv6.Web.hideLoadingView();
+            	}
+            	if ( typeof (NPIv6.Config.cSetupPage) !== 'undefined' && NPIv6.Config.cSetupPage != "") {
+            		//설치 페이지로 이동
+            		NPIv6.Web.Pagelocation(false);
+            	}
+            	else if (NPIv6.Config.isAutoDownload == true) {
+        			NPIv6.Web.downloadAgent();
+        		}
+            	
+            }
+            else if (result == true && data.result == "I") {
+            	eventcode += ",E00033";
+            	NPIv6.Web.datacollector(obj,data);
+            }
+            else if (result == true && data.result != "I") {
+            	eventcode += ",E00034";
+            	if (typeof (obj.before) !== 'function') {
+            		NPIv6.Web.hideLoadingView();
+            	}
+            }
+        }
+    	//installcallback
+    	else if (data.result != "I") {
+    		
+    		if (typeof (data.isvalidate) === 'undefined') {
+    			data.isvalidate = "1";
+    		}
+    		
+    		if (data.result == "U" && data.isvalidate == "0") {
+    			NPIv6.Config.isValidate = false;
+    		}
+    		
+    		
+    		if (typeof (obj.before) !== 'function') {
+    			NPIv6.Web.hideLoadingView();
+        	}
+    		if (typeof (obj.installCheckCallback) === 'function') {
+    			if (NPIv6.Config.isAutoDownload == true) {
+	    			NPIv6.Web.downloadAgent();
+	    		}
+    			obj.installCheckCallback(data.result);
+        	}
+    		else if (typeof (obj.after) === 'function') {
+    			NPIv6.Web.Pagelocation(false);
+        	}
+		}
+    	else {
+    		if (typeof (obj.after) !== 'function') {
+    			if (typeof (obj.before) !== 'function') {
+        			NPIv6.Web.hideLoadingView();
+            	}
+    			if (typeof (obj.installCheckCallback) === 'function') {
+    				obj.installCheckCallback(data.result);
+            	}
+        	}
+    		else {
+    			NPIv6.Web.datacollector(obj,data);	
+    		}
+    	}
+    	
+    	//20160810 선택 고객사에서 agent 설치여부 쿠키 저장
+    	if (!NPIv6.Config.isNecessary && data.result == "I") {
+   			NPIv6.Web.setCookie("com.interezen.IPinside6.isInstalled", "YES");
+    	} else if (!NPIv6.Config.isNecessary && data.result != "I") {
+    		NPIv6.Web.setCookie("com.interezen.IPinside6.isInstalled", "NO");
+    	}
+    });
+};
+
+//데이터 수집 로직
+NPIv6.Web.datacollector = function(obj2,data) {
+	//이건 설치 체크에서 I라고 들어왔을 경우 이다.
+	//data.result = I
+	//만약 수집이 대표 값이 없을 경우
+    //만약 버전 정보만 따로 요청한 것이라면 
+    //버전은 설치 체크 로직이다. 앞단에서 했기 때문에 이건 제외 시켜야 한다.
+    //V로 셋팅 됐을 경우 A로 값을 변경한다.
+	if (typeof(NPIv6.Config.cDataType) === 'undefined' || NPIv6.Config.cDataType == "V") {
+        NPIv6.Config.cDataType = "A";
+    }
+	//이건 Udata 수집을 위해 값을 임의 적으로 셋팅하는 것이다.
+    var purl = "";
+    if (typeof(obj2.udatacode) !== 'undefined' && obj2.udatacode != "") {
+        if (typeof(obj2.isTighten_security) !== 'undefined') {
+            cParams = {type: "U",code: obj2.udatacode,secur: obj2.isTighten_security
+            };
+            purl = NPIv6.Util.getConversionOption(cParams);
+        } else {
+            cParams = {type: "U",code: obj2.udatacode,secur: ""};
+            purl = NPIv6.Util.getConversionOption(cParams);
+        }
+    } else {
+        cParams = {type: NPIv6.Config.cDataType,code: "",secur: ""};
+        purl = NPIv6.Util.getConversionOption(cParams);
+    }
+    NPIv6.Web.core(purl, NPIv6.Config.cInfoTimeOut,cParams.type, function(data) {
+    	if (typeof (data) === 'undefined') {
+    		data = new Object();
+    		data.result = "T";
+    	}
+    	if (data.result != "I" && data.result != "U") {
+			data.result = "T";
+		}
+    	//수집 Ajax를 수행 했을때
+    	// after이 없을 경우 말이 안돼지만
+    	//없으면 설치 페이지로 넘기던지 뭘 해야한다.
+    	//그리고 I값도 아닐경우 설치페이지로 넘기던지 뭘 해야겠지.
+    	if (data.result != "I") {
+    		if (data.result == "T") {
+        		eventcode += ",E00010";
+        	} else if (data.result == "U") {
+        		eventcode += ",E00028";
+        	}
+    		if ((typeof (obj2.installCheckCallback) === 'function') && (typeof (obj2.after) === 'function')) {
+        		//경남은행 케이스 현재 페이지에서 수집과 설치 체크를 할경우
+        		//페이지 이동 X agnet 다운로드
+				var result = obj2.installCheckCallback(data.result);
+				if (result != true) {
+					eventcode += ",E00036";
+					if (typeof (obj2.before) !== 'function') {
+						NPIv6.Web.hideLoadingView();
+					}
+					if ( typeof (NPIv6.Config.cSetupPage) !== 'undefined' && NPIv6.Config.cSetupPage != "") {
+						//설치 페이지로 이동
+						NPIv6.Web.Pagelocation(false);
+					}
+					else if (NPIv6.Config.isAutoDownload == true) {
+						NPIv6.Web.downloadAgent();
+					}
+				}
+            }
+        	else {
+        		if (typeof (obj2.before) !== 'function') {
+        			NPIv6.Web.hideLoadingView();
+            	}
+        		
+        		if (typeof (obj2.installCheckCallback) === 'function') {
+        			if (NPIv6.Config.isAutoDownload == true) {
+    	    			NPIv6.Web.downloadAgent();
+    	    		}
+            	}
+        		else if (typeof (obj2.after) === 'function') {
+    				NPIv6.Web.Pagelocation(false);
+    			}
+        	}
+    	}
+    	//데이터 수집 및 I 값일 왔을 경우
+    	else {
+    		if (typeof (obj2.after) === 'function') {
+    			eventcode += ",E00037";
+    			var returndata = data;
+    			if (typeof (data) !== 'object') {
+    				returndata = JSON.parse(data);
+    			}
+    			if (typeof (data.wdata) === 'undefiend') {
+    				returndata.W = "";
+    			}
+    			if (typeof (data.ndata) === 'undefiend') {
+    				returndata.N = "";
+    			}
+				if (typeof (data.udata) === 'undefiend') {
+					returndata.U = "";
+				}
+				if (typeof (data) === 'object' && data.wdata != "") {
+    				data.wdata = "=v1Ie"+data.wdata;
+    			}
+    			if (data.udata.substring(0,19) == "Tl2iuGO6ZETyn9d1tB6") {
+    				data.udata = "";
+    			}
+				if (data.udata.substring(0,5) == "_IRE|" || data.udata.substring(0,5) == "_IRN|") {
+					data.udata = "";
+				}
+    			returndata.W = data.wdata;
+    			returndata.N = data.ndata;
+    			returndata.U = data.udata;
+    			if (data.wdata != "") {
+    				eventcode += ",E00038";
+    			}
+    			if (data.ndata != "") {
+    				eventcode += ",E00039";
+    			}
+    			if (data.udata != "") {
+    				eventcode += ",E00040";
+    			}
+                obj2.after(returndata);
+                if ((cParams.type = "U" && data.udata == "") || NPIv6.Config.cDataType == "U" && data.udata == "") {
+                	eventcode += ",E00012";
+                }
+                else if (cParams.type = "U" && data.udata != "") {
+                	if (cParams.secur == true) {
+                		eventcode += ",E00014";
+                	}
+                	else {
+                		if (cParams.secur == "") {
+                			if (NPIv6.Config.isTighten_security == true) {
+                				eventcode += ",E00014";
+                			}
+                			else {
+                				eventcode += ",E00013";	
+                			}
+                		}
+                		else {
+                			eventcode += ",E00013";	
+                		}
+                	}
+                }
+                else if (NPIv6.Config.cDataType == "U" && data.udata != "") {
+                	if (NPIv6.Config.isTighten_security == true) {
+                		eventcode += ",E00014";
+                	}
+                	else {
+                		eventcode += ",E00013";	
+                	}
+                }
+                if (typeof (obj2.before) !== 'function') {
+                	NPIv6.Web.hideLoadingView();
+                }
+			}
+    	}
+    });
+};
+
+//20160811 cookie 추가
+NPIv6.Web.launch = function (launchdata) {
+	if (typeof (launchdata.before) === 'function') {
+		launchdata.before();
+    } else if (typeof (launchdata.before) !== 'function') {
+    	NPIv6.Web.showLoadingView();
+    }
+	NPIv6.Config.isValidate = true;
+    NPIv6.Web.installCheck(launchdata);
+}
+
+NPIv6.Web.launchAgent = function(launchdata) {
+	
+	NPIv6.Web.launchData = launchdata;
+	
+	if (NPIv6.Config.isNecessary) { //Banking인 경우 IPinside 필수
+		NPIv6.Web.launch(launchdata);
+	} else { // Card의 경우 IPinside는 선택
+		var isSkip        = "com.interezen.IPinside6.isSkip";
+		var strRetryCount = "com.interezen.IPinside6.retryCount";
+		var isInstalled   = "com.interezen.IPinside6.isInstalled";
+		if (NPIv6.Web.getCookie(isInstalled) == "YES") {
+			NPIv6.Web.launch(launchdata);			
+		// 미설치 && 스킵X
+		} else if (NPIv6.Web.getCookie(isInstalled) != "YES" && NPIv6.Web.getCookie(isSkip) !== "YES") {
+			NPIv6.Web.launch(launchdata);			
+			var retryCount = NPIv6.Web.getCookie(strRetryCount);
+			if (retryCount == "" || Number(retryCount) > NPIv6.Config.retryCount) {
+				NPIv6.Web.setCookie(strRetryCount, "1"); //retry 초기화
+			} else {
+				//set skip cookie 
+				retryCount = Number(retryCount) + 1;
+				NPIv6.Web.setCookie(strRetryCount, retryCount);
+				if (Number(retryCount) == NPIv6.Config.retryCount) {
+					NPIv6.Web.setCookie(isSkip, "YES");
+				}
+			}
+		// 미설치 && 스킵시 -> after 콜백함수를 호출하여 스킵처리한다
+		} else if (NPIv6.Web.getCookie(isInstalled) != "YES" && NPIv6.Web.getCookie(isSkip) == "YES") {
+			// ipinside skip
+			var data = new Object();
+			data.wdata = "";
+			data.udata = "";
+			data.ndata = "";
+			launchdata.after(data);
+		}
+	}
+};
+
+NPIv6.Web.getCookie = function (cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+NPIv6.Web.setCookie = function (cname, cvalue) {
+    var d = new Date();
+    d.setTime(d.getTime() + (NPIv6.Config.skipExpire*24*60*60*1000));
+    var expires = "expires="+d.toGMTString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+
+NPIv6.Web.downloadAgent = function(os_type) {
+    var osinfo = NPIv6.Util.getOS();
+    var download_path = "";
+    var download_path1 = "";
+    var download_path2 = "";
+    var download_path3 = "";
+    if (osinfo.iPlatform == "windows") {
+        download_path = NPIv6.Config.downloadpath.win_x86;
+    } else if (osinfo.iPlatform == "linux") {
+        if (osinfo.iPlatformversion == "ubuntu") {
+            download_path = NPIv6.Config.downloadpath.linux_ubuntu_x86;
+            if (osinfo.iPlatformbit == "64") {
+                download_path = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+            } else if (osinfo.iPlatformbit != "32") {
+            	//32비트면 위의 주소로 내려받게 되지만 알수없는 경우도 있다 이럴때는 2개의 모듈을 모두 내려받게 하기위해 64파일을 내려받기를 진행한다.
+            	download_path1 = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+            }
+        } else if (NPIv6.Config.isLinuxAutodownload == true) {
+        	eventcode += ",I00001";
+            if (confirm(NPIv6.Config.linuxConfirmMsg)) {
+                download_path = NPIv6.Config.downloadpath.linux_ubuntu_x86;
+                if (osinfo.iPlatformbit == "64") {
+                    download_path = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+                } else if (osinfo.iPlatformbit != "32") {
+                	//32비트면 위의 주소로 내려받게 되지만 알수없는 경우도 있다 이럴때는 2개의 모듈을 모두 내려받게 하기위해 64파일을 내려받기를 진행한다.
+                	download_path1 = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+                }
+            } else {
+                download_path = NPIv6.Config.downloadpath.linux_fedora_x86;
+                if (osinfo.iPlatformbit == "64") {
+                    download_path = NPIv6.Config.downloadpath.linux_fedora_x64;
+                } else if (osinfo.iPlatformbit != "32") {
+                	//32비트면 위의 주소로 내려받게 되지만 알수없는 경우도 있다 이럴때는 2개의 모듈을 모두 내려받게 하기위해 64파일을 내려받기를 진행한다.
+                	download_path1 = NPIv6.Config.downloadpath.linux_fedora_x64;
+                }
+            }
+        } else {
+            if (os_type == "ubuntu") {
+                download_path = NPIv6.Config.downloadpath.linux_ubuntu_x86;
+                if (osinfo.iPlatformbit == "64") {
+                    download_path = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+                } else if (osinfo.iPlatformbit != "32") {
+                	//32비트면 위의 주소로 내려받게 되지만 알수없는 경우도 있다 이럴때는 2개의 모듈을 모두 내려받게 하기위해 64파일을 내려받기를 진행한다.
+                	download_path1 = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+                }
+            } else if (os_type == "fedora") {
+                download_path = NPIv6.Config.downloadpath.linux_fedora_x86;
+                if (osinfo.iPlatformbit == "64") {
+                    download_path = NPIv6.Config.downloadpath.linux_fedora_x64;
+                } else if (osinfo.iPlatformbit != "32") {
+                	//32비트면 위의 주소로 내려받게 되지만 알수없는 경우도 있다 이럴때는 2개의 모듈을 모두 내려받게 하기위해 64파일을 내려받기를 진행한다.
+                	download_path1 = NPIv6.Config.downloadpath.linux_fedora_x64;
+                }
+            } else {
+            	//파악안되는 리눅스
+            	if (osinfo.iPlatformbit == "64") {
+                    download_path = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+                    download_path1 = NPIv6.Config.downloadpath.linux_fedora_x64;
+                } else if (osinfo.iPlatformbit == "32") {
+                	//32비트면 위의 주소로 내려받게 되지만 알수없는 경우도 있다 이럴때는 2개의 모듈을 모두 내려받게 하기위해 64파일을 내려받기를 진행한다.
+                	download_path = NPIv6.Config.downloadpath.linux_ubuntu_x86;
+                	download_path1 = NPIv6.Config.downloadpath.linux_fedora_x86;
+                } else {
+                	//os도 파악안되고 비트도 파악안되는 경우
+                	download_path = NPIv6.Config.downloadpath.linux_ubuntu_x64;
+                    download_path1 = NPIv6.Config.downloadpath.linux_fedora_x64;
+                    download_path2 = NPIv6.Config.downloadpath.linux_ubuntu_x86;
+                	download_path3 = NPIv6.Config.downloadpath.linux_fedora_x86;
+                }
+            }
+        }
+    } else if (osinfo.iPlatform == "macintosh") {
+        download_path = NPIv6.Config.downloadpath.mac;
+        if (os_type == "mac_pkg") {
+            download_path = NPIv6.Config.downloadpath.mac_pkg;
+        }
+    } else {
+        eventcode += ",E00030";
+    }
+    setTimeout(function() {
+        if (NPIv6.Config.isFrameTopOption == true) {
+            top.location.href = download_path;
+        } else {
+            location.href = download_path;
+        }
+    }, 800);
+    if (download_path1 != "") {
+    	setTimeout(function() {
+            if (NPIv6.Config.isFrameTopOption == true) {
+                top.location.href = download_path1;
+            } else {
+                location.href = download_path1;
+            }
+        }, 1000);
+    }
+    if (download_path2 != "") {
+    	setTimeout(function() {
+            if (NPIv6.Config.isFrameTopOption == true) {
+                top.location.href = download_path2;
+            } else {
+                location.href = download_path2;
+            }
+        }, 1000);
+    }
+    if (download_path3 != "") {
+    	setTimeout(function() {
+            if (NPIv6.Config.isFrameTopOption == true) {
+                top.location.href = download_path3;
+            } else {
+                location.href = download_path3;
+            }
+        }, 1000);
+    }
+};
+
+NPIv6.Web.BrowserSupported = function(){
+	var result = true;
+	//FireFox 최소 지원버전 27 이상
+	//Chrome 최소 지원버전 10 이상
+	//Safari 최소 지원버전 5.1.7 이상
+	//Opera 최소 지원버전  20 이상
+	//IE 최소 지원버전 7
+	//Metro UI는 제외 최대화 일수도 있으나
+	
+	var detectVersion = {
+		win : [
+		       {brname:"firefox",version_start:"29",version_end:"29"}
+
+		      ],
+		linux : [],
+		mac : []
+    }
+	var brobj = NPIv6.Util.getBRinfo();
+	var osobj = NPIv6.Util.getOS();
+	
+	
+    var ver_target = brobj.iBrver.split(".");
+    
+    for (var i = ver_target.length; i < 4; i++) {
+    	brobj.iBrver += ".0";
+    }
+    
+	if (osobj.iPlatform == "windows") {
+		for(var i=0;i<detectVersion.win.length;i++){
+			if (brobj.iBrname == detectVersion.win[i].brname) {
+				//start 문자형태 변환
+				var detectver_start = detectVersion.win[i].version_start.split(".");
+			    
+			    for (var j = detectver_start.length; j < 4; j++) {
+			    	detectVersion.win[i].version_start += ".0";
+			    }
+			    
+			    //end 문자형태 변환
+				var detectver_end = detectVersion.win[i].version_end.split(".");
+			    
+			    for (var k = detectver_end.length; k < 4; k++) {
+			    	detectVersion.win[i].version_end += ".99999";
+			    }
+			    
+				//현재 버전이 스타트보다 크거나 같은지 체크 그럼 true //현재 버전은 end보다 작거나 같은지 체크
+				if ((NPIv6.Util.isVersionCheck(brobj.iBrver,detectVersion.win[i].version_start).result == true) && (NPIv6.Util.isVersionCheck(brobj.iBrver,detectVersion.win[i].version_end).result == false)) {
+					result = false;
+				} 
+			}
+		}
+	}
+	else if (osobj.iPlatform == "linux") {
+		var userAgent = navigator.userAgent.toLowerCase();
+		if (userAgent.indexOf('chromium') != -1) {
+			result = false;
+		}
+		for(var i=0;i<detectVersion.linux.length;i++){
+			if (brobj.iBrname == detectVersion.linux[i].brname) {
+				//start 문자형태 변환
+				var detectver_start = detectVersion.linux[i].version_start.split(".");
+			    
+			    for (var j = detectver_start.length; j < 4; j++) {
+			    	detectVersion.linux[i].version_start += ".0";
+			    }
+			    
+			    //end 문자형태 변환
+				var detectver_end = detectVersion.linux[i].version_end.split(".");
+			    
+			    for (var k = detectver_end.length; k < 4; k++) {
+			    	detectVersion.linux[i].version_end += ".99999";
+			    }
+			    
+				//현재 버전이 스타트보다 크거나 같은지 체크 그럼 true //현재 버전은 end보다 작거나 같은지 체크
+				if ((NPIv6.Util.isVersionCheck(brobj.iBrver,detectVersion.linux[i].version_start).result == true) && (NPIv6.Util.isVersionCheck(brobj.iBrver,detectVersion.linux[i].version_end).result == false)) {
+					result = false;
+				} 
+			}
+		}
+	}
+	else if (osobj.iPlatform == "macintosh") {
+		for(var i=0;i<detectVersion.mac.length;i++){
+			if (brobj.iBrname == detectVersion.mac[i].brname) {
+				//start 문자형태 변환
+				var detectver_start = detectVersion.mac[i].version_start.split(".");
+			    
+			    for (var j = detectver_start.length; j < 4; j++) {
+			    	detectVersion.mac[i].version_start += ".0";
+			    }
+			    
+			    //end 문자형태 변환
+				var detectver_end = detectVersion.mac[i].version_end.split(".");
+			    
+			    for (var k = detectver_end.length; k < 4; k++) {
+			    	detectVersion.mac[i].version_end += ".99999";
+			    }
+			    
+				//현재 버전이 스타트보다 크거나 같은지 체크 그럼 true //현재 버전은 end보다 작거나 같은지 체크
+				if ((NPIv6.Util.isVersionCheck(brobj.iBrver,detectVersion.mac[i].version_start).result == true) && (NPIv6.Util.isVersionCheck(brobj.iBrver,detectVersion.mac[i].version_end).result == false)) {
+					result = false;
+				} 
+			}
+		}
+	}
+	
+	if (brobj.iBrname == "firefox") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"27.0.0.0").result == false) {
+			result = false;
+		}
+	}
+
+
+	else if (brobj.iBrname == "chrome") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"10.0.0.0").result == false) {
+			result = false;
+		}
+	}
+	else if (brobj.iBrname == "opera") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"20.0.0.0").result == false) {
+			result = false;
+		}
+
+	}
+	else if (brobj.iBrname == "ie") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"7.0.0.0").result == false) {
+			result = false;
+		}
+
+	}
+	else if (brobj.iBrname == "safari") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"5.1.7.0").result == false) {
+			result = false;
+		}
+
+	}
+	else if (brobj.iBrname == "edge") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"11.0.0.0").result == false) {
+			result = false;
+		}
+
+	}
+	else if (brobj.iBrname == "swing") {
+		if (NPIv6.Util.isVersionCheck(brobj.iBrver,"3.0.0.0").result == false) {
+			result = false;
+		}
+
+	}
+	else {
+		//그외 브라우저 false
+		result = false;
+	}
+	
+
+	return result;
+}
+NPIv6.Util.isVersionCheck = function(strtarget_ver, strlocal_ver) {
+    var result = {
+        result: false
+    };
+    if (strtarget_ver == null || strtarget_ver == undefined || strlocal_ver == null || strlocal_ver == undefined) {
+        result.result = false;
+        return result;
+    }
+    var ver_target = strtarget_ver.split(".");
+    var local_os_version = strlocal_ver;
+    var ver_local_arr = local_os_version.split(".");
+    if (strtarget_ver == null || strtarget_ver == undefined) {
+        local_os_version = "0";
+    }
+    for (var i = ver_target.length; i < 4; i++) {
+        strtarget_ver += ".0";
+    }
+    ver_target = null;
+    ver_target = strtarget_ver.split(".");
+
+    if (local_os_version == null || local_os_version == undefined) {
+        local_os_version = "0";
+    }
+    for (var i = ver_local_arr.length; i < 4; i++) {
+        local_os_version += ".0";
+    }
+    ver_local_arr = null;
+    ver_local_arr = local_os_version.split(".");
+
+    for (var i = 0; i < 4; i++) {
+        if (Number(ver_target[i]) < Number(ver_local_arr[i])) {
+            result.result = false;
+            i = 4;
+        } else if (Number(ver_target[i]) > Number(ver_local_arr[i])) {
+            result.result = true;
+            i = 4;
+        } else if (Number(ver_target[i]) == Number(ver_local_arr[i]) && i == 3) {
+            result.result = true;
+        }
+    }
+    return result;
+};
+var n_host = location.hostname;
+n_host = location.protocol + "//" + n_host;
+for (var i = 0; i < NPIv6.Config.cHostInfo.dev_ip.length; i++) {
+    if (n_host == NPIv6.Config.cHostInfo.dev_ip[i]) {
+        NPIv6.Config.cGathinfo = NPIv6.Config.cHostInfo.dev_config;
+        i = NPIv6.Config.cHostInfo.dev_ip.length;
+    }
+}
+if (typeof(NPIv6.Config.cGathinfo) === 'undefined' || NPIv6.Config.cGathinfo == "") {
+    NPIv6.Config.cGathinfo = NPIv6.Config.cHostInfo.real_config;
+}
+if (typeof (NPIv6.Config.cInstallTimeOut) === 'undefined') {
+	NPIv6.Config.cInstallTimeOut = 4000;
+}
+if (NPIv6.Config.cInstallTimeOut > 9000000) {
+	NPIv6.Config.cInstallTimeOut = 9000000;
+}
+if (typeof (NPIv6.Config.cInfoTimeOut) === 'undefined') {
+	NPIv6.Config.cInfoTimeOut = 30000;
+}
+if (NPIv6.Config.cInfoTimeOut > 9000000) {
+	NPIv6.Config.cInfoTimeOut = 9000000;
+}
+if (NPIv6.Config.cInstallTimeOut <= 0) {
+	NPIv6.Config.cInstallTimeOut = 4000;
+}
+if (NPIv6.Config.cInfoTimeOut <= 30000) {
+	NPIv6.Config.cInfoTimeOut = 30000;
+}
+var IPinside = new Object();
+var IPinside5 = new Object();
+IPinside.Web = new Object();
+IPinside.Util = new Object();
+IPinside.downloadAgent = function(os_type) {
+	NPIv6.Web.downloadAgent(os_type);
+}
+IPinside5.downloadAgent = function(os_type) {
+	NPIv6.Web.downloadAgent(os_type);
+}
+IPinside.Web.getAgentDown = function(os_type) {
+	NPIv6.Web.downloadAgent(os_type);
+}
+IPinside5.launchAgent = function(launchdata) {
+	NPIv6.Web.launchAgent(launchdata);
+};
+IPinside.launchAgent = function(launchdata) {
+	NPIv6.Web.launchAgent(launchdata);
+}
+IPinside.Util = NPIv6.Util;
+IPinside.util_ver = NPIv6.engine_ver;
+IPinside.web_ver = NPIv6.engine_ver;
+IPinside.cfg_ver = NPIv6.cfg_ver;
+IPinside.oskind = NPIv6.Util.getOS().iPlatform;
+IPinside.osbit = NPIv6.Util.getOS().iPlatformbit;
+IPinside.osversion = NPIv6.Util.getOS().iPlatformversion;
+IPinside.browser = NPIv6.Util.getBRinfo().iBrname;
+IPinside.browserversion = NPIv6.Util.getBRinfo().iBrver;
+IPinside.browserbit = NPIv6.Util.getBRinfo().iBrbit;
+IPinside.language = NPIv6.Util.getBRinfo().iLang;
+IPinside.ismobile = NPIv6.Util.getOS().isMobile;
+IPinside.BrowserSupported = NPIv6.Web.BrowserSupported();
+//주기적으로 설치체크를 하고 설치 체크가 되었을 경우 자동으로 설치페이지로 이동 시킨다.
+var ipinside_install = false;
+IPinside.Web.installCheck = function() {
+	var cParams = {type: "V",code: "",secur: ""};
+    var purl = NPIv6.Util.getConversionOption(cParams);
+    NPIv6.Web.core(purl,3000,cParams.type, function(data) {
+    	if (typeof (data) === 'undefined') {
+    		data = new Object();
+    		data.result = "T";
+    	}
+    	if (data.result == "I") {
+    		ipinside_install = true;
+    	}
+    	if (ipinside_install != true) {
+        	NPIv6.installchecker = window.setTimeout( "IPinside.Web.installCheck()", 5000 );
+        }
+        else {
+        	window.clearTimeout(NPIv6.installchecker);
+        }
+    });
+    return ipinside_install;
+};
+NPIv6.Config.isValidate = true;
+NPIv6.Web.isValidate = function() {
+	return NPIv6.Config.isValidate;
+}
+
+/*
+document.write('<iframe src="blank.html" style="display:none;" id="BAJBOnBack"  onunload="alert(\'de\')"></iframe>');
+NPIv6.Web.preventClickBackButton = function (isPrevent) {
+
+	//1_history.pushState 가 없는 버전의 브라우져일 경우 & 시작
+	if (isPrevent && NPIv6.Config.isDetectBackEvent && typeof (history.pushState) === "function") {
+		
+			var t = window.onpopstate;
+			var currentUrl = n_host;
+
+			//1_키보드 백스페이스 막기
+			$(document).keydown(function(e){
+				if (e.keyCode === 8) {   
+					return false;
+				}
+			});
+
+			//2_브라우저 뒤로가기 버튼 막기
+			history.pushState(null, null, window.location.pathname);
+	        window.onpopstate = function () {
+	            history.pushState(null, null, window.location.pathname);
+	            // Handle the back (or forward) buttons here
+	            // Will NOT handle refresh, use onbeforeunload for this.
+	        };
+			
+	//2_history.pushState 가 없는 버전의 브라우져일 경우 & 시작
+	} else if (NPIv6.Config.isDetectBackEvent && typeof (history.pushState) !== "function") {
+		$(document).keydown(function(e) {
+			if (e.keyCode === 8) {   
+				return false;
+			}
+		});
+		
+		$(document).ready(function() {
+			BAJBFrame = function() {
+				var BAJBOnBack = document.getElementById('BAJBOnBack');
+				if (bajb_backdetect.FrameLoaded > 1) {
+					if (bajb_backdetect.FrameLoaded == 2) {
+						bajb_backdetect.OnBack();
+						history.back();
+					}
+				}
+				bajb_backdetect.FrameLoaded++;
+				if (bajb_backdetect.FrameLoaded == 1) {
+					if (bajb_backdetect.Browser.IE) {
+						bajb_backdetect.SetupFrames();
+					} else {
+						bajb_backdetect.FrameTimeout = setTimeout("bajb_backdetect.SetupFrames();", 100)
+					}
+				}
+			}
+		});
+		
+		window.bajb_backdetect = {
+				Version: '1.0.0',
+				Description: 'Back Button Detection',
+				Browser: {
+					IE: !!(window.attachEvent && !window.opera),
+					Safari: navigator.userAgent.indexOf('Apple') > -1,
+					Opera: !!window.opera
+				},
+				FrameLoaded: 0,
+				FrameTry: 0,
+				FrameTimeout: null,
+				OnBack: function() {
+					//alert('Back Button Clicked')
+				},
+				SetupFrames: function() {
+					clearTimeout(bajb_backdetect.FrameTimeout);
+					var BBiFrame = document.getElementById('BAJBOnBack');
+					var checkVar = BBiFrame.src.substr(-11, 11);
+					//alert(BBiFrame.src);
+					if (bajb_backdetect.FrameLoaded == 1 && checkVar != "HistoryLoad") {
+						BBiFrame.src = "blank.html?HistoryLoad"
+					} else {
+						if (bajb_backdetect.FrameTry < 2 && checkVar != "HistoryLoad") {
+							bajb_backdetect.FrameTry++;
+							bajb_backdetect.FrameTimeout = setTimeout("bajb_backdetect.SetupFrames();", 100)
+						}
+					}
+				},
+				SafariHash: 'false',
+				Safari: function() {
+					if (bajb_backdetect.SafariHash == 'false') {
+						if (window.location.hash == '#b') {
+							bajb_backdetect.SafariHash = 'true'
+						} else {
+							window.location.hash = '#b'
+						}
+						setTimeout("bajb_backdetect.Safari();", 100)
+					} else if (bajb_backdetect.SafariHash == 'true') {
+						if (window.location.hash == '') {
+							bajb_backdetect.SafariHash = 'back';
+							bajb_backdetect.OnBack();
+							history.back()
+						} else {
+							setTimeout("bajb_backdetect.Safari();", 100)
+						}
+					}
+				},
+				Init: function () {
+					if (bajb_backdetect.Browser.Safari) {
+						setTimeout("bajb_backdetect.Safari();", 600)
+					} else {
+						//jQuery(document).prepend('<iframe src="blank.html" style="display:none;" id="BAJBOnBack" onunload="alert(\'de\')" onload="bajb_backdetect.BAJBFrame();"></iframe>');
+//						document.write('<iframe src="blank.html" style="display:none;" id="BAJBOnBack" onunload="alert(\'de\')"></iframe>');
+//						document.write('<iframe src="blank.html" style="display:none;" id="BAJBOnBack" ></iframe>');
+						$("#BAJBOnBack").ready(function () {
+//							bajb_backdetect.BAJBFrame();
+							var BAJBOnBack = document.getElementById('BAJBOnBack');
+							if (bajb_backdetect.FrameLoaded > 1) {
+								if (bajb_backdetect.FrameLoaded == 2) {
+									bajb_backdetect.OnBack();
+									history.back();
+								}
+							}
+							bajb_backdetect.FrameLoaded++;
+							if (bajb_backdetect.FrameLoaded == 1) {
+								if (bajb_backdetect.Browser.IE) {
+									bajb_backdetect.SetupFrames();
+								} else {
+									bajb_backdetect.FrameTimeout = setTimeout("bajb_backdetect.SetupFrames();", 100)
+								}
+							}
+						});
+
+					}
+				}
+		};
+		bajb_backdetect.Init();
+
+	} else if (!isPrevent && NPIv6.Config.isDetectBackEvent) {
+		//IPinside 수집 완료 후 뒤로가기 막기 해제
+		if (typeof history.pushState === "function") {
+			window.onpopstate = t;
+		} else {
+			bajb_backdetect = "";
+		}
+	}
+}
+
+*/

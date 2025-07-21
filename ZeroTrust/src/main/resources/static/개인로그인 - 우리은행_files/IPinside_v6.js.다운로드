@@ -1,0 +1,25 @@
+/**
+ * IPinside javascript
+ * 
+ * @class	IPinside Javascript Auto Load
+ * @project nplws
+ * @version 1.00
+ * @index 4
+ * 
+ * @author	lee seung young sylee@interezen.co.kr
+ * @author	lee seung young junayou@daum.net
+ */
+var IPinsideDate = new Date();
+var IPinsideJScache = IPinsideDate.getFullYear()+""+(IPinsideDate.getMonth() + 1)+""+IPinsideDate.getDate();
+var IPinsidejsUrls = []; 
+IPinsidejsUrls = 
+		[ 
+		 	"/js/sec/IPinside/IPinside_v6_config.js?jscache="+IPinsideJScache,
+		 	"/js/sec/IPinside/IPinside_v6_engine.js?jscache="+IPinsideJScache
+		];
+for(var i=0;i<IPinsidejsUrls.length;i++) 
+{
+	document.write("<script type=\"text/javascript\" src=\"" + IPinsidejsUrls[i] + "\"></script>");
+}
+function IPinside_Init(){ // dummy
+}

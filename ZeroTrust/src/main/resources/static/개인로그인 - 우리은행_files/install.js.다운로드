@@ -1,0 +1,7 @@
+var tmps = new RegExp("withyou=([^#|^&]+)").exec(location.search.toLowerCase());
+
+if ( tmps && tmps.length == 2 && tmps[1].match(/^my/)) {
+ console.log("MY DAYA");
+}else{
+(function(k,b,i,g){if(m()){n();return}var e=document.getElementsByTagName(i)[0];var h=document.createElement(i);var l=c();h.async=true;h.charset="utf-8";h.src=o(l)+"ver="+f(g);e.parentNode.insertBefore(h,e);function m(){var p=j();return p>0&&p<9}function j(){var p=-1;if(navigator.appName=="Microsoft Internet Explorer"&&navigator.userAgent.toLowerCase().indexOf("msie")!=-1&&new RegExp("MSIE ([0-9]{1,}[./0-9]{0,})").exec(navigator.userAgent)!=null){p=parseInt(RegExp.$1)}return p}function c(){var p=k+"="+b;a(p);return d(p)}function a(q){var r=window.location.search.replace("?","").split("&");for(var p=0;p<r.length;p++){if(r[p]===q){document.cookie=q+";path=/";return}}}function d(r){var q=document.cookie.split(";");for(var p=0;p<q.length;p++){if(q[p].trim()===r){return true}}return false}function o(p){if(window.location.protocol=="https:"){return p?"https://wcdplp.wooribank.com/ntm/11111?preview=true&":"https://wcdplp.wooribank.com/static/11111/ntm.js?"}return p?"http://wcdplp.wooribank.com/ntm/11111?preview=true&":"http://wcdplp.wooribank.com/static/11111/ntm.js?"}function f(p){var q=new Date().getTime();var r=p*1000*60;return p>0?Math.floor(q/r)*r:q}function n(){}})("11111","acfc527b-031b-4e6e-aaf7-8935b4cdd4dc","script",1440);
+}

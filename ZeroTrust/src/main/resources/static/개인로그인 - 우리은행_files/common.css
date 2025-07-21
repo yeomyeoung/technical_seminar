@@ -1,0 +1,521 @@
+@charset "utf-8";
+
+/* common css */
+.xwup_common{background:0;background-color:transparent;background-image:none;background-position:0;background-repeat:repeat;background-size:auto;box-shadow:none;box-sizing:border-box;clear:none;color:inherit;empty-cells:show;float:none;font:normal;font-family:inherit;font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;height:auto;left:auto;letter-spacing:normal;line-height:normal;list-style:none;list-style-image:none;list-style-position:none;list-style-type:none;margin:0;max-height:none;max-width:none;min-height:0;min-width:0;opacity:1;overflow:visible;padding:0;table-layout:auto;text-align:left;text-decoration:none;text-decoration-color:inherit;text-decoration-line:none;text-decoration-style:solid;text-shadow:none;vertical-align:middle;visibility:inherit;white-space:normal;widows:0;width:auto;word-spacing:normal;z-index:auto;position:static;cursor:auto}
+.xwup_cert_wide,.xwup_cert_pop,.xwup_cert_mini{display:block;visibility:visible;overflow:visible;height:auto;background-color:#fff;color:#000;font-weight:normal;line-height:normal;background-image:none;cursor:auto}
+.xwup_cert_mini{width:600px;border:0} /* 미니UI */
+.xwup_cert_pop{position:absolute;top:0;left:0;border-style:solid} /* 팝업UI */
+.xwup_cert_wide{border-style:solid} /* 바닥UI */
+.xwup_common div,.xwup_common a,.xwup_common span,.xwup_common table,.xwup_common tr,.xwup_common th,.xwup_common td,.xwup_common ul,.xwup_common ol,.xwup_common li,.xwup_common dl,.xwup_common dt,.xwup_common dd,.xwup_common form,.xwup_common button,.xwup_common fieldset,.xwup_common legend,.xwup_common select,.xwup_common textarea,.xwup_common p,.xwup_common label,.xwup_common input,.xwup_common h1,.xwup_common h2,.xwup_common h3,.xwup_common h4,.xwup_common h5,.xwup_common h6,.xwup_common blockquote{margin:0;padding:0;font-family:'Malgun Gothic',Dotum,Helvetica,AppleGothic,Sans-serif;font-size:12px;color:#000;background:0;background-color:transparent;background-image:none;background-position:0;background-repeat:repeat;background-size:auto;box-shadow:none;clear:none;empty-cells:show;float:none;font:normal;font-style:normal;font-variant:normal;font-weight:normal;height:auto;left:auto;letter-spacing:normal;line-height:normal;list-style:none;list-style-image:none;list-style-position:none;list-style-type:none;margin:0;opacity:1;overflow:visible;padding:0;table-layout:auto;text-align:left;text-decoration:none;text-decoration-color:inherit;text-decoration-line:none;text-decoration-style:solid;text-shadow:none;vertical-align:middle;visibility:inherit;white-space:normal;widows:0;width:auto;word-spacing:normal;z-index:auto;position:static;cursor:auto}
+
+/* default setting */
+.xwup_common img,.xwup_common fieldset{border:0}
+.xwup_common form,.xwup_common fieldset,.xwup_common legend,.xwup_common input,.xwup_common button,.xwup_common textarea,.xwup_common select{color:#000;font-size:12px}
+.xwup_common button::-moz-focus-inner{padding:0;border:0}
+.xwup_common ul,.xwup_common ol{list-style:none}
+.xwup_common table{border-collapse:collapse}
+.xwup_common label{cursor:default}
+.xwup_common input,.xwup_common textarea{display:inline-block;font-size:13px;vertical-align:middle}
+.xwup_common textarea{resize:none}
+.xwup_common address,.xwup_common em{font-style:normal}
+.xwup_common fieldset,.xwup_common img{border:0}
+.xwup_common em{font-style:normal}
+.xwup_common h3{top:0}
+.xwup_common button{cursor:pointer}
+.xwup_common a{text-decoration:none;cursor:pointer}
+.xwup_common table{border-collapse:collapse}
+.xwup_common th,.xwup_common td{padding:0;vertical-align:middle;text-align:left;font-weight:normal}
+.xwup_common input[type="text"],.xwup_common input[type="password"],.xwup_common input[type="email"],.xwup_common input[type="search"],.xwup_common input[type="image"],.xwup_common input[type="button"],.xwup_common textarea{border:1px solid #777;background:#fff;-webkit-appearance:none;border-radius:0}
+.xwup_common input[type="checkbox"]:checked{background-color:#fff;-webkit-appearance:checkbox}
+.xwup_common input[type="text"],.xwup_common input[type="password"]{height:18px;position:relative;margin:1px 2px 0;padding:2px 3px 3px;border:1px solid #777;background:#fff;color:#000}
+.xwup_common .lt-css3 input[type="text"],.xwup_common input[type="password"]{padding:1px 3px 4px}
+.xwup_common input[type="text"]:focus,.xwup_common input[type="password"]:focus,.xwup_common textarea:focus{border:1px solid #009ae6;outline-width:0} 
+.xwup_common input[disabled="disabled"]{background:#f0f0f0;border:1px solid #f0f0f0;color:#555}
+.xwup_common input[readonly="readonly"]{background:#f0f0f0;border:1px solid #777;color:#555}
+.xwup_common .disabled{background:#f0f0f0;border:1px solid #f0f0f0;color:#555}
+.xwup_common input.error-input{background:#fff;border:1px solid #ff4b2a;color:#000}
+.xwup_common .form-error{display:block;background:url(../img/common/etc/ico_form_error.gif) no-repeat left 5px;padding:0 0 0 23px;color:#ff4b2a;vertical-align:top}
+.xwup_common input[type="checkbox"],.xwup_common input[type="radio"]{width:13px;height:13px;margin:0;padding:0;vertical-align:middle;line-height:27px}
+.xwup_common select{position:relative;height:25px;vertical-align:middle;border:1px solid #777;padding:2px 2px 2px 0;margin:-1px 0 0 2px}
+.xwup_common .ie7 select{line-height:1.65;font-family:'돋움',dotum;padding:4px 4px 5px 0}
+
+/* Layout */
+.xwup_common .xwup_mbottom img{height:auto;margin-right:5px;vertical-align:middle}
+.xwup_common .hidden{overflow:hidden;position:absolute;top:-9999px;left:-9999px;width:0;height:0;font-size:0;line-height:0;text-indent:-9999px}
+.xwup_common .w100{width:100px}
+.xwup_common div.xwup-w300-body{width:300px}
+.xwup_common div.xwup-w400-body{width:400px}
+.xwup_common div.xwup-w410-body{width:410px}
+.xwup_common div.xwup-w420-body{width:420px}
+.xwup_common div.xwup-w500-body{width:500px}
+.xwup_common div.xwup-w530-body{width:530px}
+.xwup_common div.xwup-w730-body{width:730px}
+.xwup_common div.xwup-w946-body{width:946px}
+.xwup_common .xwup-font10{font-size:10px}
+.xwup_common .xwup-degap{margin:10px 10px 20px}
+.xwup_common .xwup-mr5{margin-right:15px}
+.xwup_common .xwup-fontb{font-weight:bold}
+.xwup_common .xwup_mbottom{margin:0 0 10px;text-align:left}
+.xwup_common .xwup-legend{display:block;*display:inline-block;margin:0 0 0 5px;background-color:#fff;font-weight:normal;text-align:left}
+.xwup_common caption{visibility:hidden;width:0;height:0;line-height:0}
+.xwup_common .xwup-h140{height:140px}
+.xwup_common .xwup-str-pd0{padding:0}
+.xwup_common .brt-color-none{border-top-color:transparent}
+.xwup_common .xwup-wrd-normal{word-wrap:normal}
+.xwup_common .xwup-ovf-yscroll{oveflow:hidden;overflow-y:scroll}
+.xwup_common .xwup-ovf-yscroll-none{overflow-y:hidden}
+
+/* common title */
+.xwup_common .xwup-title2{_width:452px}
+.xwup_common .title h3,.xwup_common .xwup-title h3{height:40px;padding:0 0 0 15px;font-size:18px;line-height:40px;letter-spacing:-2px;font-weight:bold;cursor:move}
+.xwup_common .xwup-title h3{font-weight:bold}
+.xwup_common .xwup-title-mini{top:0;left:0;width:100%;height:30px;margin-bottom:-15px;border-radius:0;background:none}
+.xwup_common .xwup-title-mini h3{font-size:20px;height:31px;color:#000;background:none;line-height:27px;vertical-align:middle;letter-spacing:-2px}
+
+/* contents body */
+.xwup_common .xwup-body{margin:0 20px 20px 20px;padding-top:20px}
+.xwup_common .blank0,.xwup_common .xwup-blank0{overflow:hidden;position:absolute;top:-9999px;left:-9999px;width:0;height:0;font-size:0;line-height:0;text-indent:-9999px}
+.xwup_common .blank10,.xwup_common .xwup-blank10{height:10px;margin:0}
+.xwup_common .blank15,.xwup_common .xwup-blank15{height:15px;margin:0}
+
+/* button */
+.xwup_common .xwup-buttons-layout,.xwup_common .xwup-buttons-layout2,.xwup_common .xwup-buttons-layout4{display:block;margin:15px 0;text-align:center}
+.xwup_common .xwup-buttons-layout2{text-align:right}
+.xwup_common .xwup-buttons-layout3{text-align:left}
+.xwup_common .xwup-buttons-layout4{margin:0;text-align:right}
+.xwup_common .xwup-buttons-layout button,.xwup_common .xwup-buttons-layout2 button,.xwup_common .xwup-buttons-layout3 button,.xwup_common .xwup-buttons-layout4 button{height:25px;margin:0 5px;padding:0 13px;*padding:0 10px;_padding:0 10px;border:1px solid gray;border-radius:6px;background-color:#EFEFEF;background-image:url(../img/btn_bg.png);text-align:center;vertical-align:top}
+/*.xwup_common .xwup-buttons-layout .ok,.xwup_common .xwup-buttons-layout2 .ok,.xwup_common .xwup-buttons-layout3 .ok,.xwup_common .xwup-buttons-layout4 .ok{overflow:hidden;height:28px;border:0;background:url(../img/btn_ok_blue.png);line-height:9000px;cursor:pointer}*/
+/* wb style */
+.xwup_common .xwup-buttons-layout .ok,.xwup_common .xwup-buttons-layout2 .ok,.xwup_common .xwup-buttons-layout3 .ok,.xwup_common .xwup-buttons-layout4 .ok{overflow:hidden;height:28px;width:68px;border:0;background:url(../img/btn_ok_blue.png);line-height:9000px;cursor:pointer}
+/*.xwup_common .xwup-buttons-layout .cancel,.xwup_common .xwup-buttons-layout2 .cancel,.xwup_common .xwup-buttons-layout3 .cancel,.xwup_common .xwup-buttons-layout4 .cancel{overflow:hidden;height:28px;border:0;background:url(../img/btn_cancel.png);line-height:9000px;cursor:pointer}*/
+/* wb style */
+.xwup_common .xwup-buttons-layout .cancel,.xwup_common .xwup-buttons-layout2 .cancel,.xwup_common .xwup-buttons-layout3 .cancel,.xwup_common .xwup-buttons-layout4 .cancel{overflow:hidden;height:28px;width:68px;border:0;background:url(../img/btn_cancel.png);line-height:9000px;cursor:pointer}
+.xwup_common .xwup-buttons-layout .view,.xwup_common .xwup-buttons-layout2 .view,.xwup_common .xwup-buttons-layout3 .view,.xwup_common .xwup-buttons-layout4 .view{margin:5px;padding:0 13px;border:1px solid #c7c7c7;border-radius:4px;-webkit-border-radius:4px}
+.xwup_common .xwup-button-disabled{color:gray}
+.xwup_common .xwup-box-layout{position:relative;padding-top:7px}
+.xwup_common .xwup-box-border{display:block;padding:10px;border:1px solid #c7c7c7}
+/* x button */
+/*.xwup_common .xwup-close-button {background:url(../img/btn_pop_close.png) no-repeat;position:absolute;height:15px;width:15px;top:14px;right:13px}*/
+.xwup_common .xwup-close-button {background:url(../img/btn_pop_close.png) no-repeat;position:absolute;height:29px;width:29px;top:10px;right:13px}
+
+/* tab */
+.xwup_common div.xwup-tab-view{display:block;clear:both;padding:15px;border:2px solid #6C9CDA;border-radius:0 8px 8px 8px;background-color:#fff;text-align:left;zoom:1}
+.xwup_common div.xwup-tab-list ul{float:left;position:relative;margin:0;padding:0;color:#666;text-align:left}
+.xwup_common div.xwup-tab-list ul li{display:inline-block;*display:inline;margin:0;border:1px solid #999;border-bottom:0;border-radius:6px 6px 0 0;background:#f9f9f9;list-style-type:none;*zoom:1}
+.xwup_common div.xwup-tab-list ul li a{display:block;padding:6px 10px 2px;font-weight:normal;color:#000;list-style:none;white-space:nowrap}
+.xwup_common div.xwup-tab-list .selected a{border-top:1px solid #6c9cda;border-right:1px solid #6c9cda;background-color:#6C9CDA;font-weight:bold;color:#FFF;list-style:none}
+.xwup_common div.xwup-tab-list .tmenu{width:46px}
+.xwup_common div.xwup-tab-list .tmenu2{width:98px}
+.xwup_common div.xwup-tab-list .tmenu3{width:138px}
+.xwup_common div.xwup-tab-list .tmenu4{width:98px}
+.xwup_common div.xwup-tab-list .tmenu5{width:48px}
+.xwup_common div.xwup-tab-list .tmenu6{width:60px}
+
+/* label */
+.xwup_common .xwup-for-password{display:inline-block;margin:0;font-weight:bold;color:#000;vertical-align:top}
+
+/* input */
+.xwup_common .xwup-password{overflow:hidden;margin:0 5px;padding:0 0 0 5px;border:1px solid;font-size:12px;vertical-align:middle}
+.xwup_common .xwup-checkbox{margin:0 5px 0 0}
+
+/* fieldset */
+.xwup_common .xwup-location-item{display:block;margin:0;padding:0 0 5px;border:1px solid #949494}
+.xwup_common .xwup-location-item button{display:inline-block;*display:block;width:78px;height:62px;padding:2px;border:2px solid #fff;border-radius:6px;background:#fff}
+.xwup_common fieldset.manager{display:inline-block;*display:inline;width:207px;height:125px;margin:10px 2px 0;padding:2px 0;border:1px solid #949494;text-align:center;*zoom:1}
+.xwup_common fieldset.manager .xwup-legend{margin:0 0 0 10px}
+.xwup_common .importexport{display:block;overflow:hidden;margin-top:15px;padding:0 10px 10px;border:1px solid #949494}
+.xwup_common .importexport div{margin:8px 0 3px}
+.xwup_common .p10x10-gray1{display:block;overflow:hidden;padding:10px;border:1px solid #949494;text-align:left}
+.xwup_common .p10x10-gray1 .group{margin-top:3px}
+.xwup_common .p10x10-gray1 input{width:13px;height:13px;vertical-align:middle}
+.xwup_common .p10x10-gray1 label{vertical-align:middle}
+.xwup_common .p10x10-gray1 .margin-top{margin-top:12px}
+.xwup_common .p10x10-gray1 .margin-bottom{margin-bottom:12px}
+.xwup_common .xwup-cert-position,.xwup_common .xwup-cert-position2{margin:7px 4px 5px;table-layout:fixed;zoom:1}
+.xwup_common .xwup-cert-position2{width:410px;margin:7px 7px 5px}
+.xwup_common .xwup-cert-position td,.xwup_common .xwup-cert-position2 td{width:20%}
+.xwup_common .xwup-cert-position span,.xwup_common .xwup-cert-position2 span{display:block;margin:0 auto;background-repeat:no-repeat;cursor:pointer}
+.xwup_common .xwup-cert-position .xwup-rbg-text,.xwup_common .xwup-cert-position2 .xwup-rbg-text{display:block;height:auto;margin:2px 0 0;text-align:center;background:none;cursor:pointer}
+.xwup_common .mngr-btn-text{display:inline-block;margin:2px 0 0;text-align:center}
+.xwup_common .mngr-btn-img{display:inline-block;height:16px;margin:0 0 0 15px;background-repeat:no-repeat}
+
+/* radio button group */
+.xwup_common .xwup-location-item .xwup-rbg-normal{background:#fff;border-color:#fff}
+.xwup_common .xwup-location-item .xwup-rbg-hover,.xwup_common .xwup-location-item .xwup-rbg-pressed{background:#eee;border-color:#999 #ddd #ddd #999}
+.xwup_common .xwup-location-item .xwup-rbg-disabled{border:2px solid #FFF;background-color:#fff;background-image:none}
+.xwup_common .exclamation{display:inline-block;width:16px;height:16px;margin:4px 0 0;background-image:url(../img/bu.png);background-repeat:no-repeat}
+
+/* password field */
+.xwup_common .xwup-password-field,.xwup_common .xwup-password-field2{margin:8px 0 0}
+.xwup_common .xwup-password-field2{text-align:center}
+.xwup_common .xwup-password-field label,.xwup_common .xwup-password-field2 label{display:inline-block;min-width:100px;_width:100px;margin:0 10px 0 0;text-align:right}
+.xwup_common .xwup-password-field2 label{width:145px}
+
+/* cert manager */
+.xwup_common .xwup-group-btn-layout{display:block;height:132px; text-align:left}
+.xwup_common .xwup-group-btn-layout button{width:75px;height:25px;border:1px solid gray;border-radius:6px;background-color:#efefef;background-image:url(../img/btn_bg.png);text-align:center;vertical-align:top;cursor:pointer}
+.xwup_common .xwup-group-btn-layout span{display:inline-block;margin:0 5px;background-repeat:no-repeat;vertical-align:middle;cursor:pointer}
+.xwup_common span.xwup-group-btn-desc{display:inline-block;height:12px;margin:10px 5px;text-align:left;vertical-align:top;*zoom:1}
+.xwup_common .xwup-group-btn-layout .xwup-size150{width:150px;margin:8px 0 0;padding:1px 0 1px 7px;background-repeat:no-repeat;background-position:10% 50%;text-align:left}
+.xwup_common .xwup-group-btn-layout .xwup-size180{width:180px;margin:8px 0 0;padding:1px 0 1px 5px;background-repeat:no-repeat;background-position:10% 50%;text-align:left}
+
+/* table view */
+.xwup_common .xwup-tableview{overflow-x:hidden;overflow-y:auto;position:relative;width:100%;_width:423px;height:140px;margin:10px 0 15px;border:1px solid #949494}
+.xwup_common .xwup-tableview table{width:100%;margin:0;border-width:0;table-layout:fixed}
+.xwup_common .xwup-tableview caption{visibility:hidden;width:0;height:0;line-height:0}
+.xwup_common .xwup-tableview thead{border:0;border-bottom:1px solid #c7c7c7;background:#f5f5f5;background-image:url(../img/btn_bg.png);font-weight:bold}
+.xwup_common .xwup-tableview th{position:static;padding:5px 0;background-color:#f5f5f5;font-weight:bold;text-align:center;white-space:nowrap;text-overflow:ellipsis;cursor:default}
+.xwup_common .xwup-tableview th .wide-cert-table-resizearea{position:relative;zoom:1;text-align:center;font-weight:bold}
+.xwup_common .xwup-tableview .xwup-mcert{width:82px}
+.xwup_common .xwup-tableview .xwup-mcert2{width:164px}
+.xwup_common .xwup-tableview .xwup-mcert3{width:82px}
+.xwup_common .xwup-tableview .xwup-mcert4{width:82px}
+.xwup_common .xwup-tableview tbody tr{border-bottom:1px solid #e3e3e3}
+.xwup_common .xwup-tableview td{padding:0 5px;border:1px solid #eee;border-width:0 1px 1px 0;word-wrap:normal}
+.xwup_common .xwup-tableview-cell{overflow:hidden;width:100%;max-width:100%;margin:0;padding:1px 0;text-align:left;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;word-wrap:normal}
+.xwup_common .xwup-tableview-cell img{vertical-align:middle}
+.xwup_common .xwup-tableview-selected-row td{background-color:#6c9cda;color:#fff;cursor:pointer}
+.xwup_common .xwup-tableview-selected-row .xwup-tableview-cell{color:#fff}
+.xwup_common .xwup-tableview-unselected-row{background-color:transparent;color:#000;cursor:pointer}
+.xwup_common .xwup-tableview-resizer{position:absolute;top:-5px;left:100%;width:6px;height:27px;margin-left:-3px;*margin-left:4px;cursor:w-resize}
+.xwup_common .xwup-tableview-button{width:15px}
+.xwup_common .xwup-tableview-viewbutton{width:70px;height:24px;margin:0 2px;border:1px solid #c7c7c7;border-radius:4px;background-color:#FFF;font-size:11px;text-align:center;cursor:pointer}
+
+/* certselect */
+.xwup_common .xwup-widget-sec{position:relative;width:100%;height:0px}
+.xwup_common .xwup-widget-sec .fb{display:inline-block;color:#000;font-weight:bold}
+.xwup_common .xwup-widget-sec .fc{color:#000}
+.xwup_common .exclamation-image{display:inline-block;margin:4px 0 0 0;width:16px;height:16px;background:url(../img/bu.png) no-repeat}
+.xwup_common .xwup-cert-passwd{padding-left:10px}
+.xwup_common .xwup-cert-passwd span{display:block;padding:10px 0 2px}
+.xwup_common .xwup-passwd-field{width:100%;height:26px;padding:13px 0 0;color:#986e3b}
+.xwup_common .xwup-passwd-field .xwup-tit-pw{display:inline-block;font-weight:bold;color:#0078D4;margin:0;padding-top:5px;vertical-align:top;cursor:default}
+.xwup_common .xwup-passwd-field .xwup-pw-box{width:180px;height:18px;margin-left:4px;padding-left:4px;border:1px solid #000;vertical-align:middle;color:#000}
+.xwup_common .xwup-passwd-field img{margin-right:4px;vertical-align:middle}
+.xwup_common .xwup-passwd-field span{display:inline-block;padding:0;vertical-align:middle}
+.xwup_common .xwup-expire-alert{display:none;width:220px;position:absolute;padding:7px;border:1px solid gray;border-radius:6px;background:#FFF;text-align:left;-webkit-border-radius:6px;box-shadow:3px 3px 10px gray;-webkit-box-shadow:3px 3px 10px gray}
+.xwup_common .xwup-expire-icon{display:block;position:absolute;top:0;left:0;margin:0;padding:10px}
+.xwup_common .xwup-expire-message{display:block;margin-left:28px;font-weight:bold}
+.xwup_common .xwup-renew-message{display:block;margin-left:28px}
+.xwup_common .xwup-expire-arrow{position:absolute;top:-19px;left:30px;width:0;height:0;border:10px solid;border-color:transparent transparent #FFF}
+.xwup_common .xwup-expire-arrow-border{position:absolute;top:-20px;left:30px;width:0;height:0;border:10px solid;border-color:transparent transparent #c7c7c7}
+.xwup_common #xwup_header{text-align:center}
+
+/* fileselect */
+.xwup_common .xwup-medialist{display:inline-block;*float:left;overflow-x:scroll;overflow-y:auto;width:160px;height:250px;border:1px solid #949494;background-color:#fff;margin:14px 14px 14px 0px;cursor:auto}
+.xwup_common .xwup-medialist table{width:100%}
+.xwup_common .xwup-medialist td{overflow:hidden;padding:2px 3px 1px;text-overflow:ellipsis;white-space:nowrap}
+.xwup_common .xwup-medialist td a,.xwup_common .xwup-filelist td a{display:block}
+.xwup_common .xwup-medialist td span,.xwup_common .xwup-filelist td span{display:inline-block;width:16px;height:16px;margin:0 4px}
+.xwup_common .xwup-filelist{display:inline-block;overflow-x:scroll;overflow-y:auto;_float:left;width:512px;height:250px;border:1px solid #949494;background-color:#fff;margin:14px 0px;cursor:auto}
+.xwup_common .xwup-filelist table{width:100%;table-layout:fixed}
+.xwup_common .xwup-filelist td{overflow:hidden;padding:2px 10px 1px 3px;white-space:nowrap;cursor:default}
+.xwup_common .xwup-tab-list .selected{background-color:#3875D7;color:#fff}
+.xwup_common .media-list-image{display:inlinewidth:16px;height:16px;vertical-align:middle;margin-right:4px}
+.xwup_common .file-list-image{display:inline;width:16px;height:16px;vertical-align:middle}
+.xwup_common .file-list-cell{overflow:hidden;padding:2px 3px 1px 3px;border:0;white-space:nowrap;padding-right:10px;cursor:default}
+.xwup_common .file-url,.xwup_common .filename-url{text-align:right}
+.xwup_common .file-url .btn-folder{width:80px;height:25px;margin-right:14px;border:1px solid gray;border-radius:6px;background-color:#EFEFEF;background-image:url(../img/btn_bg.png);text-align:center;vertical-align:top}
+.xwup_common .file-url .txt-url{width:516px;height:24px;padding:0 5px;background:#f0f0f0;cursor:auto;line-height:24px}
+.xwup_common .filename-url .txt-nurl{width:516px;height:24px;margin-left:4px;padding:0 0 0 2px;border:1px solid #c9c9c9;background:#f0f0f0;line-height:22px;vertical-align:middle}
+
+/* viewverify */
+.xwup_common .xwup-cert-infos{width:420px}
+.xwup_common .xwup-cert-infos table{overflow-x:hidden;font-size:11px;table-layout:fixed}
+.xwup_common .xwup-cert-infos th.filed-value{width:100px;text-align:center}
+.xwup_common .xwup-cert-infos th.value-end{width:296px;text-align:center}
+.xwup_common .xwup-cert-infos img{margin-right:5px}
+.xwup_common .xwup-cert-infos button{width:100px}
+.xwup_common .xwup-textview{overflow:auto;width:400px;height:323px;margin:0 0 10px;padding:5px 7px 5px 7px;background-color:#fff;border:1px solid #6C9CDA;resize:none;box-sizing:content-box}
+.xwup_common .xwup-textview2{overflow:auto;width:404px;height:63px;margin:0 0 3px;padding:5px 7px 5px 7px;background-color:#fff;border:1px solid #6C9CDA;resize:none;box-sizing:content-box}
+.xwup_common .xwup-textview3{overflow:auto;width:450px;height:160px;margin:0 0 3px;padding:5px 7px 5px 7px;background-color:#fff;border:1px solid #6C9CDA;resize:none;box-sizing:content-box}
+
+/* savelog */
+.xwup_common .xwup-slsave{margin:6px 0 0 0}
+.xwup_common .xwup-slremovable{margin:6px 0 0 0}
+.xwup_common .xwup-slselect-cert{width:180px;margin:6px 0px 10px 0}
+.xwup_common .xwup-sl-pkcs{margin:6px 0 0 6px}
+.xwup_common .xwup-sl-securedisk{margin:6px 0 0 6px}
+
+/* changepasswd */
+.xwup_common .xwup-ch-title{margin:0 10px 0 0}
+.xwup_common .xwup-ch-title table{width:370px}
+.xwup_common .xwup-ch-title .timg{margin:7px 8px 0 0}
+.xwup_common .xwup-ch-section{width:100%}
+.xwup_common .xwup-ch-section .xwup-input-pwd{overflow:hidden;width:170px;height:24px;line-height:24px;padding:0 4px;margin:0 5px}
+.xwup_common .xwup-widget-sec2{position:relative;width:100%;height:0px}
+.xwup_common .xwup-widget-sec2.fb{display:inline-block;color:#000;font-weight:bold}
+.xwup_common .xwup-widget-sec2.fc{color:#000}
+.xwup_common .xwup-widget-sec2 .xwup-expire-alert{display:none;width:195px;position:absolute;padding:7px;border:1px solid gray;border-radius:6px;background:#FFF;text-align:left;-webkit-border-radius:6px;box-shadow:3px 3px 10px gray;-webkit-box-shadow:3px 3px 10px gray}
+
+/* commondialog */
+.xwup_common .xwup-dialog-sec{width:100%;margin:0px 0px 20px;text-align:center;word-wrap:break-word}
+
+/* confimwindow */
+.xwup_common .xwup-confim-area{overflow:hidden;width:338px;height:380px;padding:10px}
+
+/* export */
+.xwup_common .xwup-export-area{width:100%;height:240px}
+.xwup_common .xwup-export-guide {border:0;padding:0 0 10px 10px}
+.xwup_common .xwup-export-sec .xwup-box-layout{margin:0 0 10px}
+.xwup_common .xwup-export-sec .xwup-box-border{border:0}
+.xwup_common .xwup-export-sec .xwup-box-border span{font-weight:bold;font-size:13px}
+.xwup_common .xwup-export-sec2 .xwup-box-layout{margin:0 0 20px}
+.xwup_common .xwup-export-sec2 .xwup-box-border{border:0}
+.xwup_common .xwup-export-sec2 .xwup-box-border span{padding-left:6px}
+.xwup_common .xwup-export-sec2 .filename{margin-bottom:5px}
+.xwup_common .xwup-export-sec2 .find-btn{display:inline-block;width:80px;vertical-align:middle}
+.xwup_common .xwup-export-sec2 .xwup-input-find{display:inline-block;overflow:hidden;width:240px;height:22px;margin:3px 0 0 6px;line-height:22px;vertcial-align:middle}
+.xwup_common .xwup-ex-passwd .xwup-passwd-group{margin:3px 0 10px}
+.xwup_common .xwup-ex-passwd .xwup-passwd-group .input-passwd{width:245px}
+.xwup_common .xwup-ex-passwd .xwup-passwd-group .input-mouse{margin:0 4px 0 0}
+.xwup_common .xwup-passwd-group .pw-txt{display:block;margin:0 0 7px}
+.xwup_common .xwup-passwd-group .input-passwd{overflow:hidden;width:370px;height:24px;margin:0 5px 0 0;padding:0 4px;line-height: 24px}
+.xwup_common .xwup-export-area .xwup-expire-alert{display:none;width:180px}
+.xwup_common .xwup-export-area .xwup-input-find{width:260px}
+.xwup_common .xwup-btn-find{width:68px;height:25px;margin:0 5px;border:1px solid gray;border-radius:6px;background-color:#EFEFEF;background-image:url(../img/btn_bg.png);text-align:center;vertical-align:middle}
+
+/* hmsselect */
+.xwup_common .description-layout{height:16px;margin:10px 0 0 0;padding:2px 0 0 0;background-color:#ccc;text-align:center}
+
+/* import */
+.xwup_common .xwup-import-area{height:240px}
+.xwup_common .xwup-import-area .xwup-select-sert{margin:15px 0}
+.xwup_common .xwup-import-area .xwup-tit-import{margin:0 0 3px;font-weight:bold}
+.xwup_common .xwup-import-area .xwup-input-imfile,.xwup_common .xwup-import-area .xwup-input-imfile2{overflow:hidden;width:350px;_height:24px;margin:0 0 5px;line-height:24px;background:#fff;_border:1px solid #777}
+.xwup_common .xwup-import-area .xwup-input-imfile2{width:210px;margin:0 5px 0 0}
+.xwup_common .xwup-import-area .xwup-import-passwd{margin:15px 0 0 0}
+
+/* inputpasswd */
+.xwup_common .xwup-inpwd-sec .xwup-input-name{margin:0 10px 0 0}
+.xwup_common .xwup-inpwd-sec .xwup-input-pwd{overflow:hidden;width:165px;height:24px;margin:0 5px;padding:0 4px;line-height:24px}
+
+/* iccard */
+.xwup_common .xwup-inpwd-sec2{position:relative;padding:20px}
+.xwup_common .xwup-inpwd-sec2 .xwup-input-name{display:block;margin:0 10px 13px 0}
+.xwup_common .xwup-inpwd-sec2 .xwup-input-pwd{overflow:hidden;width:165px;height:24px;margin:0px 5px 0 0;padding:0 4px;line-height:24px}
+.xwup_common .xwup-inpwd-sec2 .xwup-buttons-layout{margin:10px 0px 0px 0px}
+
+/* iccardlist */
+.xwup_common .xwup-iccardlist{margin:10px}
+.xwup_common .xwup-iccardlist .xwup-tableview{_width:300px;height:125px}
+
+/* scpselect */
+.xwup_common .xwup-scpselect{margin:10px}
+.xwup_common .xwup-scpselect .xwup-tableview{_width:420px;height:170px}
+
+/* rootverify */
+.xwup_common .xwup-boxtitle{margin:10px 0 0 0;font-size:11px;font-weight:bold;color:#606060}
+.xwup_common .xwup-content-box2{display:none;margin:0 0 8px;padding:5px 0px 3px 5px;border:1px solid #a0a0a0;border-radius:5px;text-align:center}
+.xwup_common .xwup-verify-input{width:100%;margin:0 0 5px}
+.xwup_common .xwup-verify-info{margin:10px 0 15px 0;text-align:left}
+.xwup_common .xwup-verify-info .info{margin-bottom:8px;font-weight:bold;text-decoration:underline}
+
+/* savepasswd */
+.xwup_common .xwup-savepwd-sec .xwup-input-pwd{overflow:hidden;width:154px;height:24px;margin:0 5px;padding:0 4px;line-height:24px}
+.xwup_common .xwup-txt-message{padding:0 14px 10px;line-height:18px}
+
+/* usernotify */
+.xwup_common .xwup-usernoti-box{width:344px;height:288px;padding:5px;border:1px solid #949494}
+
+/* verifyhsm */
+.xwup_common .xwup-verrify-sec .xwup-input-pwd{overflow:hidden;width:190px;height:24px;margin:0 5px;padding:0 4px;line-height:24px}
+
+/* verifyvid */
+.xwup_common .xwup-veriid-sec .xwup-input-name{display:block;margin:0 0 5px}
+.xwup_common .xwup-veriid-sec .xwup-input-pwd{overflow:hidden;width:330px;height:24px;margin:0 5px;padding:0 4px;line-height:24px}
+
+/* guidewindow */
+.xwup_common .xwup-guidewindow{text-align:center;margin-top:10px}
+
+/* pfxdialog */
+.xwup_common .xwup-tit-pfxdialog{margin:0 0 3px;font-weight:bold}
+.xwup_common .xwup-pfx-drag{border:2px dashed #bbb;/*border-radius:5px;*/padding:10px;text-align:center;color:#bbb}
+.xwup_common .xwup-drag-guide-certselect{display:none;border:2px dashed #bbb;padding-top:29px;text-align:center;color:#bbb;width:404px;height:80px;margin-left:1px;position:absolute;top:-129px;box-sizing:content-box}
+.xwup_common .xwup-drag-guide-certselect2{display:none;border:2px dashed #fff;padding-top:36px;text-align:center;color:#bbb;width:412px;height:108px;margin-left:-3px;position:absolute;top:-160px;}
+.xwup_common .xwup-drag-guide-certmanager{display:none;border:2px dashed #bbb;padding-top:21px;text-align:center;color:#bbb;width:420px;height:88px;margin-left:1px;position:absolute;top:-129px;}
+.xwup_common .xwup-drag-guide-certmanager2{display:none;border:2px dashed #fff;padding-top:40px;text-align:center;color:#bbb;width:428px;height:104px;margin-left:-3px;position:absolute;top:-160px;z-index:-1}
+.xwup_common .xwup-drag-guide-certselectwide{display:none;border:2px dashed #bbb;padding-top:20px;text-align:center;color:#bbb;width:903px;height:73px;margin-left:20px;margin-top:9px;position:absolute;top:-107px}
+.xwup_common .xwup-drag-overlay-certselectwide{width:948px;height:325px;top:-320px;left:0;}
+.xwup_common .xwup-drag-overlay-certselect{width:452px;height:578px;top:-575px;left:0;}
+.xwup_common .xwup-drag-overlay-certmanager{width:500px;height:585px;top:-582px;left:0;}
+.xwup_common .xwup-drag-guide-certselectmini{display:none;border:2px dashed #bbb;padding-top:29px;text-align:center;color:#bbb;width:404px;height:80px;margin-left:1px;position:absolute;top:-129px;}
+.xwup_common .xwup-drag-overlay-certselectmini{width:422px;height:384px;top:-396px;left:14px;}
+.xwup_common .xwup-drag-hover{border:2px dashed #20509f;background-color:#bcd5ff;}
+.xwup_common .xwup-drag-guide-span{color:grey;}
+.xwup_common .xwup-drag-guide-span-hover{color:#000;}
+.xwup_common .xwup-input-pfxfile{overflow:hidden;width:300px}
+.xwup_common .xwup-pfx-filebox label {display: inline-block;padding: .5em .75em;color:#fff;font-size: inherit;line-height: normal;vertical-align: middle;background-color: #337ab7;cursor: pointer;border: 1px solid #2e6da4;border-radius: .25em}
+/*.xwup_common .xwup-pfx-filebox2 {display: inline-block;padding: .5em .75em;color:#fff;font-size: inherit;line-height: normal;vertical-align: middle;background-color: #337ab7;cursor: pointer;border: 1px solid #2e6da4;border-radius: .25em}*/
+.xwup_common .xwup-pfx-filebox [type="file"] {position: absolute;width: 1px;height: 1px;padding: 0;margin: -1px;overflow: hidden;clip:rect(0,0,0,0);border: 0}
+
+/* xfslogin */
+.xwup_common .xwup-xfs-section{width:100%}
+.xwup_common .xwup-xfs-section .xwup-password-field label{vertical-align:baseline}
+.xwup_common .xwup-xfs-section .xwup-input-pwd{overflow:hidden;width:170px;height:24px;line-height:24px;padding:0 4px;margin:0 5px}
+.xwup_common .xwup-xfs-section .xwup-buttons-layout3 button{vertical-align:middle}
+.xwup_common .xwup-xfs-section .xwup-buttons-layout3 input[type="checkbox"]{margin:0 5px;}
+.xwup_common .xwup-xfs-regist{width:100%;text-align:right;text-decoration:underline}
+/*
+.xwup_common .xwup-widget-sec2{position:relative;width:100%;height:0px}
+.xwup_common .xwup-widget-sec2.fb{display:inline-block;color:#000;font-weight:bold}
+.xwup_common .xwup-widget-sec2.fc{color:#000}
+.xwup_common .xwup-widget-sec2 .xwup-expire-alert{display:none;width:195px;position:absolute;padding:7px;border:1px solid gray;border-radius:6px;background:#FFF;text-align:left;-webkit-border-radius:6px;box-shadow:3px 3px 10px gray;-webkit-box-shadow:3px 3px 10px gray}
+*/
+
+/* certselectwide */
+.xwup_common .xwup-title-wide{height:55px;background:#fff;color:#20509f}
+.xwup_common .xwup-title-wide h3{height:55px;font-size:20px;line-height:55px;color:#20509f;letter-spacing:-2px}
+.xwup_common .xwup-location-wideitem{width:946px}
+.xwup_common .xwup-location-wideitem span{display:inline-block;height:34px;background-repeat:no-repeat;vertical-align:middle;cursor:pointer}
+.xwup_common .xwup-location-wideitem .xwup-rbg-text{display:inline-block;height:auto;margin:2px 0 0;vertical-align:middle;background:none}
+.xwup_common .xwup-location-wideitem td{height:45px}
+.xwup_common .xwup-location-wideitem button{display:block;position:relative;height:45px;margin:0 -1px;border:1px solid #c7c7c7;border-bottom:1px solid #346ad5;border-radius:4px 4px 0 0;background:#fff;color:#000;white-space:nowrap;-webkit-border-radius:4px 4px 0 0;z-index:10}
+.xwup_common .xwup-wide-rbg{text-align:center}
+.xwup_common .xwup-wide-rbg:hover{color:#0078d4}
+.xwup_common .xwup-location-wideitem .wide-xwup-rbg-pressed{zoom:1;padding:0 0 1px;border:1px solid #346ad5;border-bottom:0;z-index:20;color:#0078d4;text-align:center}
+.xwup_common .xwup-wide-body{margin:0 -1px;*margin:0 0 0 -1px;padding:20px 0;border:1px solid #346ad5}
+.xwup_common .wide-cert-table-outline{overflow-x:hidden;overflow-y:auto;height:126px;margin:0 20px 0 20px;border-bottom:1px solid #c7c7c7;zoom:1}
+.xwup_common .wide-cert-table-outline table.wide-cert-table{width:100%;margin-right:-1px;border-top:1px solid #000;table-layout:fixed}
+.xwup_common .xwup-wide-body .wide-cert-table-outline table.wide-cert-table thead{background:#e9e9e9}
+.xwup_common .xwup-wide-body .wide-cert-table-outline table.wide-cert-table th{width:25%;border-right:1px solid #e9e9e9;background-color:#efefef}
+.xwup_common .xwup-wide-body .wide-cert-table-outline table.wide-cert-table th div{height:30px;line-height:30px;font-weight:bold;text-align:center;vertical-align:middle}
+.xwup_common .xwup-wide-body .wide-cert-table-outline table.wide-cert-table th .wide-cert-table-resizearea{zoom:1}
+.xwup_common .button-on-table{width:70px;height:24px;margin-right:10px;border:1px solid #c7c7c7;font-size:11px;background-image:url(../img/btn_bg.png);background-color:transparent;border-radius:4px;text-align:center}
+.xwup_common .button-on-table:hover{color:#0078d4}
+.xwup_common .xwup-password-field-wide{height:45px;margin:0 20px;padding:0 0 0 10px;border:1px solid #c7c7c7}
+.xwup_common .xwup-password-field-wide table{width:100%;height:100%}
+.xwup_common .xwup-password-field-wide img{vertical-align:middle}
+.xwup_common .xwup-password-field-wide .xwup-password-input-wide{width:269px;height:24px;line-height:24px;padding:0 0 0 5px;margin:0 5px;vertical-align:middle;overflow:hidden;border:1px solid #0078d4;font-size:12px;font-family:Dotum,Helvetica,AppleGothic,Sans-serif;color:#000}
+.xwup_common .xwup-password-field-wide .xwup-password-label-wide{color:#0078D4;font-weight:bold;font-size:16px}
+.xwup_common .xwup-password-field-wide .xwup-password-text-wide{display:inline;color:#986e3b;margin-left:5px}
+
+ /* Conetxt Menu */
+.xwup_common .context-menu-item-focused{background:#6C9CDA;color:#FFF}
+.xwup_common .context-menu-item-unfocused{background:transparent;color:#000}
+.xwup_common .xwup-content-box{margin-top:10px;border:1px solid #949494}
+.xwup_common .xwup-content-box table{width:100%}
+.xwup_common .xwup-content-box td{vertical-align:top}
+.xwup_common .xwup-content-box button{width:90px;height:25px;margin:5px;border:1px solid #c7c7c7;border-radius:6px;background-image:url(../img/btn_bg.png);text-align:center;vertical-align:top}
+.xwup_common .xwup-content-box .cert-buttons{width:100px}
+.xwup_common .xwup-ico-save,.xwup_common .xwup-ico-del,.xwup_common .xwup-ico-pfx16,.xwup_common .xwup-ico-prop,.xwup_common .xwup-ico-secure05,.xwup_common .xwup-ico-misc25,.xwup_common .xwup-ico-install{width:16px;height:16px;cursor:pointer}
+.xwup_common .xwup-ico-save{width:20px;height:18px;background-image:url(../img/save.png)}
+.xwup_common .xwup-ico-del{width:20px;height:18px;background-image:url(../img/delete.png)}
+.xwup_common .xwup-ico-pfx16{width:20px;height:18px;background-image:url(../img/pfx16.png)}
+.xwup_common .xwup-ico-prop{width:20px;height:18px;background-image:url(../img/prop.png)}
+.xwup_common .xwup-ico-secure05{width:20px;height:18px;background-image:url(../img/secure05.png)}
+.xwup_common .xwup-ico-misc25{width:20px;height:18px;background-image:url(../img/misc25.png)}
+.xwup_common .xwup-ico-install{width:20px;height:18px;background-image:url(../img/install.png)}
+
+/* TabView */
+.xwup_common .layout-tab-content{display:block;clear:both;margin-bottom:10px;padding:20px 0px;border:2px solid #6C9CDA;border-radius:0px 12px 12px;-moz-border-radius:0px 12px 12px;background-color:#fff;text-align:center}
+.xwup_common ul.tabnav{float:left;position:relative;margin:10px 0 0;padding:0;color:#666;cursor:pointer;text-align:left}
+.xwup_common ul.tabnav li{display:inline-block;*display:inline;margin:0px;padding:6px 10px 2px;border-bottom-width:0px;border-radius:6px 6px 0px 0px;-moz-border-radius:6px 6px 0px 0px;list-style:none;*zoom:1}
+.xwup_common .tabnav-unselected{margin:0;border:1px solid #999;border-bottom-width:0;background-color:#f9f9f9;list-style:none;font-weight:normal;color:#000}
+.xwup_common .xwup-tab-list ul li.tabnav-selected{margin:0;border:1px solid #6c9cda;border-bottom-width:0;background-color:#6c9cda;color:#fff;list-style:none}
+.xwup_common .xwup-tab-list ul li.tabnav-selected a{color:#fff}
+.xwup_common .tabcontent-unselected{display:none}
+.xwup_common .tabcontent-selected{display:inline-block;*display:inline;text-align:center;*zoom:1}
+.xwup_common .tabcontent-selected .xwup-tableview{height:300px;margin:10px 0 18px}
+
+.xwup_common .xwup-td-style-case1{height:30px;padding:0;border-bottom:1px solid #e3e3e3;border-right:1px solid #e3e3e3;border-top-color:transparent;word-wrap:normal}
+.xwup_common .xwup-td-style-case2{padding:0;border-bottom:1px solid #e3e3e3;border-right:1px solid #e3e3e3;border-top-color:transparent;word-wrap:normal}
+.xwup_common .xwup-td-style-case3{padding:0;border-bottom:1px solid #e3e3e3;border-top-color:transparent;word-wrap:normal}
+.xwup_common .context-menu-item-focused{background-color:#6c9cda;color:#fff}
+.xwup_common .context-menu-item-unfocused{background-color:transparent;color:#000}
+.xwup_common .context-menu-layout{position:absolute;*display:block;min-width:190px;background:#fff;font-size:16px;cursor:default;box-shadow:10px 12px 35px gray;-moz-box-shadow:10px 12px 35px gray;-webkit-box-shadow:10px 12px 35px gray}
+.xwup_common .ul-list-type1{margin:0;padding:3px;list-style:none}
+.xwup_common .ul-list-type1 li{display:block;padding:3px 10px;font-weight:bold;font-size:16px;text-decoration:none;white-space:nowrap}
+.xwup_common .info-type1{display:block;margin:7px 0 0;font-weight:bold;font-size:11px}
+
+.xwup_common .frame-type1{width:401px;height:160px;padding:4px;border:1px solid gray;background:#fff}
+.xwup_common .xwup_btn_ok{background:url(../img/btn_ok_blue_eng.png) no-repeat}
+.xwup_common .xwup_btn_cancel{background:url(../img/btn_cancel_blue_eng.png) no-repeat}
+.xwup_common .certselect_input_type1{height:18px;padding:5px 0 0 5px}
+.xwup_common .xwup-td-style-case1 .xwup-tableview-cell,.xwup_common .xwup-td-style-case2 .xwup-tableview-cell,.xwup_common .xwup-td-style-case3 .xwup-tableview-cell{text-align:center}
+.xwup_common .xwup-td-style-case3 .xwup-tableview-cell button{width:74px;height:25px;margin:0 0 0 5px;color:#000;border:1px solid gray;border-radius:4px;-moz-border-radius:2px;font-size:12px;text-align:center}
+.xwup_common .xwup-td-style-case3 .xwup-tableview-cell button:hover{color:#0078d4}
+.xwup_common .xwup-td-style-case3 .xwup-tableview-cell button:first-child{margin:0}
+
+.xwup_common .xwup_expire_alert{position:absolute;top:0;left:0;z-index:200;padding:10px;background:#fff;border:1px solid gray}
+.xwup_common .xwup-table-mini{overflow-y:auto;width:auto;height:140px;margin:10px 0 15px;border:1px solid #949494}
+.xwup_common .xwup-table-mini table{width:100%;margin:0;border:0;table-layout:fixed}
+.xwup_common .xwup-table-mini table thead{border-bottom:1px solid #c7c7c7;background:#f5f5f5 url(../img/btn_bg.png)}
+.xwup_common .xwup-table-mini table th.xwup-mcert,.xwup_common .xwup-table-mini table th.xwup-mcert2,.xwup_common .xwup-table-mini table th.xwup-mcert3,.xwup_common .xwup-table-mini table th.xwup-mcert4{position:static;width:82px;padding:5px 0;background:#f5f5f5;font-weight:bold;text-align:center;white-space:nowrap;text-overflow:eliipsis;cursor:default}
+.xwup_common .xwup-table-mini table th.xwup-mcert2{width:164px}
+.xwup_common .xwup-table-mini table td .xwup-tableview-cell{text-align:center !Important}
+.xwup_common div.xwup-complete-page{position:relative}
+.xwup_common p.xwup-txt-notice{position:absolute;top:100px;left:150px;width:215px}
+
+/* Bug & IE6 */
+.xwup_common iframe.not{position:absolute;top:0;left:0;background:transparent;z-index:-1;width:900px;height:900px;filter:alpha(opacity=0);opacity:0}
+.xwup_common button[disabled="disabled"]{background:none;color:gray;cursor:default}
+.xwup_common .xwup-group-btn-layout button.xwup-size180[disabled="disabled"] span{color:gray;cursor:default}
+
+/* design modify - img */
+/* 타이틀 영역 */
+/*.xwup_common .title,.xwup_common .xwup-title{top:0;left:0;width:100%;height:45px;border-radius:0;background:url(../img/btn_background.gif) repeat-x;cursor:move} */ /* 1px 이미지로 repeat시킨 Type */
+/* wb style */
+.xwup_common .title,.xwup_common .xwup-title{top:0;left:0;width:100%;height:45px;border-radius:0;background:#20509f url(../img/title_bg.png) no-repeat 100% 50%;cursor:move} /* 단색위에 이미지얹어진 형태 (우측에 이미지) */
+/*.xwup_common .title,.xwup_common .xwup-title{top:0;left:0;width:100%;height:45px;border-radius:0;background:#20509f url(../img/title_bg.png) no-repeat 0 50%;cursor:move}*/ /* 단색위에 이미지얹어진 형태 (좌측에 이미지) */
+/*.xwup_common .title,.xwup_common .xwup-title{top:0;left:0;width:100%;height:45px;border-radius:0;background:#20509f;cursor:move}*/ /* 단색으로만 되어있는 형태 */
+/*.xwup_common .title h3,.xwup_common .xwup-title h3{color:#777}*/
+/* wb style */
+.xwup_common .title h3,.xwup_common .xwup-title h3{color:#FFF}
+
+/* 배너 */
+.xwup_common #xwup_header .banner{width:410px;height:66px} /* 이미지크기에 따라 같이 변경해야함. */
+
+/* 인증서 위치내부 이미지 */
+/* 공통 */
+.xwup_common .xwup-cert-position span,.xwup_common .xwup-cert-position2 span{height:32px}
+/* 활성화 */
+.xwup_common .xwup-ico-localstorage{width:32px;background-image:url(../img/icon_localstorage.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_localstorage.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-memorystorage{width:32px;background-image:url(../img/icon_memorystorage.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_memorystorage.png', sizingMethod='crop')}
+/*.xwup_common .xwup-ico-hdd{width:32px;background-image:url(../img/icon_hdd.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_hdd.png', sizingMethod='crop')}*/
+/* wb style */
+.xwup_common .xwup-ico-hdd{width:37px;background-image:url(../img/icon_hdd.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_hdd.png', sizingMethod='crop')}
+/*.xwup_common .xwup-ico-removable{width:32px;background-image:url(../img/icon_removable.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_removable.png', sizingMethod='crop')}*/
+/* wb style */
+.xwup_common .xwup-ico-removable{width:45px;background-image:url(../img/icon_removable.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_removable.png', sizingMethod='crop')}
+/*.xwup_common .xwup-ico-savetoken{width:32px;background-image:url(../img/icon_savetoken.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_savetoken.png', sizingMethod='crop')}*/
+/* wb style */
+.xwup_common .xwup-ico-savetoken{width:38px;background-image:url(../img/icon_savetoken.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_savetoken.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-securedisk{width:32px;background-image:url(../img/icon_securedisk.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_securedisk.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-xfs{width:32px;background-image:url(../img/icon_cloud.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_cloud.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-nfciccard{width:32px;background-image:url(../img/icon_nfciccard.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_nfciccard.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-smartcert{width:32px;background-image:url(../img/icon_smartcert.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_smartcert.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-pkcs11{width:32px;background-image:url(../img/icon_pkcs11.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_pkcs11.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-mobile{width:32px;background-image:url(../img/icon_mobile.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_mobile.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-arrow-left{width:6px;background-image:url(../img/icon_arrow_left.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_localstorage.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-arrow-right{width:6px;background-image:url(../img/icon_arrow_right.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_localstorage.png', sizingMethod='crop')}
+
+/* 비활성화 */
+.xwup_common .xwup-ico-localstorage-disabled{width:32px;background-image:url(../img/icon_localstorage_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_localstorage_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-memorystorage-disabled{width:32px;background-image:url(../img/icon_memorystorage_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_memorystorage_disabled.png', sizingMethod='crop')}
+/*.xwup_common .xwup-ico-hdd-disabled{width:32px;background-image:url(../img/icon_hdd_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_hdd_disabled.png', sizingMethod='crop')}*/
+/* wb style */
+.xwup_common .xwup-ico-hdd-disabled{width:37px;background-image:url(../img/icon_hdd_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_hdd_disabled.png', sizingMethod='crop')}
+/*.xwup_common .xwup-ico-removable-disabled{width:32px;background-image:url(../img/icon_removable_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_removable_disabled.png', sizingMethod='crop')}*/
+/* wb style */
+.xwup_common .xwup-ico-removable-disabled{width:45px;background-image:url(../img/icon_removable_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_removable_disabled.png', sizingMethod='crop')}
+/*.xwup_common .xwup-ico-savetoken-disabled{width:32px;background-image:url(../img/icon_savetoken_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_savetoken_disabled.png', sizingMethod='crop')}*/
+/* wb style */
+.xwup_common .xwup-ico-savetoken-disabled{width:38px;background-image:url(../img/icon_savetoken_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_savetoken_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-securedisk-disabled{width:32px;background-image:url(../img/icon_securedisk_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_securedisk_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-xfs-disabled{width:32px;background-image:url(../img/icon_cloud_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_cloud_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-nfciccard-disabled{width:32px;background-image:url(../img/icon_nfciccard_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_nfciccard_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-smartcert-disabled{width:32px;background-image:url(../img/icon_smartcert_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_smartcert_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-pkcs11-disabled{width:32px;background-image:url(../img/icon_pkcs11_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_pkcs11_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-mobile-disabled{width:32px;background-image:url(../img/icon_mobile_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_mobile_disabled.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-arrow-left-disabled{width:6px;background-image:url(../img/icon_arrow_left_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_localstorage.png', sizingMethod='crop')}
+.xwup_common .xwup-ico-arrow-right-disabled{width:6px;background-image:url(../img/icon_arrow_right_disabled.png);_background:none;_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../AnySign4PC/img/icon_localstorage.png', sizingMethod='crop')}
+
+/* design modify - border */
+/*.xwup_cert_pop{border-width:1px 1px 5px 1px;border-color:#777;box-shadow:10px 12px 45px gray;-webkit-box-shadow:10px 12px 45px gray}*/ /* 팝업UI */
+/* wb style */
+.xwup_cert_pop{border-width:1px 1px 5px 1px;border-color:#20509f;box-shadow:10px 12px 45px gray;-webkit-box-shadow:10px 12px 45px gray} /* 팝업UI */
+.xwup_cert_wide{border-width:0 0 5px 0;border-color:#777} /* 바닥UI */
+
+.xwup_common .context-menu-layout{border-width:3px 3px 3px 3px;border-style:solid;border-color:#20509f}
+.xwup_common .xwup-drag-zone{position:absolute;border-radius:4px;background-color:#000;opacity:0.1;display:none;}

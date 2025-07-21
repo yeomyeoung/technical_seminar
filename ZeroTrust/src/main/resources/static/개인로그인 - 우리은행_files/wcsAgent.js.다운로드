@@ -1,0 +1,210 @@
+var wcsAgent = wcsAgent || (function(){
+	var Class = {};  
+	var ecsCertSdkBASE64 = {
+		_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",   // base64 dictionary
+		_decodeUrl: function(input, isToHex) {
+			var output = "";
+			var chr1, chr2, chr3;
+			var enc1, enc2, enc3, enc4;
+			var i = 0;			
+			input = input.replace(/-/g, '+').replace(/_/g, '/');
+			input = input.replace(/[^A-Za-z0-9\+\/\=]/g,"");		
+			while( i < input.length ) {
+				enc1 = this._keyStr.indexOf(input.charAt(i++));
+				enc2 = this._keyStr.indexOf(input.charAt(i++));
+				enc3 = this._keyStr.indexOf(input.charAt(i++));
+				enc4 = this._keyStr.indexOf(input.charAt(i++));				
+				chr1 = (enc1 << 2) | (enc2 >> 4);
+				chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+				chr3 = ((enc3 & 3) << 6) | enc4;				
+				output = output + String.fromCharCode(chr1);				
+				if(enc3 != 64) {
+					output = output + String.fromCharCode(chr2);
+				}		
+				if(enc4 != 64) {
+					output = output + String.fromCharCode(chr3);
+				}
+			} // while		
+			if (isToHex != undefined && isToHex != null && isToHex == true){
+				output = ecsCertSdkBASE64._encodeToHex(output);
+			}		
+			return output;
+		}, // decodeUrl
+		_encodeToHex: function(base64) {
+			var rval = '';
+			for(var i = 0; i < base64.length; i++) {
+				var b = base64.charCodeAt(i);
+				if(b < 16) {
+					rval += '0';
+				}
+				rval += b.toString(16);
+			}
+			return rval;
+		}
+	}
+
+	var _DomainKeyNo = {
+			_wcsSvcNo_wnpib : "fjfmzsjsiteyp3dxenqa2aei4v5sqtei9n6tmhttzthwze4kxs",
+			_wcsSvcNo_twnpib : "mhsxkcvix0z9umdlcagczacu4lhesvs8uk0jan414ixtv1mgva",
+			_wcsSvcNo_spib : "ysijgetnse3ju367kjzkjpikebuahc39vni5cmyuzucont5mb6",
+			_wcsApiKey_wnpib : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmamZtenNqc2l0ZXlwM2R4ZW5xYTJhZWk0djVzcXRlaTluNnRtaHR0enRod3plNGt4cyIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3MDgyMDYwNSwiZXhwIjoxNzAyMzU2NjA1fQ.O6_jYpnh7rlO14D6d0BaLhHbR28jyORmYnaRVN7fzx0",
+			_wcsApiKey_twnpib : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaHN4a2N2aXgwejl1bWRsY2FnY3phY3U0bGhlc3ZzOHVrMGphbjQxNGl4dHYxbWd2YSIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3MTE3NDE0MSwiZXhwIjoxNzAyNzEwMTQxfQ.AzWDrBxb80Y708i-dBiRU-Yr_m__7qloO5jmovMvj0k",
+			_wcsApiKey_spib : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5c2lqZ2V0bnNlM2p1MzY3a2p6a2pwaWtlYnVhaGMzOXZuaTVjbXl1enVjb250NW1iNiIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3MTE3NDgxOCwiZXhwIjoxNzAyNzEwODE4fQ.uMhBcbTS07Nwo41EuQ3ZzhuZSR8dZZa-FHBhNPRP6rE",
+
+			_wcsSvcNo_wnpot : "xere73nloolouxz6okukqy4enmpelafnszxtsbaslazmowessn",
+			_wcsSvcNo_twnpot : "e0cjxnob6uzjzd7gocpqwxjoww1gnsbteyfvh30973hqm9owf6",
+			_wcsSvcNo_spot : "i07i6rkcyv9nihnsj2b9g4uv0at85caglm6q9g71faecmdv5ae",
+			_wcsApiKey_wnpot : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4ZXJlNzNubG9vbG91eHo2b2t1a3F5NGVubXBlbGFmbnN6eHRzYmFzbGF6bW93ZXNzbiIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3OTQ2MjY5NywiZXhwIjoxNzEwOTk4Njk3fQ.VVqHq_s2WEF2irXntUy-cUXvuOq94_e6gadd8_tc4DY",
+			_wcsApiKey_twnpot : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMGNqeG5vYjZ1emp6ZDdnb2NwcXd4am93dzFnbnNidGV5ZnZoMzA5NzNocW05b3dmNiIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3OTQ2MjgzOSwiZXhwIjoxNzEwOTk4ODM5fQ.Qrt3yBN1ad5gRo9is5enJv6B7z9idprneOxIdYYbwCs",
+			_wcsApiKey_spot : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpMDdpNnJrY3l2OW5paG5zajJiOWc0dXYwYXQ4NWNhZ2xtNnE5ZzcxZmFlY21kdjVhZSIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3OTQ2MzUxMSwiZXhwIjoxNzEwOTk5NTExfQ.pP_M0cIX_SHn0DWQ_AA3Niibb6IQXL4RfxvNj6mKfas",
+
+			_wcsSvcNo_wnsvc : "zyzos6jz17xgvrlsgsmqlquozxpvxtaeyyxmqrta3j7zpv9uzb",
+			_wcsSvcNo_twnsvc : "jhtrltav21euiexlput5lg2341ucwu2kxcfyjencgpyfo0msdj",
+			_wcsSvcNo_svc : "igt85lkxqacjaaogpr5r59mjswwktyicjqph4uymevof1khylp",
+			_wcsApiKey_wnsvc : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ6eXpvczZqejE3eGd2cmxzZ3NtcWxxdW96eHB2eHRhZXl5eG1xcnRhM2o3enB2OXV6YiIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3OTQ2Mzc4OCwiZXhwIjoxNzEwOTk5Nzg4fQ.AIgtUeZzcJv3NowYIIQj7Cva7CgXbUnL7HxfEzSO9tA",
+			_wcsApiKey_twnsvc : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqaHRybHRhdjIxZXVpZXhscHV0NWxnMjM0MXVjd3Uya3hjZnlqZW5jZ3B5Zm8wbXNkaiIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3OTQ2MzgzOSwiZXhwIjoxNzEwOTk5ODM5fQ.5uJP5fktqPgrmY5QJfALj9EVGG7yrWN9_sHLX7UUdmo",
+			_wcsApiKey_svc : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ3Q4NWxreHFhY2phYW9ncHI1cjU5bWpzd3drdHlpY2pxcGg0dXltZXZvZjFraHlscCIsInJvbGVzIjpbImNhIl0sImlhdCI6MTY3OTQ2MzY2MSwiZXhwIjoxNzEwOTk5NjYxfQ.lIO9Drcvjwzs00oeT6XXe9DMvKuRPsWGn7mTUmH_vHk"
+	};
+	var _Class = {
+			_wcsUrl : (document.location.hostname.indexOf("wn") > -1) ? "https://pcctst.wooribank.com/wpcc/js/individual/wooricert.js" : "https://pcc.wooribank.com/wpcc/js/individual/wooricert.js",
+			_wcsId : 'wooriCert',
+			_wcsSvcNo : (document.location.hostname.indexOf("twnpib") > -1) ? _DomainKeyNo._wcsSvcNo_twnpib : (document.location.hostname.indexOf("wnpib") > -1) ? _DomainKeyNo._wcsSvcNo_wnpib : (document.location.hostname.indexOf("spib") > -1) ? _DomainKeyNo._wcsSvcNo_spib : (document.location.hostname.indexOf("twnpot") > -1) ? _DomainKeyNo._wcsSvcNo_twnpot : (document.location.hostname.indexOf("wnpot") > -1) ? _DomainKeyNo._wcsSvcNo_wnpot : (document.location.hostname.indexOf("spot") > -1) ? _DomainKeyNo._wcsSvcNo_spot : (document.location.hostname.indexOf("twnsvc") > -1) ? _DomainKeyNo._wcsSvcNo_twnsvc : (document.location.hostname.indexOf("wnsvc") > -1) ? _DomainKeyNo._wcsSvcNo_wnsvc : (document.location.hostname.indexOf("svc") > -1) ? _DomainKeyNo._wcsSvcNo_svc : "",
+			_wcsApiKey : (document.location.hostname.indexOf("twnpib") > -1) ? _DomainKeyNo._wcsApiKey_twnpib : (document.location.hostname.indexOf("wnpib") > -1) ? _DomainKeyNo._wcsApiKey_wnpib : (document.location.hostname.indexOf("spib") > -1) ? _DomainKeyNo._wcsApiKey_spib : (document.location.hostname.indexOf("twnpot") > -1) ? _DomainKeyNo._wcsApiKey_twnpot : (document.location.hostname.indexOf("wnpot") > -1) ? _DomainKeyNo._wcsApiKey_wnpot : (document.location.hostname.indexOf("spot") > -1) ? _DomainKeyNo._wcsApiKey_spot : (document.location.hostname.indexOf("twnsvc") > -1) ? _DomainKeyNo._wcsApiKey_twnsvc : (document.location.hostname.indexOf("wnsvc") > -1) ? _DomainKeyNo._wcsApiKey_wnsvc : (document.location.hostname.indexOf("svc") > -1) ? _DomainKeyNo._wcsApiKey_svc : "",
+			_wcs_load_retryCount : 0,
+			_wcs_maxRetryCount : 1,
+			_initErrorCode : '',
+			_initErrorMsg : '',
+			_initSuccess : false,
+			load: function(callback){
+				var scriptElem = document.createElement('script');
+				scriptElem.src = _Class._wcsUrl;
+				scriptElem.id = _Class._wcsId;
+				document.querySelector("body").appendChild(scriptElem);
+				scriptElem.onload = function() {
+					_Class.init(callback);  //WON인증서SDK 초기화
+				}
+//				console.log("wooriSign _Class._wcsSvcNo :" + _Class._wcsSvcNo);
+//				console.log("wooriSign _Class._wcsApiKey :" + _Class._wcsApiKey);
+			},
+			init: function(callback){
+				try {
+					// WON인증서 초기화		
+					WooriCert.Sdk.init({
+						insttSvcNo: _Class._wcsSvcNo,
+						apiKey: _Class._wcsApiKey,
+						success : function(data) {
+							_initSuccess = true;
+							_initErrorCode = '';
+							_initErrorMsg = '';
+							if (typeof callback == "function") {
+								callback();
+							}
+						},
+						fail : function(error) {
+							_initSuccess = false;
+							_initErrorCode = error.code;
+							_initErrorMsg = error.message;
+							if (typeof callback == "function") {
+								callback();
+							}
+						}
+					});
+				} catch(e) {
+					console.log("wcsAgent init 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback();
+					}
+				}
+			},
+			sign: function(plainText, signType, callback){
+				try {
+					if (typeof WooriCert == 'undefined' || WooriCert == null || WooriCert == '') {
+						callback('ERROR', 'WON인증서SDK를 로드하지 못하였습니다. 방화벽/네트워크 상태를 확인해주세요.', '10011');
+						return;
+					}
+					
+					if (typeof _initSuccess == 'undefined' || _initSuccess == false){
+						callback('ERROR', 'WON인증서SDK를 로딩이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.', '10011');
+						return;
+					}
+					
+					if (_initErrorCode != '') {
+						alert('[' + _initErrorCode + "] " +  _initErrorMsg);
+						return;
+					}
+					
+					if( signType == null || typeof signType == "undefined" || signType == "" ) {
+						signType = '1003'; //1003은 레거시 서명타입
+					}
+
+	                WooriCert.Sdk.wooriSign({
+	                    //plainText 	: '${todayDate}',		// { plainTexts : {"issu":{"name":"김고은","no":"1231212345","cash":"3000"}}},
+	                	plainText 	: plainText,		
+	                    signType 	:signType,    			// signType : 1003은 레거시, 0001은 일반이용기관용 
+	                    agreeViewYn : "N",
+	                    success: function(result) {
+							callback('SUCCESS', result.certTxId, result.eltsgnVal); // 전자서명 검증 요청
+						},
+						fail: function(error) {
+	                        console.log("wooriSign fail :" + JSON.stringify(error));
+							if('9999' != error.rsp_code && '9702' != error.rsp_code && 'INVALID_PASSWORD' != error.rsp_code){ //창닫기(9999), 비번5회오류(9702), 비밀번호오류는 에러응답 전달하지 않음
+								callback('ERROR', error.rsp_msg, error.rsp_code);
+							}
+						}
+	                });
+					
+				} catch(e) {
+					console.log("wcsAgent sign 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', 'WON인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				}
+			},
+			manage: function(callback){
+				try {
+					WooriCert.Sdk.wooriManage({
+						signType 	: "1002",
+						success: function(result) {
+							callback('SUCCESS', result.rsp_msg, result.rsp_code);
+						},
+						fail: function(error) {
+							callback('ERROR', error.rsp_msg, error.rsp_code);
+						}
+					});
+				} catch(e) {
+					console.log("wcsAgent manage 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', 'WON인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				}
+			},
+			check: function(callback){
+				try{
+					if (typeof callback == "function") {
+						if (typeof WooriCert == 'undefined' || WooriCert == null || WooriCert == '') {
+							callback('ERROR', 'WON인증서SDK를 로드하지 못하였습니다. 방화벽/네트워크 상태를 확인해주세요.', '10011');
+							return;
+						}else if (typeof _initSuccess == 'undefined' || _initSuccess == false){
+							callback('ERROR', 'WON인증서SDK를 로딩이 완료되지 않았습니다. 잠시 후 다시 시도해주세요.', '10011');
+							return;
+						}else{
+							callback('SUCCESS',"성공", '0000');
+						}
+					}
+				} catch(e) {
+					console.log("wcsAgent check 처리중 예외발생 :" + e);
+					if (typeof callback == "function") {
+						callback('ERROR', 'WON인증서 처리 중 오류가 발생하였습니다.', '9999');
+					}
+				}
+			}
+	};
+	
+	for (var member in _Class) {
+		if (member.indexOf('_') != 0) {
+			Class[member] = _Class[member];
+		}
+	}
+	
+	return Class;
+})();

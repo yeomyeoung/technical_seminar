@@ -1,0 +1,117 @@
+<!-- <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+</head>
+<body>
+<h1>로그인 페이지</h1>
+
+<form action="/login" method="post">
+    <label for="userID">아이디:</label>
+    <input type="text" name="userID" id="userID"><br>
+    <label for="password">비밀번호:</label>
+    <input type="password" name="password" id="password"><br>
+    <button type="submit">로그인</button>
+</form> -->
+
+<!-- 로그인 실패 메시지 -->
+<!-- <p th:if="${error}" th:text="${error}" style="color:red;"></p>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>개인로그인 - 우리은행</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS만 유지 -->
+  <link rel="stylesheet" href="./개인로그인 - 우리은행_files/login.css" type="text/css">
+  <link rel="stylesheet" href="./개인로그인 - 우리은행_files/ML4Web_BS_style.css" type="text/css">
+  <link rel="stylesheet" href="./개인로그인 - 우리은행_files/css3.css" type="text/css">
+
+  <!-- jQuery 유지 -->
+  <script type="text/javascript" src="./개인로그인 - 우리은행_files/jquery-1.7.1.min.js"></script>
+</head>
+<body>
+  <div id="accNav">
+    <p><a href="#container" class="skip">본문으로 바로가기</a></p>
+    <p><a href="#footer" class="skip">푸터 바로가기</a></p>
+  </div>
+
+  <div id="wrap" class="login_renew1031">
+    <div id="header" class="snb-padding">
+      <div id="gnb">
+        <a href="https://www.wooribank.com/" class="woori fleft" title="메인 페이지"><img alt="우리은행 로고" src="./개인로그인 - 우리은행_files/woori_s.png"></a>
+        <h1><a class="site fleft" title="메인 페이지" href="https://www.wooribank.com/"><img alt="우리은행 로고" src="./개인로그인 - 우리은행_files/cm.png"></a></h1>
+      </div>
+    </div>
+    <div id="container" class="snb-padding bg_gray">
+      <div class="title-area clearfix" id="contentTitle">
+        <h2 class="fleft">개인로그인</h2>
+      </div>
+
+      <div id="content">
+        <div id="login-area-wrap">
+          <form name="frm" action="#" method="post" id="frm">
+            <fieldset>
+              <legend>로그인 입력폼</legend>
+              <div id="login-area" class="ps wid980">
+                <div class="login-Area-Cont01">
+                  <div class="ID_Login">
+                    <form action="/dashboard" method="post"></form>
+                      <dl>
+                        <dt class="Login_title_h2">아이디 로그인</dt>
+                        <dd class="ID_Input_Cont">
+                          <ul class="Input_Cont">
+                            <li>
+                              <input type="text" id="userID" name="userID" placeholder="아이디 입력" maxlength="10">
+                            </li>
+                            <li class="mt5">
+                              <input type="password" id="password" name="password" placeholder="비밀번호 입력" maxlength="15">
+                            </li>
+                          </ul>
+                          
+                            <input type="submit" value="로그인" class="login-submit">
+                          
+                        </dd>
+                        <dd class="Add_Menu_Cont mt27">
+                          <ul class="Menu_List">
+                            <li><a href="#">아이디조회</a></li>
+                            <li><a href="#">비밀번호재등록</a></li>
+                            <li><a href="#">회원가입</a></li>
+                          </ul>
+                        </dd>
+                      </dl>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <div class="login-notice-info height70">
+          <dl>
+            <!-- <dt class="font-bold ml50">안전한 인터넷뱅킹 이용을 위해<br>꼭 알아두세요!</dt> -->
+            <!-- <dd>
+              <ul class="img_check_list">
+                <li>우리은행은 보안카드번호 35개 전체 입력을 요구하지 않습니다.</li>
+                <li>주소창에 자물쇠 등 보안 아이콘이 있는지 확인하세요.</li>
+              </ul>
+            </dd> -->
+          </dl>
+        </div>
+      </div> <!-- #content -->
+    </div> <!-- #container -->
+  </div> <!-- #wrap -->
+
+  <footer id="footer">
+    <div class="footer-inner">
+      <p>&copy; WOORI BANK. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

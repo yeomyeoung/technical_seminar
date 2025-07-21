@@ -1,0 +1,138 @@
+var console = window.console || {log:function(){}};
+var ml4web_service = {
+		browserInfo : getServiceBrowerInfo(),
+		ML_Init_Check : false,
+		iframeUrl : "",
+		child : "",
+		businessTypeCode : "",
+		tabType : 0,
+		originalText : "",
+		originalMessage : "",
+		signTyCd : "",
+		ML_Callback : "",
+		ML_HttpCallback	: "",
+		ML4Web_BS_UI	:""
+}
+function ML4Web_BS_init(callback){
+	BSConfig.serverCode = 0;
+	unBlur();
+	ml4web_service.businessTypeCode = document.getElementById("ML_businessTypeCode").value;
+	var LTabType = document.getElementById("ML_tabType").value;
+	if(LTabType != null && LTabType != "" & LTabType != "undefined"){
+		BSConfig.tabType = LTabType;
+	}
+	ml4web_service.originalText = document.getElementById("ML_originalText").value;
+	ml4web_service.originalMessage = document.getElementById("ML_originalMessage").value;
+	ml4web_service.signTyCd = document.getElementById("ML_signTyCd").value;
+	ML4Web_BS$('body').click(unBlur);
+	ML4Web_BS$('.ML_BS_ui-button').off('focus');
+	ML4Web_BS$('#ML4Web_ez').dialog({
+		draggable : false,
+		autoOpen : false,
+		closeOnEscape: false,
+		modal : true,
+		width : 400,
+		height :465,
+		resizeable : false,
+		closeText : "",
+		open : function(){
+			var win = ML4Web_BS$(window);
+			win.bind('scroll', function(){
+				ML4Web_BS$("selector").dialog('option', 'position', 'center');
+			});
+		} 
+	});
+	
+	callback(0,"ML4Web_BS_init");
+	
+}
+function ML_checkInit(){
+	setTimeout(function(){
+		if(ml4web_service.ML_Init_Check){
+			if(BSConfig.serverCode == 0 || BSConfig.serverCode == 1000){
+				ML4Web_BS$('#ML4Web_ez').dialog('open');
+				
+			}
+		}else{
+			ML_checkInit();
+		}
+	},1000);
+}
+function openBankSign(){
+	ML4Web_BS_init(function(code, data){
+		if(code == 0){
+			if(ml4web_service.browserInfo.name == "MSIE" && ml4web_service.browserInfo.version == "7" || ml4web_service.browserInfo.version == "6"){
+				alert("지원하지 않는 브라우저 버전 입니다.");
+				return false;
+			} else {
+				ML4Web_BS$('#ML4Web_BS').attr("src",BSConfig.iframeUrl);
+				ML_checkInit();
+				return false;
+			}	
+		}
+	});
+}
+function unBlur() {
+	ML4Web_BS$('.ML_BS_ui-button').blur();  
+}
+
+function popupClose() {
+	ML4Web_BS$('#ML4Web_ez').dialog('close');
+	BSConfig.serverCode = 0;
+}
+
+function makeIframe(){
+	if(ML4Web_BS$('#ML4Web_ez') == null || typeof(ML4Web_BS$('#ML4Web_ez')) !== "object"){
+		var div = document.createElement("div");
+		div.setAttribute("id","ML4Web_ez");
+		div.setAttribute("style","display:none");
+		document.body.appendChild(div);
+		
+		var iframe = document.createElement("iframe");
+		iframe.setAttribute("id","ML4Web_BS");
+		iframe.setAttribute("src","");
+		iframe.setAttribute("class","ML_BS_frame");
+		iframe.setAttribute("style","border:none");
+		iframe.setAttribute("frameborder","0");
+		iframe.width="100%;"
+		iframe.height="100%;" 
+		iframe.scrolling="no";
+		document.getElementById("ML4Web_ez").appendChild(iframe);   
+	}else{
+		var iframe = document.createElement("iframe");
+		iframe.setAttribute("id","ML4Web_BS");
+		iframe.setAttribute("src","");
+		iframe.setAttribute("class","ML_BS_frame");
+		iframe.setAttribute("style","border:none");
+		iframe.setAttribute("frameborder","0");
+		iframe.width="100%;"
+		iframe.height="100%;" 
+		iframe.scrolling="no";
+		document.getElementById("ML4Web_ez").appendChild(iframe);   
+	}
+   
+}
+
+function getServiceBrowerInfo() {
+	var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
+	if(/trident/i.test(M[1])){
+		tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
+		return {name:'IE',version:(tem[1]||'')};
+	}
+	if(M[1]==='Chrome'){
+		tem=ua.match(/\bOPR\/(\d+)/)
+		if(tem!=null)   {return {name:'Opera', version:tem[1]};}
+	}
+	M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+	if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
+	return {
+	  name: M[0],
+	  version: M[1]
+	};
+}
+
+//수정 불가
+function ML_setTempPhoneNum(phoneNum){
+	BSConfig.tempPhoneNum = phoneNum;
+}
+

@@ -1,0 +1,43 @@
+//사설인증 내부 js
+//var contextPath = [[${#servletContext.contextPath}]];
+(function(e){
+	//localStorage.setItem("testKey", "testValue");
+	
+	//window.parent.postMessage({params: [location.protocol, location.hostname, location.port]},'*');
+	window.addEventListener( 'message', function (e) {
+		if(typeof window[e.data.functionName] === 'function'){			
+			window[e.data.functionName](e.data.param);
+		}
+	});//, {once : true}
+	/**개인고객**/
+	getAccountVal = function(e){
+		//계정키를 이용기관 도메인에 보내준다.
+		var getLocalParams = JSON.parse(localStorage.getItem("__cloudInfo"));
+		var getSessionParams;
+		if(getLocalParams != null && getLocalParams != ""){
+			e.accountKey = getLocalParams.accountKey;
+			e.deviceId = getLocalParams.deviceId;
+			e.returnFnc = "getAccountVal";
+		}else{
+			getSessionParams = JSON.parse(sessionStorage.getItem("__cloudInfo"));
+			if(getLocalParams != null && getLocalParams != ""){
+				e.accountKey = getSessionParams.accountKey;
+				e.deviceId = getSessionParams.deviceId;
+				e.returnFnc = "getAccountVal";
+			}
+		} 
+		window.parent.postMessage({param : JSON.stringify(e)},'*');
+	},
+	setLocalStorageAccountVal = function(e){
+		//계정키를 이용기관 도메인에서 받아 로컬 스토리지에서 저장한다.
+		localStorage.setItem("__cloudInfo", JSON.stringify(e));
+		sessionStorage.setItem("__cloudInfo", JSON.stringify(e));
+	},
+	setSessionStorageAccountVal = function(e){
+		sessionStorage.setItem("__cloudInfo", JSON.stringify(e));
+	},
+	removeStorage = function(e){
+		localStorage.removeItem("__cloudInfo");
+		sessionStorage.removeItem("__cloudInfo");
+	}
+}(window))

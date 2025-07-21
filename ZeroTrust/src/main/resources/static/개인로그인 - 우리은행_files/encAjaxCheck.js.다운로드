@@ -1,0 +1,325 @@
+/*******************************************************************************
+* 업     무    명 :  keyboard security ajax JavaScript
+* 
+* 서브   업 무 명 :  
+* 
+* 설           명 :   As-is의 '/jss/ajax/xecureAjax.js' 대체용.
+* 
+* 작     성    자 :  XXXX
+* 
+* 작     성    일 :  XXXX.XX.XX 
+* 
+* 변  경   이  력: 
+* 
+* Version   작성자    업   무    일    자          내        용            요 청 자 
+* --------   -------   ---------   ----------      ----------------      -------- 
+*   1.1      이재현   기능공통   2012.12.     xecure html암호화는 제거, 키보드보안 암호화는 "<ks:enc>" 태그를 사용함(별도 암호화 필요없음).
+*
+*******************************************************************************/
+
+/*******************************************************************************
+ * 설명 : 대상 form을 GET방식으로 ajax submit한다.
+ * 		As-is : xecureAjaxGetSubmit
+ * @param	frm			: 대상 form object
+ * @param	onresult		: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault		: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksAjaxGetSubmit( form, onresult, onfault ){
+	ksAjaxSubmit( 'GET', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 대상 form을 POST방식으로 ajax submit한다.
+ * 		As-is : xecureAjaxPostSubmit
+ * @param	frm			: 대상 form object
+ * @param	onresult		: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault		: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksAjaxPostSubmit( form, onresult, onfault ){
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 대상 form을 ajax submit한다.[ 키보드보안 적용 : 키보드보안레이아웃 필수 ] 
+ * 		As-is : xecureAjaxSubmit
+ * @param	method		: post/get 방식구분
+ * @param	frm			: 대상 form object
+ * @param	onresult		: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault		: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksAjaxSubmit( method, frm, onresult, onfault ){
+	if( $.trim(method).toUpperCase()!=='GET' ){ method = 'POST'; }
+	if( $( frm ).length == 0 ){ 
+		//alert('[function ksAjaxSubmit] form 이 존재하지 않습니다. '); 
+		return; 
+	}
+	if( typeof DataSubmit == 'undefined' ){ 
+		//alert('[function ksAjaxSubmit] 키보드보안 DataSubmit function 이 존재하지 않습니다. \n키보드보안 레이아웃을 사용해주십시오. '); 
+		return; 
+	}
+	var d_frm = document[ $(frm).attr('name') ];
+	if( d_frm == null ){ 
+		//alert('[function ksAjaxSubmit] form name이 존재하지 않습니다. '); 
+		return; 
+	}
+	if(navigator.platform.match('Win') == 'Win'){	// window일경우에만 적용 
+		DataSubmit( d_frm );	// /sec/TouchEnKey/TouchEnKey.js
+	}
+	
+	var pageUrl = $( frm ).attr('action');
+	//alert("pageUrl : " +pageUrl);
+	var params = $( frm ).serialize();
+	var d='';
+	$.ajax({
+		url : pageUrl,
+		type : method,
+		data : params,
+		dataType : 'html',
+		success : function(data) {
+			d = data;
+		},
+		error : function(xhr){
+			d = xhr.responseText;
+		},
+		complete : function(xhr, r_msg){
+			/* alert('error: ' + xhr.status + ' ' + xhr.statusText); */
+			var isSuccess = false;
+			if(r_msg === 'success'){ isSuccess = true; }
+			if(isSuccess){
+				if( typeof onresult === 'function' ){ onresult( d, xhr ); }
+			}else{
+				if( typeof onfault === 'function' ){ onfault( d, xhr ); }
+			}
+		}
+	});
+}
+
+/*******************************************************************************
+ * 설명 : 대상 form의 element를 query string 으로 가져온다.
+ * @param	formObj		: 대상 form object
+ * @returns {string}
+ *******************************************************************************/
+function getQueryString( formObj ){
+	return $( formObj ).serialize();
+}
+
+/*******************************************************************************
+ * 설명 : trim
+ * @param	str		: 문자열
+ * @returns {string}
+ *******************************************************************************/
+function _trim( str ){
+	if( str ){
+		return str.replace(/(^\s*)|(\s*$)/g,"");
+	}else{
+		return '';
+	}
+}
+
+function defaultResultHandler( responseText, responseXML, encrypted ){
+}
+function defaultFaultHandler( status, statusText ){
+}
+
+/*******************************************************************************
+ * 설명 : xecure2 form에 input hidden element를 추가한다.
+ * @param	aName	: 추가할 element name
+ * @param	aValue	: 추가할 element value
+ * @returns {없음}
+ *******************************************************************************/
+function addHiddenItem(aName, aValue) {
+	addHiddenItem(document.xecure2, aName, aValue);
+}
+
+/*******************************************************************************
+ * 설명 : 대상 form에 input hidden element를 추가한다.
+ * @param	xform		: 대상 form
+ * @param	aName	: 추가할 element name
+ * @param	aValue	: 추가할 element value
+ * @returns {없음}
+ *******************************************************************************/
+function addHiddenItem(xform, aName, aValue) {
+	var target = $('form[name='+ $(xform).attr('name') +'] *[name='+ aName +']');
+	if( $(target).length == 0 ){
+		$('<input type="hidden" id="'+aName+'" name="'+aName+'" value="'+aValue+'" />').appendTo( $(xform) );
+	}else{
+		$(target).val( aValue );
+	}
+}
+
+/*******************************************************************************
+ * 설명 : E2E 비교
+ * 		대상 form의 ajax Submit 처리
+ * 		As-is : xaCompareAndCheck
+ * @param	form		: 대상 form
+ * @param	fname1	: 암호화할 element name 
+ * @param	fname2	: 암호화할 element name 
+ * @param	fname3	: 암호화할 element name 
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksCompareAndCheck( form, fname1, fname2, fname3, onresult, onfault ) {
+	//alert("fname1 : " + fname1 + "fname2 : " + fname2 + "fname3 : " + fname3);
+	addHiddenItem(form, "ksP1", fname1 );
+	addHiddenItem(form, "ksP2", fname2 );
+	addHiddenItem(form, "ksP3", fname3 );
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : E2E 비교 
+ * 		대상 form의 ajax Submit 처리
+ * 		As-is : xaCompare
+ * @param	form		: 대상 form
+ * @param	fname1	: 암호화할 element name (ksP1 매핑)
+ * @param	fname2	: 암호화할 element name (ksP2 매핑)
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksCompare( form, fname1, fname2, onresult, onfault ) {
+	addHiddenItem(form, "ksP1", fname1 );
+	addHiddenItem(form, "ksP2", fname2 );
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : E2E 비교 
+ * 		대상 form의 주민사업번호, 전화번호, 핸드폰번호 element를  삽입후 ajax Submit 처리
+ * 		As-is : xaCompareAcctPw
+ * @param	form		: 대상 form
+ * @param	fname1	: 암호화할 element name (키보드보안 필수)
+ * @param	fname2	: 암호화할 element name (키보드보안 필수)
+ * @param	psbz_no	: 추가전송할 aPSBZ_NO element value
+ * @param	tel_no		: 추가전송할 aTEL_NO element value
+ * @param	hp_no		: 추가전송할 aHP_NO element value
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksCompareAcctPw( form, fname1, fname2, psbz_no, tel_no, hp_no, onresult, onfault ) {
+	addHiddenItem(form, "ksP1", fname1 );
+	addHiddenItem(form, "ksP2", fname2 );
+	
+	addHiddenItem(form, "aPSBZ_NO", psbz_no );
+	addHiddenItem(form, "aTEL_NO", tel_no );
+	addHiddenItem(form, "aHP_NO", hp_no );
+	
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 비밀번호 체크
+ * 		대상 form의 ajax Submit 처리
+ * 		As-is : xaChecker
+ * @param	form		: 대상 form
+ * @param	fname1	: 암호화할 element name 
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksChecker( form, fname1, onresult, onfault ) {
+	addHiddenItem(form, "ksP1", fname1 );
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 계좌번호,비밀번호 유효성체크 (기업전용)
+ * 		대상 form의 ajax Submit 처리
+ * 		As-is : xaAcctPwCheck
+ * @param	form		: 대상 form
+ * @param	fname1	: 암호화할 element name (키보드보안 필수)
+ * @param	fname2	: 암호화할 element name (키보드보안 필수)
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksAcctPwCheck( form, fname1, fname2, onresult, onfault ) {
+	addHiddenItem(form, "ksP1", fname1 );
+	addHiddenItem(form, "ksP2", fname2 );
+	
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 인증번호
+ * 		xaFormAuth form의 전화번호 element의 값을 저장후 ajax Submit 처리
+ * 		As-is : xaAuthNumber
+ * @param	mobno1	: 전화번호1
+ * @param	mobno2	: 전화번호2
+ * @param	mobno3	: 전화번호3
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksAuthNumber( mobno1, mobno2, mobno3, onresult, onfault ) {
+	var frm = $('form[name=xaFormAuth]');
+	$(frm).find('*[name=mobno1]').val( mobno1 );
+	$(frm).find('*[name=mobno2]').val( mobno2 );
+	$(frm).find('*[name=mobno3]').val( mobno3 );
+	ksAjaxSubmit( 'POST', frm, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 인증번호
+ * 		대상 form의 전화번호 element의 값을 저장후 ajax Submit 처리
+ * 		As-is : xaAuthNumber
+ * @param	form		: 대상 form
+ * @param	mobno1	: 전화번호1
+ * @param	mobno2	: 전화번호2
+ * @param	mobno3	: 전화번호3
+ * @param	onresult	: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault	: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksAuthNumber( form, mobno1, mobno2, mobno3, onresult, onfault ) {
+	addHiddenItem(form, "mobno1", mobno1 );
+	addHiddenItem(form, "mobno2", mobno2 );
+	addHiddenItem(form, "mobno3", mobno3 );
+	ksAjaxSubmit( 'POST', frm, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : xecure2 form을 url로 ajax submit한다.
+ * 		As-is : aXecureNavigate
+ * @param	url				: action url
+ * @param	onresult		: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault		: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksNavigate(url, onresult, onfault) {
+	var frm = $('form[name=xecure2]');
+	$( frm ).attr('action', url);
+	ksAjaxSubmit( 'GET', frm, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 대상 form을 ajax submit한다.
+ * 		As-is : aXecureSubmit
+ * @param	form			: 대상 form object
+ * @param	onresult		: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault		: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksSubmit(form, onresult, onfault) {
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+
+/*******************************************************************************
+ * 설명 : 대상 form을 url로 ajax submit한다.
+ * 		As-is : aXecureSubmit
+ * @param	form			: 대상 form object
+ * @param	url				: action url
+ * @param	onresult		: ajax처리 성공시 callback function : parameter( ajaxcontent, xhr )
+ * @param	onfault		: ajax처리 실패시 callback function : parameter( ajaxcontent, xhr )
+ * @returns {없음}
+ *******************************************************************************/
+function ksSubmit(form, url, onresult, onfault) {
+	$( form ).attr('action', url);
+	ksAjaxSubmit( 'POST', form, onresult, onfault );
+}
+

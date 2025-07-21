@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="/css/login_page.css"> <!-- static/css/login_page.css -->
+    <!-- 폰트어썸 (소셜 아이콘용) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="container">
+
+        <!-- 회원가입 영역 -->
+        <div class="sign-up-container">
+          <form action="/signup" method="post">
+            <h1>Create Account</h1>
+            <div class="social-links">
+              <div><a href="#"><i class="fa-brands fa-facebook"></i></a></div>
+              <div><a href="#"><i class="fa-brands fa-twitter"></i></a></div>
+              <div><a href="#"><i class="fa-brands fa-linkedin"></i></a></div>
+            </div>
+            <span>or use your email for registration</span>
+            <input type="text" name="userName" placeholder="이름" required>
+            <input type="text" name="userID" placeholder="아이디" required>
+            <input type="password" name="password" placeholder="비밀번호" required>
+            <button class="form_btn" type="submit">Sign Up</button>
+          </form>
+        </div>
+
+        <!-- 로그인 영역 -->
+        <div class="sign-in-container">
+          <form action="/login" method="post">
+            <h1>Sign In</h1>
+            <div class="social-links">
+              <div><a href="#"><i class="fa-brands fa-facebook"></i></a></div>
+              <div><a href="#"><i class="fa-brands fa-twitter"></i></a></div>
+              <div><a href="#"><i class="fa-brands fa-linkedin"></i></a></div>
+            </div>
+            <span>or use your account</span>
+            <input type="text" name="userID" placeholder="아이디" required>
+            <input type="password" name="password" placeholder="비밀번호" required>
+            <button class="form_btn" type="submit">Sign In</button>
+
+            <!-- 로그인 실패 시 에러 메시지 -->
+            <p style="color:red;" th:text="${error}"></p>
+          </form>
+        </div>
+
+        <!-- 오버레이 영역 -->
+        <div class="overlay-container">
+          <div class="overlay-left">
+            <h1>Welcome Back</h1>
+            <p>To keep connected with us please login with your personal info</p>
+            <button id="signIn" class="overlay_btn" type="button">Sign In</button>
+          </div>
+          <div class="overlay-right">
+            <h1>Hello, Friend</h1>
+            <p>Enter your personal details and start journey with us</p>
+            <button id="signUp" class="overlay_btn" type="button">Sign Up</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- optional JS for overlay toggle -->
+    <script>
+      const signUpBtn = document.getElementById('signUp');
+      const signInBtn = document.getElementById('signIn');
+      const container = document.querySelector('.container');
+
+      signUpBtn.addEventListener('click', () => {
+        container.classList.add('right-panel-active');
+      });
+
+      signInBtn.addEventListener('click', () => {
+        container.classList.remove('right-panel-active');
+      });
+    </script>
+  </body>
+</html>

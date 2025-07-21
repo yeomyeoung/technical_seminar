@@ -1,0 +1,557 @@
+// 초기화 전에 "wooriCert" 요소 존재 여부 확인
+var certElem = document.getElementById("wooriCert");
+if (!certElem) {
+	throw new Error("요소 'wooriCert'를 찾을 수 없습니다.");
+}
+
+var srcParts = certElem.src.split("/");
+var w_PATH;
+if (srcParts[2].indexOf("localhost") > -1) {
+	w_PATH = srcParts[0] + "//" + srcParts[2];
+} else {
+	w_PATH = srcParts[0] + "//" + srcParts[2] + "/" + srcParts[3];
+}
+
+	"use strict";
+! function () {
+	var loadUtil = {};
+	/********************************************
+	 * crypto, msCrypto
+	 * 해당 페이지에서 사용하는 이유
+	 * crypto.subtle.digest로 script hash 값 구하기
+	 * 현재 통용되는 브라우져에서 접속 했는지 확인하기
+	 * IE인지 아닌지 구분 값
+	 *******************************************/
+	var cryptoObj = window.crypto || window.msCrypto;	//ms와 그외 msCrypto->ie11이상
+	var subtleObj = cryptoObj
+		? cryptoObj.subtle || cryptoObj.webkitSubtle
+		: undefined;
+	/**
+	 * script tag 생성(cryptoObj가 undefined가 아닌 경우)
+	 * 
+	 */
+	// [해결책 2] 스크립트 로딩 완료 보장을 위해 onload/onerror 사용
+	loadUtil.browserThatCompliesWithWebStandards = function (tagId, hash, fileName, iframeDocument, callback) {
+		try {
+			var scriptTag = document.createElement("script");
+			scriptTag.id = tagId;
+			scriptTag.type = "text/javascript";
+			scriptTag.src = w_PATH + "/js/" + fileName + "?" + Math.random();
+			scriptTag.charset = "utf-8";
+			scriptTag.integrity = "sha256-" + hash;
+			scriptTag.crossOrigin = "anonymous";
+			scriptTag.defer = true;
+			scriptTag.onload = function () {
+				console.log( fileName + "로드 완료");
+				if (typeof callback === "function") callback(); // 로드 완료 후 콜백 실행
+				return true;
+			};
+			scriptTag.onerror = function () {
+				// 오류 발생 시 fallback 처리
+				console.warn("오류 발생: " + fileName + " 로드 실패. 백업 스크립트 로드 시도합니다.");
+				_appendJavascriptInfo(fileName, iframeDocument, callback);
+			};
+			iframeDocument.body.appendChild(scriptTag);
+		} catch (err) {
+			console.error("브라우저 표준 준수 스크립트 로드 중 예외:", err);
+			_appendJavascriptInfo(fileName, iframeDocument, callback);
+		}
+	};
+	
+	/**
+	 * script tag 안에 내용을 밀어 넣는다.(cryptoObj가 undefined인 경우)
+	 * script url 해쉬값을 비교해서 다르면 script tag hash값 없이 생성
+	 */
+	// [해결책 2-2] crypto 지원이 없을 때 fallback으로 script 태그 직접 추가
+	loadUtil.browserThatDoesNotComplyWithWebStandards = function (hash, fileName, iframeDocument, callback) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === xhr.DONE) {
+				if (xhr.responseText === "") {
+					console.warn("XHR 응답이 없음 - fallback 스크립트 태그 추가");
+					_appendJavascriptInfo(fileName, iframeDocument, callback);
+					return;
+				}
+				var buffer = new Uint8Array(_utf8ToBytes(xhr.responseText));
+				try {
+					if (window.crypto && subtleObj) {
+						subtleObj.digest("SHA-256", buffer).then(function (e) {
+							var hashValResult = _bytesToString(e);
+							_checkBrowserThatDoesNotComplyWithWebStandards(hashValResult, hash, xhr.responseText, fileName, iframeDocument, callback);
+						});
+					} else {
+						// IE의 경우 oncomplete 사용
+						subtleObj.digest("SHA-256", buffer).oncomplete = function (e) {
+							var hashValResult = _bytesToString(e.target.result);
+							_checkBrowserThatDoesNotComplyWithWebStandards(hashValResult, hash, xhr.responseText, fileName, iframeDocument, callback);
+						};
+					}
+				} catch (err) {
+					console.error("해시 계산 중 오류:", err);
+					_appendJavascriptInfo(fileName, iframeDocument, callback);
+				}
+			}
+		};
+		var scriptSrc = w_PATH + "/js/" + fileName + "?" + Math.random();
+		xhr.open("GET", scriptSrc);
+		xhr.send();
+	};
+	
+	/**
+	 * script tag에 직접 js소스 밀어 넣기
+	*/
+	function _checkBrowserThatDoesNotComplyWithWebStandards(hashVal, wantedHashVal, jsCode, fileName, iframeDocument, callback) {
+		if (hashVal === wantedHashVal) {
+			//직접 조합
+			var script = document.createElement("script");
+			script.innerHTML = jsCode;
+			script.onload = function () {
+				console.log( fileName + "_checkBrowserThatDoesNotComplyWithWebStandards 로드 완료");
+				if (typeof callback === "function") callback(); // 로드 완료 후 콜백 실행
+				return true;
+			};
+			iframeDocument.getElementsByTagName("head")[0].appendChild(script);
+		} else {
+			console.log("'" +fileName +"' 해쉬값이 다릅니다.");
+			//직접 태그 조합
+			_appendJavascriptInfo(fileName, iframeDocument, callback);
+		}
+	}
+	
+	function _appendJavascriptInfo(fileName, iframeDocument, callback) {
+		var scriptElement = document.createElement("script");
+		scriptElement.src = w_PATH + "/js/" + fileName + "?date="+currYYYYMMDDHH();
+		
+		scriptElement.charset = "utf-8";
+		scriptElement.type = "text/javascript";
+		scriptElement.defer = true;
+		scriptElement.onload = function () {
+			console.log( fileName + "_appendJavascriptInfo 로드 완료");
+			if (typeof callback === "function") callback(); // 로드 완료 후 콜백 실행
+			return true;
+		};
+		iframeDocument.body.appendChild(scriptElement);
+	}
+	
+	/**
+	 * ArrayBuffer를 String으로 변경
+	 */
+	function _bytesToString(buf) {
+		var arrayBuffer = new Uint8Array(buf);
+		return btoa(String.fromCharCode.apply(null, arrayBuffer));
+	}
+	
+	/**
+	 * 날짜시간을 구한다.
+	 */
+	function currYYYYMMDDHH() {
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = new String(date.getMonth() + 1);
+		var day = new String(date.getDate());
+		var hour = new String(date.getHours());
+		var sec = new String(date.getSeconds());
+		if (month.length == 1) {
+			month = "0" + month;
+		}
+		
+		if (day.length == 1) {
+			day = "0" + day;
+		}
+		
+		if (hour.length == 1) {
+			hour = "0" + hour;
+		}
+		
+		return year + "" + month + "" + day + "" + hour + "" + sec;
+	}
+	
+	// utf-8 string을 arrayBuffer로 바꾸는 코드만 발췌
+	function _utf8ToBytes(string, units) {
+		units = units || Infinity;
+		var codePoint;
+		var length = string.length;
+		var leadSurrogate = null;
+		var bytes = [];
+		var i = 0;
+		
+		for (; i < length; i++) {
+			codePoint = string.charCodeAt(i);
+			
+			// is surrogate component
+			if (codePoint > 0xd7ff && codePoint < 0xe000) {
+				// last char was a lead
+				if (leadSurrogate) {
+					// 2 leads in a row
+					if (codePoint < 0xdc00) {
+						if ((units -= 3) > -1) {
+							bytes.push(0xef, 0xbf, 0xbd);
+						}
+						leadSurrogate = codePoint;
+						continue;
+					} else {
+						// valid surrogate pair
+						codePoint =
+							((leadSurrogate - 0xd800) << 10) | (codePoint - 0xdc00) | 0x10000;
+						leadSurrogate = null;
+					}
+				} else {
+					// no lead yet
+					if (codePoint > 0xdbff) {
+						// unexpected trail
+						if ((units -= 3) > -1) {
+							bytes.push(0xef, 0xbf, 0xbd);
+						}
+						continue;
+					} else if (i + 1 === length) {
+						// unpaired lead
+						if ((units -= 3) > -1) {
+							bytes.push(0xef, 0xbf, 0xbd);
+						}
+						continue;
+					} else {
+						// valid lead
+						leadSurrogate = codePoint;
+						continue;
+					}
+				}
+			} else if (leadSurrogate) {
+				// valid bmp char, but last char was a lead
+				if ((units -= 3) > -1) {
+					bytes.push(0xef, 0xbf, 0xbd);
+				}
+				leadSurrogate = null;
+			}
+			
+			// encode utf8
+			if (codePoint < 0x80) {
+				if ((units -= 1) < 0) {
+					break;
+				}
+				bytes.push(codePoint);
+			} else if (codePoint < 0x800) {
+				if ((units -= 2) < 0) {
+					break;
+				}
+				bytes.push((codePoint >> 0x6) | 0xc0, (codePoint & 0x3f) | 0x80);
+			} else if (codePoint < 0x10000) {
+				if ((units -= 3) < 0) {
+					break;
+				}
+				bytes.push(
+					(codePoint >> 0xc) | 0xe0,
+					((codePoint >> 0x6) & 0x3f) | 0x80,
+					(codePoint & 0x3f) | 0x80
+				);
+			} else if (codePoint < 0x200000) {
+				if ((units -= 4) < 0) {
+					break;
+				}
+				bytes.push(
+					(codePoint >> 0x12) | 0xf0,
+					((codePoint >> 0xc) & 0x3f) | 0x80,
+					((codePoint >> 0x6) & 0x3f) | 0x80,
+					(codePoint & 0x3f) | 0x80
+				);
+			} else {
+				throw new Error("Invalid code point");
+			}
+		}
+		
+		return bytes;
+	}
+	
+	if (!window.WooriCert) {
+		window.WooriCert = {};
+	}
+	//WooriCert.loadUtil에 위 함수들을 담는다.
+	window.WooriCert.loadUtil = loadUtil;
+}(window), "undefined" == typeof WooriCert && (WooriCert = {}),
+function(wd, e) {
+	var sdk = e.Sdk = e.Sdk || {},
+		loadUtil = e.loadUtil = e.loadUtil || {},
+		//integrity 구하기
+		//webnpkiConfigIntegrity = "QQQiu8AzWODNr+LL+EBQ9E/83Ru/5nQ3KeQ8PqkrLiA=",
+		sdkIntegrity			 = "UtVNZUfKMOXqncpL0oAbG2HPCDJM/pXv+FwBz88sFvw=",
+		uiIntegrity				 = "ZXrnFiIvseBqwnVC2ybxSaByy3/nKdeNWQWaaUGoHUo=",
+		comuiIntegrity			 = "qR0BYkbRbrsOlEa9R+PrlysfpcOiq8xOQhI6yrzu9yw=",
+		comuiNewIntegrity		 = "DdRH9wkLKCYYhX11fqLeaZdWcyeCIqJ/xQArMKBYDjc=",
+		swiperIntegrity			 = "axCA4zZfWCHK3Voqm20kNdIvm0vPCz4KTRUYPVNadLA=",
+		//swiperBundleIntegrity = "JluiAKmLMzs9VaXjIogdtEwF5WhaKlYY6CWYVxM+eN4=",
+		webnpkiIntegrity		 = "Dn7jJO1/4ja/GeV6+z7pHzDmySd/D9erG8Z+7MSPeSQ=",
+		transkeyIntegrity		 = "zbmmjRVoIFQQ4eGBZCs99EV8pryW9juxjbrL1MjpjqA=",
+		transkeyLibPackIntegrity = "8n1hhA/JbaCxAB52nAPaEyxAfh9M6UHYVafsJqtgwl8=",
+		rsaIntegrity			 = "TIs7Uh24gb1PZoeXicDSyOv9FI3wWGESlski//ViUpM=",
+		jsbnIntegrity			 = "xEzyQXQZv5Q8KH357Xr/xGG5ZdFfrxFSckHjX5pEcrQ=",
+		typedarrIntegrity		 = "z0yxAdRNxYloEovMBpoMiDtYw6eF0WHa4cfHK7yVPXU=",
+		
+		loadWait = false,
+		loadBoolean = false,
+		cryptoObj = wd.crypto || wd.msCrypto;
+		
+	let loadding = e.loadding = true;
+	var initLoadingTimer = 0;
+	sdk.init || (sdk.waitUntilLoadingCompleted = function(e) {
+		var t = document.getElementById("wooriCertSdkIframe");
+		//iframe에 sdk js(actionFnc), css(certView)가 정상 로딩 되었는지 확인 모두 true이면 init함수 호출
+		if (!(t && t.contentWindow && t.contentWindow.actionFnc) || !(t && t.contentWindow && t.contentWindow.certView)){
+			if(initLoadingTimer > 1000){
+				if (errMsg = {
+					rsp_msg: "JS 파일 로딩 중 오류가 발생하였습니다."
+					,rsp_code: 9998
+				}, !e || !e.fail) throw errMsg;
+				// 현재 페이지의 관련 요소 삭제
+				var sdkIframe = parent.document.getElementById("wooriCertSdkIframe");
+				if (sdkIframe && sdkIframe.parentNode) {
+					sdkIframe.parentNode.removeChild(sdkIframe);
+				}
+				var wooriCert = parent.document.getElementById("wooriCert");
+				if (wooriCert && wooriCert.parentNode) {
+					wooriCert.parentNode.removeChild(wooriCert);
+				}
+				return e.fail(errMsg);
+			}else{
+				initLoadingTimer = setTimeout(sdk.waitUntilLoadingCompleted, 100, e);
+			}
+			return initLoadingTimer;
+		}else{
+			loadWait = true;
+		}
+		console.log("js파일 로딩이 완료되었습니다.");
+		loadBoolean = true;
+		sdk.init(e);
+	}, sdk.init = function(e) {
+		//최초 진입 시 loadWait가 false이어서 대기함수로 이동 후 sdk, css 모두 로딩이 되면 다시 해당 함수로 진입
+		//loadWait가 true면 sdk에이용기관 검증 함수를 호출한다.
+		if (cryptoObj){
+			if (loadBoolean){ 
+				document.getElementById("wooriCertSdkIframe").contentWindow.actionFnc.sdk.cloudVerification(e);
+			}else {
+				//실패 시 fail 호출
+				if (loadWait) {
+					if (errMsg = {
+						rsp_msg: "JS 파일 로딩 중 오류가 발생하였습니다."
+						,rsp_code: 9999
+					}, !e || !e.fail) throw errMsg;
+					return e.fail(errMsg);
+				}
+				if(loadWait == false){
+					sdk.waitUntilLoadingCompleted(e);
+				}
+			}
+		} else {
+			var errMsg = {
+				rsp_msg: "미지원 브라우저 입니다. 다른 브라우저를 사용하시기 바랍니다."
+				,rsp_code: 9002
+			};
+			if (!e || !e.fail) throw errMsg;
+			e.fail(errMsg);
+		}
+	}, sdk.wooriSign = function(e) {	//이용기관 인증하기
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriSign(e);
+		}
+	}, sdk.wooriManage = function(e) {	//인증 안되고 관리만 하는 모드
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriSign(e);
+		}
+	}, sdk.wooriCertExec = function(e){	//우리은행용 실행 거래
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriCertExec(e);
+		}
+	}, sdk.wooriSignMydata = function(e){	//마이데이터 거래
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriSignMydata(e);
+		}
+	/* 31803889 인증요청 전자서명 */
+	}, sdk.wooriRequestSign = function(e){	//외부 gateway 거래
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriRequestSign(e);
+		}
+	/* 20900153 ci 값으로 전자서명 생성 */
+	}, sdk.wooriSignCi = function(e){	//외부 gateway 거래
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriSignCi(e);
+		}
+	/* 20900153 닫기 버튼 공통 */
+	}, sdk.wooriSignClose = function(e){	//인증서 닫기
+		if(WooriCert.loadding){
+			WooriCert.loadding = false;
+			var t = document.getElementById("wooriCertSdkIframe");
+			t.contentWindow.actionFnc.sdk.wooriSignClose(e);
+		}
+	}, sdk.testPageView = function(e) {	//단위 페이지 테스트용
+		var t = document.getElementById("wooriCertSdkIframe");
+		t && t.contentWindow.actionFnc.sdk.testPageView(e);
+	}, sdk.tstAuthFnc = function(e) {	//단위 페이지 테스트용
+		var t = document.getElementById("wooriCertSdkIframe");
+		t && t.contentWindow.actionFnc.sdk.tstAuthFnc(e);
+	});
+	
+	var f = function(sri) {
+		if (!document.getElementById("wooriCertSdkIframe")) {
+			/*이용기관 블러 처리 영역*/
+			var frameDiv = document.createElement("div");
+			frameDiv.setAttribute("class", "pcc_frame for_pc");
+			frameDiv.setAttribute("id", "wooriCertSdkDiv");
+			frameDiv.setAttribute("style", "display:none;overflow:auto;-webkit-overflow-scrolling:auto;");
+			frameDiv.style.display = "none";
+			wd.document.body.appendChild(frameDiv);
+			
+			var innerDiv = document.createElement("div");
+			innerDiv.setAttribute("class", "pcc_frame_inner");
+			innerDiv.setAttribute("style", "width:100%;height:100%;");
+			frameDiv.appendChild(innerDiv);
+			
+			var outIframe = document.createElement("iframe");
+			outIframe.style.position = "absolute";
+			outIframe.style.zIndex = 200001;
+			outIframe.style.top = "50%";
+			outIframe.style.left = "50%";
+			outIframe.style.width = "100%";
+			outIframe.style.height = "100%";
+			outIframe.style.backgroundColor = "transparent";
+			outIframe.style.border = "0";
+			outIframe.frameBorder = 0;
+			outIframe.setAttribute("id", "wooriCertSdkIframe");
+			outIframe.onload = function() {
+				try{
+					var ofw = outIframe.contentWindow;
+					var ofwd = ofw.document;
+					if(w_PATH.indexOf("localhost") < 0 &&w_PATH.indexOf("pcctst") < 0 && w_PATH.indexOf("wdraapt") < 0){
+						ofw.document.body.setAttribute("oncontextmenu", "return false");
+						ofw.document.body.setAttribute("ondragstart", "return false");
+						ofw.document.body.setAttribute("onselectstart", "return false");
+					}
+					
+					var innerIframe = ofwd.createElement("iframe");
+					innerIframe.src = w_PATH + "/wooriCertIframe?2022-03-11T05_32_44.421Z&sriHash=" + sri;
+					innerIframe.style.top = "0px";
+					innerIframe.style.left = "-1px";
+					innerIframe.style.width = "1px";
+					innerIframe.style.height = "1px";
+					innerIframe.tabIndex = -1;
+					innerIframe.frameBorder = 0;
+					innerIframe.setAttribute("id", "wooriCertSdkIframeTag");
+					
+					//순차적으로 스크립트 로드하는 함수
+					function loadScriptsSequentially(ofwd) {
+						const scripts = [
+							{ id: "swiperScriptTag",	integrity: swiperIntegrity,				src: "common/swiper.3.3.1.min.js" },
+							{ id: "comuiScriptTag",		integrity: comuiIntegrity,				src: "common/common_ui.js" },
+							{ id: "comuiNewScriptTag",	integrity: comuiNewIntegrity,			src: "common/common_ui_new.js" },
+							
+							{ id: "tlp",				integrity: transkeyLibPackIntegrity,	src: "raon/transkey/TranskeyLibPack_op.js" },
+							{ id: "rsa",				integrity: rsaIntegrity,				src: "raon/transkey/rsa_oaep-min.js" },
+							{ id: "jsbn",				integrity: jsbnIntegrity,				src: "raon/transkey/jsbn-min.js" },
+							{ id: "typedarr",			integrity: typedarrIntegrity,			src: "raon/transkey/typedarray.js" },
+							
+							{ id: "transkeyScriptTag",	integrity: transkeyIntegrity,			src: "security/transkey.js" },
+							{ id: "webnpkiScriptTag",	integrity: webnpkiIntegrity,			src: "security/webnpki.js" },
+							{ id: "sdkScriptTag",		integrity: sdkIntegrity,				src: "individual/wsdk.js" },
+							{ id: "uiScriptTag",		integrity: uiIntegrity,					src: "individual/wooricert-ui.js" },
+						];
+						
+						function loadNextScript(index) {
+							if (index >= scripts.length) return; // 모든 스크립트 로드 완료
+							
+							const { id, integrity, src } = scripts[index];
+							const callback = function() {
+								console.log("로드완료 : " + src);
+								loadNextScript(index + 1);
+							};
+							
+							sdk 
+								? loadUtil.browserThatCompliesWithWebStandards(id, integrity, src, ofwd, callback)
+								: loadUtil.browserThatDoesNotComplyWithWebStandards(integrity, src, ofwd, callback);
+						}
+						
+						//1.webnpki_config.js 먼저 로드
+						var date	= new Date();
+						var year	= date.getFullYear();
+						var month	= new String(date.getMonth() + 1);
+						var day		= new String(date.getDate());
+						var hour	= new String(date.getHours());
+						if (month.length == 1) {
+							month = "0" + month;
+						}
+						if (day.length == 1) {
+							day = "0" + day;
+						}
+						if (hour.length == 1) {
+							hour = "0" + hour;
+						}
+						var currDate = year + "" + month + "" + day + "" + hour;
+						var scriptElement = document.createElement("script");
+						scriptElement.src = w_PATH + "/js/security/webnpki_config.js?date=" + currDate;
+						scriptElement.charset = "utf-8";
+						scriptElement.type = "text/javascript";
+						scriptElement.onload = function () {
+							console.log("webnpki_config.js 로드 완료");
+							loadNextScript(0); //2.순차적으로 다른 스크립트 로드
+						};
+						ofwd.body.appendChild(scriptElement);
+					}
+					
+					//스크립트 로드 시작
+					loadScriptsSequentially(ofwd);
+						
+					ofwd.body.appendChild(innerIframe);
+					// innerIframe 로딩 완료 확인 (예외 처리 포함)
+					innerIframe.onload = function () {
+						console.log("innerIframe 로드 완료");
+					};
+				} catch (err) {
+					console.error("outIframe onload 처리 중 오류:", err);
+				}
+			};
+			try {
+				innerDiv.appendChild(outIframe);
+			} catch (err) {
+				console.error("innerDiv에 outIframe 추가 실패:", err);
+			}
+		}
+	};
+	! function e() {
+		if (wd.document && "complete" !== wd.document.readyState){
+			return setTimeout(e, 50);
+		}
+		if (cryptoObj) {
+			var scriptCreate = document.createElement("script");
+			scriptCreate.id = "woorijs";
+			scriptCreate.src = w_PATH + "/js/individual/woorijs.js";
+			wd.document.head.appendChild(scriptCreate);
+			//init load 
+			scriptCreate.onload = function () {
+				console.log("woorijs 로드 완료");
+				//더미 css 로드
+				var linkCreate = document.createElement("link");
+				linkCreate.type = "text/css";
+				linkCreate.rel = "stylesheet";
+				linkCreate.href = w_PATH + "/css/blankCss.css";
+				//linkCreate.integrity = "sha256-lYaw9nFCQhJgn1RS44Lv+8xm6iGMivP/novbFoEMkys=";
+				//linkCreate.crossOrigin = "anonymous";
+				linkCreate.onload = f.bind(this, false);
+				linkCreate.onerror = f.bind(this, true);
+				wd.document.head.appendChild(linkCreate);
+				var viewportInsttMeta = document.createElement("meta");
+				viewportInsttMeta.setAttribute("name", "viewport");
+				viewportInsttMeta.setAttribute("content", "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi");
+				wd.document.head.appendChild(viewportInsttMeta);
+			};
+		}
+	}()
+}(window, WooriCert)
+

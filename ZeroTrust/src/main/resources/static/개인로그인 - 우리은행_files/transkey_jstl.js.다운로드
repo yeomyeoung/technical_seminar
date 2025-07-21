@@ -1,0 +1,6465 @@
+/*
+
+ * Transkey
+
+ * Copyright(c) 2013, RaonSECURE.
+
+ * Version 4.5.1 - 2013-04-18-1
+ * 2013-04-18(크롬 멀티마우스 버그 수정)
+ * 수정 : 김지수
+ *  
+ */
+ 
+var transkey_url='https://simg.wooribank.com/img/sec/transkey';var transkey_surl='transkeyServlet';var transkeyErrorUrl='';var qwertyLayerX=346;var singleLayerX=158;var qwertyLayerWidth=692;var qwertyLayerHeight=271;var singleLayerWidth=315;var singleLayerHeight=271;var nIsMultiMouse=false;var isFirstUseMultyCusor=0;var isPlainTextMode=0;
+
+var gHostName = document.location.hostname;
+
+var isGenerateSessionKey=false;
+
+var isGenerateSessionKeyForCRT=false;
+
+var aLanguage = "ko-KR";
+var onlyuseTransKey = false;
+
+
+	try {
+
+		if(document.documentElement.lang == "" || document.documentElement.lang.toLowerCase() == "ko" || document.documentElement.lang.toLowerCase() == "kr") {
+
+			aLanguage = "ko-KR";
+
+		} else {
+
+			aLanguage = "en-US";
+
+		}
+
+	} catch(langexception) {
+
+		aLanguage = "ko-KR";
+
+}
+
+document.ondragstart = function(e) {
+
+	return false;
+
+};
+
+var useTransKey = true;
+
+var selectIMG = "0"; //button "1" false | "0" true
+
+var setTkEvent = false; //selectIMG = "0" 
+
+
+
+var selectIMG_crt = "0"; //crt button "1" BTN | "0" NOBTN
+
+var setTkEvent_crt = true; //
+
+var setCheckBox_multi_check = true; // multiOS checkbox check 
+
+var transkeyServlet_Excepotion = true;
+
+
+
+if(gHostName == "twnpot.wooribank.com" || gHostName == "wnpot.wooribank.com" || gHostName == "w1spot.wooribank.com" || gHostName == "spot.wooribank.com" || gHostName == "ppot.wooribank.com") {
+
+	if(window.location.href.indexOf("/pot/pot/sdt/")>0){
+
+		transkey_surl = "/pot/transkeyServlet";
+
+	}
+
+}else if(gHostName == "twnsvc.wooribank.com" || gHostName == "wnsvc.wooribank.com" || gHostName == "w1svc.wooribank.com" || gHostName == "svc.wooribank.com" || gHostName == "psvc.wooribank.com"){
+
+	if(window.location.href.indexOf("/svc/esc/b2c/")>0){
+
+		transkey_surl = "/svc/transkeyServlet";
+
+	} else if(window.location.href.indexOf("/wfc/wfc/")>0 || window.location.href.indexOf("/wfc/")>0){
+
+		transkey_surl = "/wfc/transkeyServlet";
+
+	} 
+
+} //use jsp exception _2013_03_07 
+
+setMaxDigits(131);
+
+var rsaKey;
+
+
+
+transkeyPressedColor = "gray";
+
+
+
+ 
+
+// cross-browser setting
+
+var isMac = false;
+
+var transkeyisMobile = false;
+
+var userAgent = navigator.userAgent;
+
+
+
+if (userAgent.indexOf('Mac') > -1) {
+
+	isMac = true;
+
+}
+
+if(userAgent.indexOf('Macintosh') > 0||userAgent.indexOf('Linux') > 0||userAgent.indexOf('Windows') > 0)
+
+	transkeyisMobile = false;
+
+else
+
+	transkeyisMobile = true;
+
+if (userAgent.indexOf("iPad") > 0 ||userAgent.indexOf("iPhone") > 0 || userAgent.indexOf("Android") > 0)
+
+	transkeyisMobile = true;
+
+
+
+
+var isFireFox = false;
+
+var isSafari = false;
+
+var isChrome = false;
+
+var isOpera = false;
+
+var isSafari3ver = false;
+
+var isIE9 = false;
+
+var transkey_isIE6 = false;
+
+var userAgent = navigator.userAgent;
+
+
+if(navigator.userAgent.indexOf("MSIE 6") > -1 && navigator.userAgent.indexOf("MSIE 6") < 30)
+	transkey_isIE6 = true;
+
+if (userAgent.indexOf('Chrome') > -1)
+
+	isChrome = true;
+
+else if (userAgent.indexOf('Version/3.') > -1 && userAgent.indexOf('Safari') > 0)
+
+	isSafari3ver = true;
+
+else if (userAgent.indexOf('Firefox') > 0)
+
+	isFireFox = true;
+
+else if (userAgent.indexOf('Safari') > 0)
+
+	isSafari = true;
+
+else if (navigator.appName == 'Opera') {
+
+	isOpera = true;
+
+	isFirstUseMultyCusor = false;
+
+} else if (navigator.appName.indexOf("MSIE 9"))
+
+	isIE9 = true;
+
+
+//Chrome 45-version check, start
+var tem;
+var M = navigator.userAgent.match(/(edge)\/?\s*(\.?\d+(\.\d+)*)/i);
+
+if(!M) {
+	M = navigator.userAgent.match(/(msie|trident|chrome|safari|firefox)\/?\s*(\.?\d+(\.\d+)*)/i);
+	if(M){
+		if((tem = navigator.userAgent.match(/rv:([\d]+)/)) != null) {
+			M[2] = tem[1];
+		} else if((tem = navigator.userAgent.match(/version\/([\.\d]+)/i)) != null) {
+			M[2] = tem[1];
+		}
+	}
+}
+
+if(M[1] == "Trident") M[1] = "MSIE";
+
+M = M? {"browser":M[1], "version":M[2]} : {"browser":N, "version1":navigator.appVersion,"other":'-?'};
+
+if(M.version){
+	var verArr = (M.version).split(".");
+	M.version = verArr[0];
+}
+
+var isNotSupportNPAPI = (M.browser == "Chrome" && M.version>=45 /*|| M.browser == "Edge" */)? true : false ; 
+//Chrome 45-version check, end
+
+
+
+
+if (typeof XMLHttpRequest == "undefined") {
+
+	XMLHttpRequest = function() {
+
+		try {
+
+			return new ActiveXObject("Msxml2.XMLHTTP.6.0");
+
+		} catch (e) {
+
+		}
+
+		;
+
+
+
+		try {
+
+			return new ActiveXObject("Msxml2.XMLHTTP.3.0");
+
+		} catch (e) {
+
+		}
+
+		;
+
+
+
+		try {
+
+			return new ActiveXObject("Msxml2.XMLHTTP");
+
+		} catch (e) {
+
+		}
+
+		;
+
+
+
+		try {
+
+			return new ActiveXObject("Microsoft.XMLHTTP");
+
+		} catch (e) {
+
+		}
+
+		;
+
+
+
+		throw new Error("This browser does not support XMLHttpRequest or XMLHTTP.");
+
+	};
+
+};
+
+
+
+if (typeof (document.importNode) == "undefined") {
+
+	document.importNode = function(node, deep) {
+
+		var tmp;
+
+		if (node.nodeName == "#text") {
+
+			return document.createTextNode(node.data);
+
+		} else {
+
+			if (node.nodeName == "tbody" || node.nodeName == "tr") {
+
+				tmp = document.createElement("table");
+
+			} else if (node.nodeName == "td") {
+
+				tmp = document.createElement("tr");
+
+			} else if (node.nodeName == "option") {
+
+				tmp = document.createElement("select");
+
+			} else {
+
+				tmp = document.createElement("div");
+
+			}
+
+
+
+			if (deep) {
+
+				tmp.innerHTML = node.xml ? node.xml : node.outerHTML;
+
+			} else {
+
+				tmp.innerHTML = node.xml ? node.cloneNode(false).xml : node.cloneNode(false).outerHTML;
+
+			}
+
+
+
+			return tmp.getElementsByTagName("*")[0];
+
+		}
+
+	};
+
+};
+
+
+
+var sessionKey = [ , , , , , , , , , , , , , , , ];
+
+var sessionKeyCRT = [ , , , , , , , , , , , , , , , ];
+
+var transkeyUuid;
+
+var transkeyUuidForCRT;
+
+function generateSessionKey(url) {
+
+
+	if(!isGenerateSessionKey){
+		transkeyUuid = new GenKey().tk_sh1prng();	
+
+		if (rsaKey == null) {
+
+			var request = new XMLHttpRequest();
+
+			request.open("POST", url + "?op=getPublicRsaKey&"+new GenKey().tk_sh1prng(), false);
+
+			request.send();
+
+	
+
+			if (request.readyState == 4 && request.status == 200) {
+
+				rsaKey = new RSAKeyPair(request.responseText.split('||')[0], "", request.responseText.split('||')[1]);
+
+			}
+
+		}
+
+	
+
+		var genSessionKey = new GenKey().GenerateKey(128);
+
+	
+
+		for ( var i = 0; i < 16; i++) {
+
+			sessionKey[i] = Number("0x0" + genSessionKey.charAt(i));
+
+		}
+
+	
+
+		var encSessionKey = encryptedString(rsaKey, genSessionKey);
+
+		
+
+		var operation = "setSessionKey";
+
+		var request = new XMLHttpRequest();
+
+		request.open("POST", url, false);
+
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		try {
+
+			request.send("op=" + operation + "&key=" + encSessionKey + "&transkeyUuid=" + transkeyUuid +"&"+new GenKey().tk_sh1prng());
+
+		} catch (e) {
+
+			alert("TransKey error: Cannot load TransKey. Network is not available.");
+
+			return false;
+
+		}
+		setTransKeyUuid();
+		isGenerateSessionKey = true;
+	}
+}
+
+
+
+function generateSessionKeyForCRT(url) {
+
+
+	if(!isGenerateSessionKeyForCRT){
+		if(gHostName == "twnpot.wooribank.com" || gHostName == "wnpot.wooribank.com" || gHostName == "w1spot.wooribank.com" || gHostName == "spot.wooribank.com" || gHostName == "ppot.wooribank.com"){
+
+			if(window.location.href.indexOf("/pot/pot/sdt/")>0){
+
+				url = "/pot/transkeyServlet";
+
+			}
+
+		}else if(gHostName == "twnsvc.wooribank.com" || gHostName == "wnsvc.wooribank.com" || gHostName == "w1svc.wooribank.com" || gHostName == "svc.wooribank.com" || gHostName == "psvc.wooribank.com"){
+
+			if(window.location.href.indexOf("/svc/esc/b2c/")>0){
+
+				url = "/svc/transkeyServlet";
+
+			} else if(window.location.href.indexOf("/wfc/wfc/")>0 || window.location.href.indexOf("/wfc/")>0){
+
+				url = "/wfc/transkeyServlet";
+
+			} else if(window.location.href.indexOf("/common/")>0 ){
+
+				url = "/transkeyServlet";
+
+			} 
+
+		}
+
+			transkeyUuidForCRT = new GenKey().tk_sh1prng();
+
+		
+
+			if (rsaKey == null) {
+
+				var request = new XMLHttpRequest();
+
+				request.open("POST", url + "?op=getPublicRsaKey&"+new GenKey().tk_sh1prng(), false);
+
+				request.send();
+
+		
+
+				if (request.readyState == 4 && request.status == 200) {
+
+					rsaKey = new RSAKeyPair(request.responseText.split('||')[0], "", request.responseText.split('||')[1]);
+
+				}
+
+			}
+
+		
+
+			var genSessionKey = new GenKey().GenerateKey(128);
+
+		
+
+			for ( var i = 0; i < 16; i++) {
+
+				sessionKeyCRT[i] = Number("0x0" + genSessionKey.charAt(i));
+
+			}
+
+		
+
+			var encSessionKey = encryptedString(rsaKey, genSessionKey);
+
+			
+
+			var operation = "setSessionKey";
+
+			var request = new XMLHttpRequest();
+
+			request.open("POST", url, false);
+
+			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+			try {
+
+				request.send("op=" + operation + "&key=" + encSessionKey + "&transkeyUuid=" + transkeyUuidForCRT + "&" +new GenKey().tk_sh1prng());
+
+			} catch (e) {
+
+				alert("TransKey error: Cannot load TransKey. Network is not available.");
+
+				return false;
+
+			}
+			isGenerateSessionKeyForCRT = true;
+		}
+}
+
+
+
+function Key() {
+
+	this.name = "";
+
+	this.npoints = 0;
+
+	this.xpoints = new Array();
+
+	this.ypoints = new Array();
+
+	this.addPoint = function(x, y) {
+
+		this.npoints++;
+
+		this.xpoints.push(x);
+
+		this.ypoints.push(y);
+
+	};
+
+
+
+	this.contains = function(x, y) {
+
+		var hits = 0;
+
+		var lastx = this.xpoints[this.npoints - 1];
+
+		var lasty = this.ypoints[this.npoints - 1];
+
+		var curx = 0;
+
+		var cury = 0;
+
+		for ( var i = 0; i < this.npoints; lastx = curx, lasty = cury, i++) {
+
+			curx = this.xpoints[i];
+
+			cury = this.ypoints[i];
+
+			if (cury == lasty) {
+
+				continue;
+
+			}
+
+			var leftx = 0;
+
+			if (curx < lastx) {
+
+				if (x >= lastx) {
+
+					continue;
+
+				}
+
+				leftx = curx;
+
+			} else {
+
+				if (x >= curx) {
+
+					continue;
+
+				}
+
+				leftx = lastx;
+
+			}
+
+
+
+			var test1 = 0;
+
+			var test2 = 0;
+
+			if (cury < lasty) {
+
+				if (y < cury || y >= lasty) {
+
+					continue;
+
+				}
+
+				if (x < leftx) {
+
+					hits++;
+
+					continue;
+
+				}
+
+				test1 = x - curx;
+
+				test2 = y - cury;
+
+			} else {
+
+				if (y < lasty || y >= cury) {
+
+					continue;
+
+				}
+
+				if (x < leftx) {
+
+					hits++;
+
+					continue;
+
+				}
+
+				test1 = x - lastx;
+
+				test2 = y - lasty;
+
+			}
+
+			if (test1 < (test2 / (lasty - cury) * (lastx - curx))) {
+
+				hits++;
+
+			}
+
+		}
+
+		return ((hits & 1) != 0);
+
+	};
+
+}
+
+
+
+function TranskeyRandomValue(n1, n2) {
+
+	  return Math.floor( (Math.random() * (n2 - n1 + 1)) + n1 );
+
+	}
+
+
+
+function createTranskeyMap(mapName, keys, transkey){
+
+	var keyArray = keys;
+
+	var map = document.createElement('map');
+
+	map.setAttribute("name", mapName);
+
+	map.setAttribute("id", mapName);
+
+	for(var i=0; keyArray.length>i; i++){
+
+		var key = keyArray[i];
+
+		var coords = "";
+
+		for(var k=0; key.npoints>k; k++){
+
+			coords += key.xpoints[k]+","+key.ypoints[k]+",";
+
+		}
+
+		coords = coords.substring(0, coords.length - 1);
+
+		var area = document.createElement('area');
+
+		area.setAttribute("shape", "poly");
+
+		area.setAttribute("coords", coords);
+
+		area.setAttribute("onclick", "transkey."+transkey.name+".pressMapKey("+i+");transkey."+transkey.name+".enterMapKey("+i+");");
+
+		map.appendChild(area);
+
+	}
+
+	
+
+	return map;
+
+}
+
+
+
+function Popup(xpoints, ypoints, url, options) {
+
+	this.xpoints = xpoints;
+
+	this.ypoints = ypoints;
+
+	this.url = url;
+
+	this.options = options;
+
+	this.contains = function(x, y) {
+
+		var key = new Key();
+
+		key.npoints = Math.min(xpoints.length, ypoints.length);
+
+		key.xpoints = this.xpoints;
+
+		key.ypoints = this.ypoints;
+
+		return key.contains(x, y);
+
+	};
+
+	this.popup = function() {
+
+		window.open(url, "_blank", options);
+
+	};
+
+};
+
+
+
+function blurLayout(name) {
+
+	if(transKeyObj==null)
+
+		return;
+
+	
+
+	var layerLowerDivObj, layerUpperDivObj, layerSingleDivObj;
+
+	layerLowerDivObj = document.getElementById(name + '_layoutLower');
+
+	layerUpperDivObj = document.getElementById(name + '_layoutUpper');
+
+	layerSingleDivObj = document.getElementById(name + '_layoutSingle');
+
+	var fakeMouseDivObj, visibleFakeMouse;
+
+	fakeMouseDivObj = document.getElementById(name + '_fakeMouseDiv');
+
+
+
+	// no:103
+
+	if (fakeMouseDivObj != null && fakeMouseDivObj.style.visibility == "hidden") {
+
+		if (this.isMultiCusorClick) {
+
+			visibleFakeMouse = true;
+
+		} else {
+
+			visibleFakeMouse = false;
+
+		}
+
+	} else {
+
+		visibleFakeMouse = true;
+
+	}
+
+
+
+//	document.getElementById(name + '_btnClickDiv').style.visibility = "hidden";
+
+//	document.getElementById(name + '_fakeBtnClickDiv').style.visibility = "hidden";
+
+	var blankOverDivObj;
+
+	var blankOverChromeDivObj;
+
+	blankOverDivObj = document.getElementById(name + '_blankOverDiv');
+
+	blankOverChromeDivObj = document.getElementById(name + '_blankOverChromeDiv');
+
+
+
+	if (visibleFakeMouse) {
+
+		if (layerLowerDivObj != null && layerLowerDivObj.style.visibility == "visible") {
+
+			if (layerLowerDivObj.filters)
+
+				layerLowerDivObj.style.filter = "alpha(opacity:" + 50 + ")";
+
+			else
+
+				layerLowerDivObj.style.opacity = 0.5;
+
+		} else if (layerUpperDivObj != null && layerUpperDivObj.style.visibility == "visible") {
+
+			if (layerUpperDivObj.filters)
+
+				layerUpperDivObj.style.filter = "alpha(opacity:" + 50 + ")";
+
+			else
+
+				layerUpperDivObj.style.opacity = 0.5;
+
+		} else if (layerSingleDivObj != null && layerSingleDivObj.style.visibility == "visible") {
+
+			if (layerSingleDivObj.filters)
+
+				layerSingleDivObj.style.filter = "alpha(opacity:" + 50 + ")";
+
+			else
+
+				layerSingleDivObj.style.opacity = 0.5;
+
+		}
+
+
+
+		if (isChrome == true) {
+
+			blankOverChromeDivObj.style.visibility = "visible";
+
+			blankOverChromeDivObj.style.zIndex = "1011";
+
+		} else {
+
+			blankOverDivObj.style.visibility = "visible";
+
+			blankOverDivObj.style.zIndex = "1011";
+
+		}
+
+
+
+//		document.getElementById(name + '_btnClickDiv').style.visibility = "hidden";
+
+//		document.getElementById(name + '_fakeBtnClickDiv').style.visibility = "hidden";
+
+	}
+
+}
+
+
+
+
+
+var transKeyObj = null;
+
+function TransKey(name, x, y, url, keyboardType, maxSize, fieldType, inputId) {
+	this.isLoad = false;
+	var _d = document;
+
+	this.name = name;
+
+	this.x = x;
+
+	this.y = y;
+
+	this.url = url;
+
+	this.keyboardType = keyboardType;
+
+	this.maxSize = maxSize;
+
+	this.fieldType = fieldType;
+
+	this.keys = new Array();
+
+	this.popup = null;
+
+	this.isDisabled = false;
+
+	this.isMousePressed = false;
+
+	this.isPressed = false;
+
+	this.layout = null;
+
+	this.layoutLower = null;
+
+	this.layoutUpper = null;
+
+	this.layoutSingle = null;
+
+	this.blankDivObj = null;
+
+	this.blankOverDivObj = null;
+
+	this.blankChromeDivObj = null;
+
+	this.blankOverChromeDivObj = null;
+
+	this.osMouseDivObj = null;
+
+	this.fakeMouseDivObj = null;
+
+	this.btnClickDivObj = null;
+
+	this.fakeBtnClickDivObj = null;
+
+	this.mouseOneDivObj = null;
+
+	this.mouseTwoDivObj = null;
+
+	this.indexDivObj = null;
+
+	this.indexCloseDivObj = null;
+
+	this.useTransKey = useTransKey;
+
+	this.selectIMG = "0";
+
+	this.isCrt = keyboardType;
+
+	this.setTkEvent = setTkEvent;
+
+	if(this.isCrt == "qwerty_crt"||this.isCrt == "number_crt"){
+
+		this.setTkEvent = setTkEvent_crt;
+
+	}
+
+
+
+	this.input = _d.getElementById(inputId);
+
+	if(this.isCrt == "qwerty_crt"||this.isCrt == "number_crt"){
+
+		_d.getElementById(this.name).getElementsByTagName("input")[0].id = this.name+"_input";
+
+		this.input = _d.getElementById(this.name).getElementsByTagName("input")[0];	
+
+		transkey[name]= this;
+
+	}
+
+//	this.input.id = this.input.id==""?this.name+"_input":this.input.id;
+
+	
+
+	if(this.setTkEvent==true){
+
+		var obj = _d.getElementById(this.input.id);
+
+		var addEvent;
+
+		var attachEvent;
+
+		if(this.isCrt == "qwerty_crt"||this.isCrt == "number_crt"){							
+
+			addEvent = "click";
+
+			attachEvent = "onclick";
+
+		}else{
+
+			addEvent = "focus";
+
+			attachEvent = "onfocus";
+
+		}
+
+		if (obj.addEventListener) {
+
+			obj.addEventListener(addEvent, showTransKey, false);
+
+		} else if (obj.attachEvent) {
+
+			obj.attachEvent(attachEvent, showTransKey);
+
+		}
+
+		
+
+	}
+
+
+
+	this.isMultiCusorClick = false;
+
+	this.load = function(operation) {
+
+		var languageOpt = "";
+
+		var card="";
+
+		if (typeof (operation) == "undefined")
+
+			operation = "load";
+
+			
+
+		languageOpt = "_"+ aLanguage;
+
+		
+
+		if(aLanguage==null||aLanguage=="undefined")
+
+		 languageOpt = "_ko-KR";
+
+		 
+
+		try{
+
+			if(TOP_PAGE_ID=="cb"||TOP_PAGE_ID=="cd")
+
+				card = "_card";
+
+			}
+
+		catch(e){
+
+			card = "";
+
+		}
+
+			
+
+		if(keyboardType=="letter"){
+
+			languageOpt = "";
+
+			card = "";
+
+		}
+
+
+
+		var transkey = this;
+
+		var request = new XMLHttpRequest();
+
+		
+
+		if(gHostName == "twnpot.wooribank.com" || gHostName == "wnpot.wooribank.com" || gHostName == "w1spot.wooribank.com" || gHostName == "spot.wooribank.com" || gHostName == "ppot.wooribank.com"){
+
+			if(window.location.href.indexOf("/pot/pot/sdt/")>0){
+
+				url = "/pot/transkeyServlet";
+
+			}
+
+		}else if(gHostName == "twnsvc.wooribank.com" || gHostName == "wnsvc.wooribank.com" || gHostName == "w1svc.wooribank.com" || gHostName == "svc.wooribank.com" || gHostName == "psvc.wooribank.com"){
+
+			if(window.location.href.indexOf("/svc/esc/b2c/")>0){
+
+				url = "/svc/transkeyServlet";
+
+			} else if(window.location.href.indexOf("/wfc/wfc/")>0 || window.location.href.indexOf("/wfc/")>0){
+
+				url = "/wfc/transkeyServlet";
+
+			}
+
+		}
+
+		request.open("POST", url, false);
+
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		try {
+
+			if (this.isCrt == 'qwerty_crt'||this.isCrt == 'number_crt') {
+
+				if(operation=="allocate"){
+
+					if(this.keyboardType == 'qwerty_crt')
+
+						this.keyboardType = 'qwerty';
+
+					else if(this.keyboardType == 'number_crt')
+
+						this.keyboardType = 'number';
+
+					request.send("op=" + operation + "&name=" + this.name + "&keyboardType=" + keyboardType +languageOpt+ card + "&fieldType=" + this.fieldType + "&maxSize=" + this.maxSize + "&x=" + this.x + "&y=" + this.y
+
+							+ "&transkeyUuid=" + transkeyUuidForCRT );
+
+				}else{
+
+					request.send("op=" + operation + "&name=" + this.name + "&keyboardType=" + keyboardType +languageOpt+ card + "&fieldType=" + this.fieldType + "&maxSize=" + this.maxSize + "&x=" + this.x + "&y=" + this.y
+
+							+ "&transkeyUuid=" + transkeyUuidForCRT );
+
+					
+
+				}
+
+			}else{
+
+				request.send("op=" + operation + "&name=" + this.name + "&keyboardType=" + keyboardType +languageOpt+ card + "&fieldType=" + this.fieldType + "&maxSize=" + this.maxSize + "&x=" + this.x + "&y=" + this.y
+
+						+ "&transkeyUuid=" + transkeyUuid );
+
+			}
+
+
+
+		} catch (e) {
+
+			alert("TransKey error: Cannot load TransKey. Network is not available.");
+
+			return false;
+
+		}
+
+
+
+		if (request.readyState == 4 && request.status == 200) {
+
+			if (request.responseXML) {
+
+				var template = document.getElementById(transkey.name);
+
+				var result = request.responseXML.firstChild;
+
+				for ( var i = 0; i < result.childNodes.length; i++) {
+
+					var node = result.childNodes[i];
+
+					if (node.tagName == "script") {
+
+						for ( var j = 0; j < node.childNodes.length; j++) {
+
+							eval(node.childNodes[j].nodeValue);
+
+						}
+
+					}else if(node.tagName == "input"){
+
+						var tmp = document.createElement(node.tagName);
+
+						for(var k=0; node.attributes.length>k; k++){
+
+							tmp.setAttribute(node.attributes[k].name, node.attributes[k].value);
+
+						}
+
+						template.appendChild(tmp);
+
+					} else {
+
+						var tmp, tmp2;
+
+						try {
+
+							tmp2 = document.importNode(node, true);
+
+						} catch (e) {
+
+							if (node.nodeName == "#text") {
+
+								return document.createTextNode(node.data);
+
+							} else {
+
+								if (node.nodeName == "tbody" || node.nodeName == "tr") {
+
+									tmp2 = document.createElement("table");
+
+								} else if (node.nodeName == "td") {
+
+									tmp2 = document.createElement("tr");
+
+								} else if (node.nodeName == "option") {
+
+									tmp2 = document.createElement("select");
+
+								} else {
+
+									tmp2 = document.createElement("div");
+
+								}
+
+								if (true) {
+
+									tmp2.innerHTML = node.xml ? node.xml : node.outerHTML;
+
+								} else {
+
+									tmp2.innerHTML = node.xml ? node.cloneNode(false).xml : node.cloneNode(false).outerHTML;
+
+								}
+
+								tmp2 = tmp2.getElementsByTagName("*")[0];
+
+							}
+
+						}											
+
+							tmp = document.createElement(node.tagName);							
+
+							tmp.appendChild(tmp2);
+
+							tmp.innerHTML = tmp.innerHTML;
+
+							template.appendChild(tmp.firstChild);
+
+					}
+
+				}
+
+			}
+
+
+
+			if((this.isCrt == "qwerty"||this.isCrt == "number")&&selectIMG=="1"){
+
+				this.addButton();
+
+			}
+
+			if((this.isCrt == "qwerty_crt"||this.isCrt == "number_crt")&&selectIMG_crt=="1"){
+
+				this.addButton();
+
+			}
+
+			return true;
+
+		} else {
+
+			location.href = transkeyErrorUrl;
+
+			// return false;
+
+		}
+
+
+
+	};
+
+
+
+
+
+	this.setVisible = function(isVisible, bVisible) {
+		
+		if(this.isCrt=="number_crt"||this.isCrt=="qwerty_crt"){
+			if(!isGenerateSessionKeyForCRT)
+				generateSessionKeyForCRT(transkey_surl);
+			
+			if(!this.isLoad)
+				this.load();
+			
+		}else{
+			if(!isGenerateSessionKey)
+				generateSessionKey(transkey_surl);
+		}
+		
+		if (this.isDisabled == true)
+
+			return;
+
+
+
+		if (isVisible != false) {
+
+			if (transKeyObj != null) {
+
+				transKeyObj.setVisible(false, "temp");
+
+				transKeyObj.setMode(false);
+
+			}
+
+			transKeyObj = this;
+
+		}
+
+
+
+		this.blankDivObj = document.getElementById(this.name + "_blankDiv");
+
+		try{
+
+			if(this.blankDivObj.getElementsByTagName("img")[0]!=null){
+
+					if(TOP_PAGE_ID=="cb"||TOP_PAGE_ID=="cd")
+
+						this.blankDivObj.getElementsByTagName("img")[0].src= transkey_url+"/images/blank_card.png";
+
+				}
+
+			
+
+			}
+
+		catch(e){
+
+		}
+
+		this.multiMouseTypeDiv = document.getElementById(this.name + "_multiMouseTypeDiv");
+		this.singleMouseTypeDiv = document.getElementById(this.name + "_singleMouseTypeDiv");
+			
+		try{
+				if(aLanguage == "en-US"){
+					if(this.multiMouseTypeDiv.getElementsByTagName("img")[0]!=null){
+						this.multiMouseTypeDiv.getElementsByTagName("img")[0].src= transkey_url+"/images/multi_s_eng.png";
+					}
+					if(this.singleMouseTypeDiv.getElementsByTagName("img")[0]!=null){
+						this.singleMouseTypeDiv.getElementsByTagName("img")[0].src= transkey_url+"/images/single_s_eng.png";
+					}
+				}
+			}
+		catch(e){
+		}
+			
+
+		this.blankChromeDivObj = document.getElementById(this.name + "_blankChromeDiv");
+
+		try{
+
+			if(this.blankChromeDivObj.getElementsByTagName("img")[0]!=null){
+
+					if(TOP_PAGE_ID=="cb"||TOP_PAGE_ID=="cd")
+
+						this.blankChromeDivObj.getElementsByTagName("img")[0].src= transkey_url+"/images/blank_ch_card.png";
+
+				}
+
+			
+
+			}
+
+		catch(e){
+
+		}
+
+		this.blankOverDivObj = document.getElementById(this.name + "_blankOverDiv");
+
+		this.osMouseDivObj = document.getElementById(this.name + "_osMouseDiv");
+
+		this.fakeMouseDivObj = document.getElementById(this.name + "_fakeMouseDiv");
+
+//		this.btnClickDivObj = document.getElementById(this.name + "_btnClickDiv");
+
+//		this.fakeBtnClickDivObj = document.getElementById(this.name + "_fakeBtnClickDiv");
+
+
+
+		if (isVisible == "callIndex") {
+
+			this.mouseOneDivObj = document.getElementById(this.name + "_mouseOneDiv");
+
+			this.mouseTwoDivObj = document.getElementById(this.name + "_mouseTwoDiv");
+
+			this.indexDivObj = document.getElementById(this.name + '_indexDiv');
+
+			this.indexCloseDivObj = document.getElementById(this.name + '_indexCloseDiv');
+
+
+
+			if (bVisible == "true") {
+
+				this.indexDivObj.style.visibility = "visible";
+
+				this.mouseOneDivObj.style.visibility = "visible";
+
+				this.mouseTwoDivObj.style.visibility = "visible";
+
+				this.indexCloseDivObj.style.visibility = "visible";
+
+				this.indexDivObj.style.zIndex = "1";
+
+				this.mouseOneDivObj.style.zIndex = "2";
+
+				this.mouseTwoDivObj.style.zIndex = "3";
+
+				this.indexCloseDivObj.style.zIndex = "4";
+
+			} else {
+
+				this.indexDivObj.style.visibility = "hidden";
+
+				this.mouseOneDivObj.style.visibility = "hidden";
+
+				this.mouseTwoDivObj.style.visibility = "hidden";
+
+				this.indexCloseDivObj.style.visibility = "hidden";
+
+			}
+
+		} else if (isVisible) {			
+
+			
+
+			this.setPosition(this.x, this.y);
+
+			
+
+			var kbd = this.isCrt;
+
+
+
+			if (this.layoutLower == null && this.layoutUpper == null && this.layoutSingle == null) {
+
+				this.load("allocate");
+
+				this.layout = document.getElementById(this.name + "_layout");
+
+				this.layoutLower = document.getElementById(this.name + "_layoutLower");
+
+				this.layoutUpper = document.getElementById(this.name + "_layoutUpper");
+
+				this.layoutSingle = document.getElementById(this.name + "_layoutSingle");
+				
+				
+
+				this.singleMouseTypeDivObj = document.getElementById(this.name + "_singleMouseTypeDiv");
+
+				this.multiMouseTypeDivObj = document.getElementById(this.name + "_multiMouseTypeDiv");
+
+				//if(this.isCrt!="number_crt"&&this.isCrt!="qwerty_crt")
+
+				//	this.directTypeDivObj = document.getElementById(this.name + "_directTypeDiv");
+
+				if (this.layoutLower != null && this.layoutUpper != null) {
+
+					if(kbd == "qwerty_crt"){
+
+						this.layoutLower.getElementsByTagName("img")[0].src = url + "?op=lowerLayout&name=" + this.name + "&dummy=" + new GenKey().tk_getrnd_int() + "&transkeyUuid=" + transkeyUuidForCRT;
+
+						this.layoutUpper.getElementsByTagName("img")[0].src = url + "?op=upperLayout&name=" + this.name + "&dummy=" + new GenKey().tk_getrnd_int() + "&transkeyUuid=" + transkeyUuidForCRT;
+
+					}else{
+
+						this.layoutLower.getElementsByTagName("img")[0].src = url + "?op=lowerLayout&name=" + this.name + "&dummy=" + new GenKey().tk_getrnd_int() + "&transkeyUuid=" + transkeyUuid;
+
+						this.layoutUpper.getElementsByTagName("img")[0].src = url + "?op=upperLayout&name=" + this.name + "&dummy=" + new GenKey().tk_getrnd_int() + "&transkeyUuid=" + transkeyUuid;
+
+					}
+
+					if(transkeyisMobile){
+
+						this.layoutLower.getElementsByTagName("img")[0].useMap = "#"+this.name+"_map";
+
+						this.layoutUpper.getElementsByTagName("img")[0].useMap = "#"+this.name+"_map";						
+
+					}
+
+											
+
+
+
+						
+
+				} else if (this.layoutSingle != null) {
+
+					if(kbd == "number_crt")
+
+						this.layoutSingle.getElementsByTagName("img")[0].src = url + "?op=singleLayout&name=" + this.name + "&dummy=" + new GenKey().tk_getrnd_int() + "&transkeyUuid=" + transkeyUuidForCRT;
+
+					else
+
+						this.layoutSingle.getElementsByTagName("img")[0].src = url + "?op=singleLayout&name=" + this.name + "&dummy=" + new GenKey().tk_getrnd_int() + "&transkeyUuid=" + transkeyUuid;
+
+					if(transkeyisMobile)
+
+						this.layoutSingle.getElementsByTagName("img")[0].useMap = "#"+this.name+"_map";
+
+				} else {
+
+					alert("TransKey error: Cannot initialize virtual keyboard's layout.\nLayout count is " + subLayouts.length);
+
+					return;
+
+				}
+
+			}
+
+
+
+
+
+
+
+			// Set layout's visibility
+
+			if (this.layoutLower != null && this.layoutUpper != null) {
+				
+				if(transkey_isIE6 == true &&this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt"){
+					this.layout.style.display="inline";
+					this.block = document.getElementById(this.name + "_block");
+				
+					this.block.style.visibility = "visible";
+			}
+
+				this.layoutLower.style.visibility = "visible";
+
+				if(transkeyisMobile)
+
+					this.layout.insertBefore(createTranskeyMap(this.name+"_map", this.keys, this), this.layoutLower.getElementsByTagName("img")[0].nextSibiling);
+
+				if (navigator.appName == 'Opera'||transkeyisMobile==true) {
+
+					this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+					//if(this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt") {
+
+					//	this.directTypeDivObj.style.visibility = "hidden";
+
+					//}
+
+				} else if(userAgent.indexOf('Macintosh') > 0||userAgent.indexOf('Linux') > 0) { //KJS
+
+						this.multiMouseTypeDivObj.style.visibility = "visible";
+
+						//if(this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt") {
+
+						//	this.directTypeDivObj.style.visibility = "visible";
+
+					//}
+
+				} else {
+
+
+					this.multiMouseTypeDivObj.style.visibility = "visible";
+
+					//if(this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt") {
+
+					//	this.directTypeDivObj.style.visibility = "hidden";
+
+					//}
+
+				}
+
+				this.multiMouseTypeDivObj.style.zIndex = "1011";
+
+				this.layoutLower.style.zIndex = "1009";
+
+				// ************************************************//
+
+				this.layoutLower.style.cursor = "default";
+
+				this.multiMouseTypeDivObj.style.cursor = "default";
+
+				// ************************************************//
+
+				if (this.layoutLower.filters)
+
+					this.layoutLower.style.filter = "alpha(opacity:" + 100 + ")";
+
+				else
+
+					this.layoutLower.style.opacity = 1.0;
+
+
+
+				this.layoutUpper.style.visibility = "hidden";
+
+//				this.btnClickDivObj.style.visibility = "hidden";
+
+//				this.fakeBtnClickDivObj.style.visibility = "hidden";
+
+
+
+
+
+				if (isChrome == true) {
+
+					this.blankChromeDivObj = document.getElementById(this.name + "_blankChromeDiv");
+
+					this.blankChromeDivObj.style.visibility = "visible";
+
+					this.blankChromeDivObj.style.zIndex = "1011";
+
+					// ************************************************//
+
+					this.blankChromeDivObj.style.cursor = "default";
+
+					// ************************************************//
+
+				} else {
+
+					this.blankDivObj = document.getElementById(this.name + "_blankDiv");
+
+					if (navigator.appName == 'Opera'||transkeyisMobile==true) {
+
+						this.blankDivObj.style.visibility = "hidden";
+
+					} else {
+
+						this.blankDivObj.style.visibility = "visible";
+
+					}
+
+
+
+					this.blankDivObj.style.zIndex = "1011";
+
+					// ************************************************//
+
+					this.blankDivObj.style.cursor = "default";
+
+					// ************************************************//
+
+				}
+
+
+
+			} else if (this.layoutSingle != null) {
+				
+				if(transkey_isIE6 == true&&this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt"){
+					this.layout.style.display="inline";
+					this.block = document.getElementById(this.name + "_block");
+					this.block.style.visibility = "visible";
+			}
+
+				this.layoutSingle.style.visibility = "visible";
+
+				if(transkeyisMobile)
+
+					this.layout.insertBefore(createTranskeyMap(this.name+"_map", this.keys, this), this.layoutSingle.getElementsByTagName("img")[0].nextSibiling);
+
+				if (navigator.appName == 'Opera'||transkeyisMobile==true) {
+
+					this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+				} else {
+
+
+					this.multiMouseTypeDivObj.style.visibility = "visible";
+
+				}
+
+				this.multiMouseTypeDivObj.style.zIndex = "1011";
+
+				this.layoutSingle.style.zIndex = "1009";
+
+				// ************************************************//
+
+				this.layoutSingle.style.cursor = "default";
+
+				this.multiMouseTypeDivObj.style.cursor = "default";
+
+				// ************************************************//
+
+
+
+				if (this.layoutSingle.filters)
+
+					this.layoutSingle.style.filter = "alpha(opacity:" + 100 + ")";
+
+				else
+
+					this.layoutSingle.style.opacity = 1.0;
+
+
+
+
+
+
+
+				if (isChrome == true) {
+
+					this.blankChromeDivObj = document.getElementById(this.name + "_blankChromeDiv");
+
+					this.blankChromeDivObj.style.visibility = "visible";
+
+					this.blankChromeDivObj.style.zIndex = "1011";
+
+					// ************************************************//
+
+					this.blankChromeDivObj.style.cursor = "default";
+
+					// ************************************************//
+
+				} else {
+
+					this.blankDivObj = document.getElementById(this.name + "_blankDiv");
+
+					if (navigator.appName == 'Opera'||transkeyisMobile==true) {
+
+						this.blankDivObj.style.visibility = "hidden";
+
+					} else {
+
+						this.blankDivObj.style.visibility = "visible";
+
+					}
+
+					this.blankDivObj.style.zIndex = "1011";
+
+					// ************************************************//
+
+					this.blankDivObj.style.cursor = "default";
+
+					// ************************************************//
+
+				}
+
+			}
+
+			this.setMode(true);
+
+		} else {
+
+			this.layout = document.getElementById(this.name + "_layout");
+
+			if(transkeyisMobile)
+
+				this.layout.removeChild(_d.getElementById(this.name+"_map"));
+
+			if (navigator.appName == "Opera") {
+
+				this.layout.style.position = "";
+
+			}
+
+			if (this.layoutLower != null && this.layoutUpper != null) {
+
+				this.layoutLower.style.visibility = "hidden";
+
+				this.layoutUpper.style.visibility = "hidden";
+
+				if (isChrome == true) {
+
+					this.blankOverChromeDivObj = document.getElementById(this.name + "_blankOverChromeDiv");
+
+					this.blankChromeDivObj.style.visibility = "hidden";
+
+					this.blankOverChromeDivObj.style.visibility = "hidden";
+
+				} else {
+
+					this.blankDivObj.style.visibility = "hidden";
+
+					this.blankOverDivObj.style.visibility = "hidden";
+
+				}
+
+
+
+				this.osMouseDivObj.style.visibility = "hidden";
+
+				this.fakeMouseDivObj.style.visibility = "hidden";
+
+//				this.btnClickDivObj.style.visibility = "hidden";
+
+//				this.fakeBtnClickDivObj.style.visibility = "hidden";
+
+				this.singleMouseTypeDivObj.style.visibility = "hidden";
+
+				this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+				//if(this.isCrt!="number_crt"&&this.isCrt!="qwerty_crt")
+
+				//	this.directTypeDivObj.style.visibility = "hidden";
+
+			} else if (this.layoutSingle != null) {
+
+				this.layoutSingle.style.visibility = "hidden";
+
+				if (isChrome == true) {
+
+					this.blankOverChromeDivObj = document.getElementById(this.name + "_blankOverChromeDiv");
+
+					this.blankChromeDivObj.style.visibility = "hidden";
+
+					this.blankOverChromeDivObj.style.visibility = "hidden";
+
+				} else {
+
+					this.blankDivObj.style.visibility = "hidden";
+
+					this.blankOverDivObj.style.visibility = "hidden";
+
+				}
+
+
+
+				this.osMouseDivObj.style.visibility = "hidden";
+
+				this.fakeMouseDivObj.style.visibility = "hidden";
+
+//				this.btnClickDivObj.style.visibility = "hidden";
+
+//				this.fakeBtnClickDivObj.style.visibility = "hidden";
+
+				this.singleMouseTypeDivObj.style.visibility = "hidden";
+
+				this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+			} else if (this.mouseOneDivObj != null && this.mouseTwoDivObj != null) {
+
+				this.mouseOneDivObj.style.visibility = "hidden";
+
+				this.mouseTwoDivObj.style.visibility = "hidden";
+
+				this.indexDivObj.style.visibility = "hidden";
+
+				this.indexCloseDivObj.style.visibility = "hidden";
+
+				this.mouseOneDivObj = null;
+
+				this.mouseTwoDivObj = null;
+
+				this.indexDivObj = null;
+
+				this.indexCloseDivObj = null;
+
+			}
+
+		}
+
+		this.isMousePressed = false;
+
+	};
+
+
+
+	this.getKey = function(x, y) {
+
+		for ( var i = 0; i < this.keys.length; i++) {
+
+			if (this.keys[i].contains(x, y)) {
+
+				return this.keys[i];
+
+			}
+
+		}
+
+		return null;
+
+	};
+
+
+
+	this.pressKey = function(event) {
+
+
+
+		this.isMousePressed = true;
+
+		var x = 0;
+
+		var y = 0;
+
+		// TODO: overflow hidden ??외 구문
+
+		if (event.offsetX != null || event.offsetY != null) {
+
+			x = event.offsetX + 1;
+
+			y = event.offsetY + 1;
+
+		} else if (event.layerX != null || event.layerY != null) {
+
+			x = event.layerX - 2;
+
+			y = event.layerY - 2;
+
+		}
+
+
+
+		var key = this.getKey(x, y);
+
+		if (key != null) {
+
+			var applyOpacity = false;
+
+			if (this.keyboardType == 'qwerty') {
+
+				var layerLowerDivObj, layerUpperDivObj;
+
+				layerLowerDivObj = document.getElementById(this.name + '_layoutLower');
+
+				layerUpperDivObj = document.getElementById(this.name + '_layoutUpper');
+
+				var fakeMouseDivObj, visibleFakeMouse;
+
+				fakeMouseDivObj = document.getElementById(this.name + '_fakeMouseDiv');
+
+				if (fakeMouseDivObj.style.visibility == "hidden") {
+
+					visibleFakeMouse = false;
+
+				}
+
+
+
+				if (layerLowerDivObj.style.visibility == "visible") {
+
+					if (layerLowerDivObj.filters) {
+
+						if (layerLowerDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+							applyOpacity = true;
+
+						}
+
+					} else {
+
+						if (layerLowerDivObj.style.opacity == 0.5) {
+
+							applyOpacity = true;
+
+						}
+
+					}
+
+				} else {
+
+					if (layerUpperDivObj.filters) {
+
+						if (layerUpperDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+							applyOpacity = true;
+
+						}
+
+					} else {
+
+						if (layerUpperDivObj.style.opacity == 0.5) {
+
+							applyOpacity = true;
+
+						}
+
+					}
+
+				}
+
+			} else {
+
+				var layerSingleDivObj;
+
+				layerSingleDivObj = document.getElementById(this.name + '_layoutSingle');
+
+				var fakeMouseDivObj, visibleFakeMouse;
+
+				fakeMouseDivObj = document.getElementById(this.name + '_fakeMouseDiv');
+
+
+
+				if (fakeMouseDivObj.style.visibility == "hidden") {
+
+					visibleFakeMouse = false;
+
+				}
+
+				if (layerSingleDivObj.filters) {
+
+					if (layerSingleDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+						applyOpacity = true;
+
+					}
+
+				} else {
+
+					if (layerSingleDivObj.style.opacity == 0.5) {
+
+						applyOpacity = true;
+
+					}
+
+				}
+
+			}
+
+
+
+			if (key.name == "backspace" || key.name == "caps" || key.name == "close" || applyOpacity == true) {
+
+
+
+			} else {
+
+				this.isPressed = true;
+
+			}
+
+		}
+
+	};
+
+	
+
+	this.pressMapKey = function(i) {
+
+		
+
+		var key = this.keys[i];
+
+		var x = TranskeyRandomValue(key.xpoints[0],key.xpoints[1]);
+
+		var y = TranskeyRandomValue(key.ypoints[0],key.ypoints[1]);
+
+
+
+		this.isMousePressed = true;
+
+
+
+		key = this.getKey(x, y);
+
+		if (key != null) {
+
+			var applyOpacity = false;
+
+			if (this.keyboardType == 'qwerty') {
+
+				var layerLowerDivObj, layerUpperDivObj;
+
+				layerLowerDivObj = document.getElementById(this.name + '_layoutLower');
+
+				layerUpperDivObj = document.getElementById(this.name + '_layoutUpper');
+
+				var fakeMouseDivObj, visibleFakeMouse;
+
+				fakeMouseDivObj = document.getElementById(this.name + '_fakeMouseDiv');
+
+				if (fakeMouseDivObj.style.visibility == "hidden") {
+
+					visibleFakeMouse = false;
+
+				}
+
+
+
+				if (layerLowerDivObj.style.visibility == "visible") {
+
+					if (layerLowerDivObj.filters) {
+
+						if (layerLowerDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+							applyOpacity = true;
+
+						}
+
+					} else {
+
+						if (layerLowerDivObj.style.opacity == 0.5) {
+
+							applyOpacity = true;
+
+						}
+
+					}
+
+				} else {
+
+					if (layerUpperDivObj.filters) {
+
+						if (layerUpperDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+							applyOpacity = true;
+
+						}
+
+					} else {
+
+						if (layerUpperDivObj.style.opacity == 0.5) {
+
+							applyOpacity = true;
+
+						}
+
+					}
+
+				}
+
+			} else {
+
+				var layerSingleDivObj;
+
+				layerSingleDivObj = document.getElementById(this.name + '_layoutSingle');
+
+				var fakeMouseDivObj, visibleFakeMouse;
+
+				fakeMouseDivObj = document.getElementById(this.name + '_fakeMouseDiv');
+
+
+
+				if (fakeMouseDivObj.style.visibility == "hidden") {
+
+					visibleFakeMouse = false;
+
+				}
+
+				if (layerSingleDivObj.filters) {
+
+					if (layerSingleDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+						applyOpacity = true;
+
+					}
+
+				} else {
+
+					if (layerSingleDivObj.style.opacity == 0.5) {
+
+						applyOpacity = true;
+
+					}
+
+				}
+
+			}
+
+
+
+			if (key.name == "backspace" || key.name == "caps" || key.name == "close" || applyOpacity == true) {
+
+
+
+			} else {
+
+				this.isPressed = true;
+
+			}
+
+		}
+
+	};
+
+
+
+	this.LButtonUp = function(event) {
+
+		this.isMousePressed = false;
+
+	};
+
+
+
+	this.releaseKey = function(event) {
+
+		if (this.isPressed) {
+
+			this.isPressed = false;
+
+		//	if (nIsMultiMouse) {
+
+		//		setTimeout(function() {
+
+		//			this.blurLayout(name);
+
+		//		}, 100);
+
+		//	}
+
+		}
+
+	};
+
+
+
+	this.enterKey = function(event) {
+
+		var x = 0;
+
+		var y = 0;
+
+		if (event.offsetX != null || event.offsetY != null) {
+
+			x = event.offsetX + 1;
+
+			y = event.offsetY + 1;
+
+		} else if (event.layerX != null || event.layerY != null) {
+
+			x = event.layerX - 2;
+
+			y = event.layerY - 2;
+
+		}
+
+		  x = parseInt(x);
+
+		  y = parseInt(y); //추가
+
+
+
+		var applyOpacity = false;
+
+		if (this.keyboardType == 'qwerty') {
+
+			var layerLowerDivObj, layerUpperDivObj;
+
+			layerLowerDivObj = document.getElementById(this.name + '_layoutLower');
+
+			layerUpperDivObj = document.getElementById(this.name + '_layoutUpper');
+
+			if (layerLowerDivObj.style.visibility == "visible") {
+
+				if (layerLowerDivObj.filters) {
+
+					if (layerLowerDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+						applyOpacity = true;
+
+					}
+
+				} else {
+
+					if (layerLowerDivObj.style.opacity == 0.5) {
+
+						applyOpacity = true;
+
+					}
+
+				}
+
+			} else {
+
+				if (layerUpperDivObj.filters) {
+
+					if (layerUpperDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+						applyOpacity = true;
+
+					}
+
+				} else {
+
+					if (layerUpperDivObj.style.opacity == 0.5) {
+
+						applyOpacity = true;
+
+					}
+
+				}
+
+			}
+
+		} else {
+
+			var layerSingleDivObj;
+
+			layerSingleDivObj = document.getElementById(this.name + '_layoutSingle');
+
+			if (layerSingleDivObj.filters) {
+
+				if (layerSingleDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+					applyOpacity = true;
+
+				}
+
+			} else {
+
+				if (layerSingleDivObj.style.opacity == 0.5) {
+
+					applyOpacity = true;
+
+				}
+
+			}
+
+		}
+
+
+
+		var key = this.getKey(x, y);
+
+		if (key != null) {
+
+			if (!applyOpacity) {
+
+				if (key.name == "backspace") {
+
+					this.backspace();
+
+				} else if (key.name == "clear") {
+
+					this.clear();
+
+				} else if (key.name == "caps") {
+
+					this.caps();
+
+				} else if (key.name == "close") {
+
+					this.close();
+
+					if(typeof infovine_VKPadUse != 'undefined' ){ //infovine
+
+						infovine_goDecode();
+
+						//return;
+
+					}else{
+
+						if(this.isCrt=="qwerty_crt"||this.isCrt=="number_crt"){
+
+							if(this.keyboardType == "qwerty"){
+
+								if (this.onCompleteClose () == false)
+
+								{
+ 
+									return false;
+
+									} 
+
+							}else if(this.keyboardType == "number"){
+
+								if (this.onCompleteClose () == false)
+
+								{
+
+									return false;
+
+									}
+
+								}
+
+						}
+
+					}
+
+				} else if (key.name == "directType") {
+
+					
+
+					this.directType();
+
+					 
+
+				} else if (key.name == "enter") {
+
+//					var this_input = document.getElementById(this.name + "_input");
+
+					var encSubmit = this.input.getAttribute("encSubmit");
+
+					if (encSubmit != null) {
+
+						eval(encSubmit);
+
+					} else {
+
+						this.close();
+
+					}
+
+				} else if (key.name == "crtenter") {
+
+					this.close();
+
+					if(typeof infovine_VKPadUse != 'undefined' ){ //infovine
+
+						infovine_goDecode();
+
+						//return;
+
+					}else 
+
+						if(this.isCrt=="qwerty_crt"||this.isCrt=="number_crt"){
+							if(this.keyboardType == "qwerty"){
+
+								if (this.onCompleteInput () == false)
+
+								{
+
+									return false;
+
+									}
+
+							}else if(this.keyboardType == "number"){
+
+								if (this.onCompleteClose () == false)
+
+								{
+
+									return false;
+
+								}
+
+						}
+					}
+
+					transKeyObj = null;
+
+					
+
+					
+
+					
+
+				} else {
+
+
+
+					var input = _d.getElementById(this.input.id);
+
+				
+
+//					var getName = document.getElementById(this.name);
+
+					if(this.fieldType == 'text'){
+
+						if(isPlainTextMode == '1'){
+
+							input.value = input.value + this.dummy(input.value);
+
+						}
+
+						
+
+					}else{
+
+						input.value = input.value + this.dummy(input.value);
+
+					}
+
+
+
+					var hidden = document.getElementById("transkey_" + this.name);
+
+					var geo;
+
+					if (this.layoutLower != null && this.layoutLower.style.visibility == "visible")
+
+						geo = "l " + x + " " + y;
+
+					else if (this.layoutUpper != null && this.layoutUpper.style.visibility == "visible")
+
+						geo = "u " + x + " " + y;
+
+					else
+
+						geo = x + " " + y;
+
+//					this.input = document.getElementById(this.name + "_input");
+
+					
+
+					var encrypted;
+
+					
+
+					if(this.isCrt=="qwerty_crt"||this.isCrt=="number_crt")
+
+						encrypted = SeedEnc(geo, sessionKeyCRT);
+
+					else
+
+					    encrypted = SeedEnc(geo, sessionKey);
+
+					hidden.value += " " + encrypted;
+
+					this.onEnter(input.value.length - 1, encrypted);
+
+					if (input.value.length >= maxSize) {
+
+						this.close();
+
+						return;
+
+					} //auto close
+
+				}
+
+				try{//개인뱅킹 입금은행 입금계좌정보 length 13일 때 2013.03.27
+					if(typeof retirePenCheck !='undefined'){
+						
+							if(document.getElementById(this.input.id).getAttribute("maxlength")>10){
+								retirePenCheck();
+							}
+						
+					}
+				}
+				catch(e){	
+				}
+			}
+
+
+
+			var userAgent = navigator.userAgent;
+
+			if ((userAgent.indexOf('Linux') > -1 || userAgent.indexOf('Mac') > -1) && userAgent.indexOf('Chrome') > -1)
+
+				this.releaseKey();
+
+		} else {
+
+			if (this.popup != null && this.popup.contains(x, y))
+
+				this.popup.popup();
+
+			else
+
+				this.onClick(x, y);
+
+		}
+
+		if (nIsMultiMouse) {
+
+			if(transKeyObj!=null)
+
+				blurLayout(transKeyObj.name);
+
+		}
+
+	};
+
+	
+
+	this.enterMapKey = function(i) {
+
+		var key = this.keys[i];
+
+		var x = TranskeyRandomValue(key.xpoints[0],key.xpoints[1]);
+
+		var y = TranskeyRandomValue(key.ypoints[0],key.ypoints[1]);
+
+
+
+		var applyOpacity = false;
+
+		if (this.keyboardType == 'qwerty') {
+
+			var layerLowerDivObj, layerUpperDivObj;
+
+			layerLowerDivObj = document.getElementById(this.name + '_layoutLower');
+
+			layerUpperDivObj = document.getElementById(this.name + '_layoutUpper');
+
+			if (layerLowerDivObj.style.visibility == "visible") {
+
+				if (layerLowerDivObj.filters) {
+
+					if (layerLowerDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+						applyOpacity = true;
+
+					}
+
+				} else {
+
+					if (layerLowerDivObj.style.opacity == 0.5) {
+
+						applyOpacity = true;
+
+					}
+
+				}
+
+			} else {
+
+				if (layerUpperDivObj.filters) {
+
+					if (layerUpperDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+						applyOpacity = true;
+
+					}
+
+				} else {
+
+					if (layerUpperDivObj.style.opacity == 0.5) {
+
+						applyOpacity = true;
+
+					}
+
+				}
+
+			}
+
+		} else {
+
+			var layerSingleDivObj;
+
+			layerSingleDivObj = document.getElementById(this.name + '_layoutSingle');
+
+			if (layerSingleDivObj.filters) {
+
+				if (layerSingleDivObj.style.filter == "alpha(opacity:" + 50 + ")") {
+
+					applyOpacity = true;
+
+				}
+
+			} else {
+
+				if (layerSingleDivObj.style.opacity == 0.5) {
+
+					applyOpacity = true;
+
+				}
+
+			}
+
+		}
+
+
+
+		key = this.getKey(x, y);
+
+		if (key != null) {
+
+			if (!applyOpacity) {
+
+				if (key.name == "backspace") {
+
+					this.backspace();
+
+				} else if (key.name == "clear") {
+
+					this.clear();
+
+				} else if (key.name == "caps") {
+
+					this.caps();
+
+				} else if (key.name == "close") {
+
+					this.close();
+
+					if(this.input.getAttribute("kbd")=="qwerty_crt"||this.input.getAttribute("kbd")=="number_crt"){
+
+						if(typeof infovine_VKPadUse != 'undefined' ){ //infovine
+
+						infovine_goDecode();
+
+						//return;
+
+						}
+					}
+
+				} else if (key.name == "directType") {
+
+					
+
+					this.directType();
+
+					
+
+				} else if (key.name == "enter") {
+
+//					var this_input = document.getElementById(this.name + "_input");
+
+					var encSubmit = this.input.getAttribute("encSubmit");
+
+					if (encSubmit != null) {
+
+						eval(encSubmit);
+
+					} else {
+
+						this.close();
+
+					}
+
+				} else if (key.name == "crtenter") {
+
+					this.close();
+
+					if(this.keyboardType == "qwerty"){
+
+						if (this.onCompleteInput () == false)
+
+						{
+
+							return false;
+
+							}
+
+					}else if(this.keyboardType == "number"){
+
+						if (this.onCompleteClose () == false)
+
+						{
+
+							return false;
+
+							}
+
+					}
+
+					
+
+					transKeyObj = null;
+
+					
+
+					
+
+					
+
+				} else {
+
+
+
+					var input = _d.getElementById(this.input.id);
+
+				//					var getName = document.getElementById(this.name);
+
+					if(this.fieldType == 'text'){
+
+						if(isPlainTextMode == '1'){
+
+							input.value = input.value + this.dummy(input.value);
+
+						}
+
+						
+
+					}else{
+
+						input.value = input.value + this.dummy(input.value);
+
+					}
+
+
+
+					var hidden = document.getElementById("transkey_" + this.name);
+
+					var geo;
+
+					if (this.layoutLower != null && this.layoutLower.style.visibility == "visible")
+
+						geo = "l " + x + " " + y;
+
+					else if (this.layoutUpper != null && this.layoutUpper.style.visibility == "visible")
+
+						geo = "u " + x + " " + y;
+
+					else
+
+						geo = x + " " + y;
+
+//					this.input = document.getElementById(this.name + "_input");
+
+					
+
+					var encrypted;
+
+					
+
+					if(this.isCrt=="qwerty_crt"||this.isCrt=="number_crt")
+
+						encrypted = SeedEnc(geo, sessionKeyCRT);
+
+					else
+
+					    encrypted = SeedEnc(geo, sessionKey);
+
+					hidden.value += " " + encrypted;
+
+					this.onEnter(input.value.length - 1, encrypted);
+
+
+
+					if (input.value.length >= maxSize) {
+
+						this.close();
+
+						return;
+
+					}//autoclose
+
+				}
+
+			}
+
+
+
+			var userAgent = navigator.userAgent;
+
+			if ((userAgent.indexOf('Linux') > -1 || userAgent.indexOf('Mac') > -1) && userAgent.indexOf('Chrome') > -1)
+
+				this.releaseKey();
+
+		} else {
+
+			if (this.popup != null && this.popup.contains(x, y))
+
+				this.popup.popup();
+
+			else
+
+				this.onClick(x, y);
+
+		}
+
+	};
+
+
+
+	// ===================================================================================//
+
+	function SeedEnc(geo, ssKey) {
+
+		var iv = [ 0x4d, 0x6f, 0x62, 0x69, 0x6c, 0x65, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x4b, 0x65, 0x79, 0x31, 0x30 ]; // "MobileTransKey10"
+
+		var inData = new Array(16);
+
+		var outData = new Array(16);
+
+		var roundKey = new Array(32);
+
+		var plainData = new Array(16);
+
+
+
+		for ( var i = 0; i < geo.length; i++) {
+
+			if (geo.charAt(i) == "l" || geo.charAt(i) == "u") {
+
+				inData[i] = Number(geo.charCodeAt(i));
+
+				continue;
+
+			} else if (geo.charAt(i) == " ") {
+
+				inData[i] = Number(geo.charCodeAt(i));
+
+				continue;
+
+			}
+
+			inData[i] = Number(geo.charAt(i)).toString(16);
+
+		}
+
+		inData[geo.length] = 32; // " "
+
+		inData[geo.length + 1] = 101; // e
+
+		Seed.SeedSetKey(roundKey, ssKey);
+
+		Seed.SeedEncryptCbc(roundKey, iv, inData, 16, outData);
+
+
+
+		var encodedData = new Array(16);
+
+		for ( var i = 0; i < 16; i++) {
+
+			encodedData[i] = Number(outData[i]).toString(16);
+
+		}
+
+
+
+		return encodedData;
+
+	}
+
+	// ===================================================================================//
+
+
+
+	this.backspace = function() {
+
+		var input = _d.getElementById(this.input.id);
+
+		input.value = input.value.substring(0, input.value.length - 1);
+
+
+
+		var hidden = _d.getElementById("transkey_" + this.name);
+
+		var pos = hidden.value.lastIndexOf(' ');
+
+		hidden.value = hidden.value.substring(0, pos);
+
+		this.onBackspace(input.value.length);
+
+	};
+
+ 
+
+	this.directType = function() {
+
+		var inpObj = _d.getElementById(this.input.id);
+
+		this.isDisabled = true;
+
+		this.useTransKey = false;
+
+		this.clear();
+
+		this.close();
+
+		//transKeyObj = null;
+
+		inpObj.value = "";
+
+		_d.getElementById(this.name+"_checkbox").checked = false;//KJS
+
+		_d.getElementById(this.name).readOnly = false;//KJS
+
+		_d.getElementById(this.name+"_check").value = "directType";
+
+		if (inpObj.setActive)
+
+			inpObj.setActive();
+
+		else
+
+			inpObj.focus();
+
+	};
+
+
+
+	this.clear = function() {
+
+		var input = _d.getElementById(this.input.id);
+
+		input.value = "";
+
+		var hidden = _d.getElementById("transkey_" + this.name);
+
+		hidden.value = "";
+
+		this.onClear();
+
+	};
+
+
+
+	this.caps = function() {
+
+		if (this.layoutLower.style.visibility == "visible") {
+
+			this.layoutLower.style.visibility = "hidden";
+
+			this.layoutUpper.style.visibility = "visible";
+
+			this.layoutUpper.style.zIndex = "1009";
+
+
+
+		} else {
+
+			this.layoutLower.style.visibility = "visible";
+
+			this.layoutUpper.style.visibility = "hidden";
+
+			this.layoutLower.style.zIndex = "1009";
+
+
+
+		}
+
+
+
+		if (isChrome == true) {
+
+			var blankChromeDivObj = document.getElementById(this.name + "_blankChromeDiv");
+
+			blankChromeDivObj.style.zIndex = "1011";
+
+		}
+
+	};
+
+
+
+	this.close = function() {
+
+		
+
+		this.layout = document.getElementById(this.name + "_layout");
+
+		if(transkeyisMobile){
+		    if(_d.getElementById(this.name+"_map")!=null)
+			    this.layout.removeChild(_d.getElementById(this.name+"_map"));
+		}
+
+		if (navigator.appName == "Opera") {
+
+			this.layout.style.position = "";
+
+		}
+
+
+
+		transKeyObj = null;
+
+		this.blankDivObj = document.getElementById(this.name + "_blankDiv");
+
+		this.blankOverDivObj = document.getElementById(this.name + "_blankOverDiv");
+
+		this.blankChromeDivObj = document.getElementById(this.name + "_blankChromeDiv");
+
+		this.blankOverChromeDivObj = document.getElementById(this.name + "_blankOverChromeDiv");
+		
+
+
+
+
+		if (this.layoutLower != null && this.layoutUpper != null) {
+			if(transkey_isIE6 == true &&this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt"){
+				this.block.style.visibility = "hidden";
+		}
+
+			this.setMouseInfo(null, 'normalMouse');
+
+			this.layoutLower.style.visibility = "hidden";
+
+			this.layoutUpper.style.visibility = "hidden";
+
+
+
+			if (isChrome == true) {
+
+				this.blankChromeDivObj.style.visibility = "hidden";
+
+				this.blankOverChromeDivObj.style.visibility = "hidden";
+
+			} else {
+
+				this.blankDivObj.style.visibility = "hidden";
+
+				this.blankOverDivObj.style.visibility = "hidden";
+
+			}
+
+			this.osMouseDivObj.style.visibility = "hidden";
+
+			this.fakeMouseDivObj.style.visibility = "hidden";
+
+//			this.btnClickDivObj.style.visibility = "hidden";
+
+//			this.fakeBtnClickDivObj.style.visibility = "hidden";
+
+			this.singleMouseTypeDivObj.style.visibility = "hidden";
+
+			this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+			//if(this.isCrt!="number_crt"&&this.isCrt!="qwerty_crt")
+
+			//	this.directTypeDivObj.style.visibility = "hidden";
+
+
+
+			this.layoutLower = null;
+
+			this.layoutUpper = null;
+
+
+
+			if (isChrome == true) {
+
+				this.blankChromeDivObj = null;
+
+				this.blankOverChromeDivObj = null;
+
+			} else {
+
+				this.blankDivObj = null;
+
+				this.blankOverDivObj = null;
+
+			}
+
+			this.osMouseDivObj = null;
+
+			this.fakeMouseDivObj = null;
+
+			
+
+//			this.btnClickDivObj = null;
+
+//			this.fakeBtnClickDivObj = null;
+
+		} else if (this.layoutSingle != null) {
+			if(transkey_isIE6 == true&&this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt"){
+				
+				this.block.style.visibility = "hidden";
+		}
+
+			this.layoutSingle.style.visibility = "hidden";
+
+			if (isChrome == true) {
+
+				this.blankChromeDivObj.style.visibility = "hidden";
+
+				this.blankOverChromeDivObj.style.visibility = "hidden";
+
+			} else {
+
+				this.blankDivObj.style.visibility = "hidden";
+
+				this.blankOverDivObj.style.visibility = "hidden";
+
+			}
+
+
+
+			this.osMouseDivObj.style.visibility = "hidden";
+
+			this.fakeMouseDivObj.style.visibility = "hidden";
+
+//			this.btnClickDivObj.style.visibility = "hidden";
+
+//			this.fakeBtnClickDivObj.style.visibility = "hidden";
+
+			this.singleMouseTypeDivObj.style.visibility = "hidden";
+
+			this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+			this.layoutSingle = null;
+
+		} else if (this.mouseOneDivObj != null && this.mouseTwoDivObj != null) {
+
+			this.mouseOneDivObj.style.visibility = "hidden";
+
+			this.mouseTwoDivObj.style.visibility = "hidden";
+
+			this.indexDivObj.style.visibility = "hidden";
+
+			this.indexCloseDivObj.style.visibility = "hidden";
+
+			this.mouseOneDivObj = null;
+
+			this.mouseTwoDivObj = null;
+
+			this.indexDivObj = null;
+
+			this.indexCloseDivObj = null;
+
+		}
+
+
+
+
+
+
+
+
+
+		this.isMousePressed = false;
+
+//		this.onClose();
+
+		if($(".pop-content").length>0){
+
+			closeTransKeyPopinner();
+
+		}
+
+	};
+
+
+
+	this.equals = function(transkey) {
+
+		var request = new XMLHttpRequest();
+
+		request.open("POST", url, false);
+
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		request.send("op=equals&name1=" + this.name + "&value1=" + document.getElementById("transkey_" + this.name).value + "&name2=" + transkey.name + "&value2="
+
+				+ document.getElementById("transkey_" + transkey.name).value + "&transkeyUuid=" + transkeyUuid);
+
+		return request.responseText;
+
+	};
+
+	
+
+	this.getHiddenData = function(){
+
+		return _d.getElementById("transkey_"+this.name).value;
+
+	};
+
+
+
+	this.getCipherData = function(xecureRandomData) {
+
+		var aCipher = null;
+
+		var aCipherArray = null;
+
+		var aInputValue = null;
+
+		var encXecureRanData = null;
+
+		var aRequest = null;
+
+
+
+		aInputValue = document.getElementById("transkey_" + this.name).value;
+
+		if (aInputValue == null || aInputValue == "") {
+
+			aCipher = "";
+
+			return aCipher;
+
+		}
+
+
+
+		encXecureRanData = encryptedString(rsaKey, xecureRandomData);
+
+		
+
+		var sPort = location.port;
+
+		if(sPort.length<=0)
+
+			sPort = '80';
+
+
+
+		aRequest = new XMLHttpRequest();
+
+		aRequest.open("POST", url, false);
+
+		aRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		aRequest.send("op=getPlainText&name=" + this.name + "&value=" + aInputValue + "&encXecureRanData=" + encXecureRanData + "&transkeyUuid=" + transkeyUuidForCRT + "&sPort=" + sPort);
+
+
+
+		if (aRequest.readyState != 4 || aRequest.status != 200) {
+
+			aCipher = "";
+
+			return aCipher;
+
+		}
+
+
+
+		aCipher = aRequest.responseText.replace(/\n/gi, '');
+
+		aCipherArray = aCipher.split(',');
+
+
+
+		aCipher = "";
+
+		for ( var i = 0; i < aCipherArray.length - 1; i++) {
+
+			if (aCipherArray[i].length == 1) {
+
+				aCipher += '0';
+
+			}
+
+
+
+			aCipher += aCipherArray[i];
+
+		}
+
+
+
+		return aCipher;
+
+	};
+
+
+
+	this.checkRealMouseOutLayer = function(e, debugMsg) {
+
+		if (debugMsg == 'twin') {
+
+			if (e) {
+
+				var osMouseDivObj = document.getElementById(this.name + '_osMouseDiv');
+
+				if (isFireFox == true) {
+
+					if (((e.layerX + 1) >= qwertyLayerWidth) || (e.layerY >= qwertyLayerHeight)) {
+
+						this.hideAllMouse();
+
+					}
+
+				} else {
+
+					if ((parseInt(osMouseDivObj.style.left) + (e.layerX + 1) >= qwertyLayerWidth) || (parseInt(osMouseDivObj.style.top) + e.layerY >= qwertyLayerHeight)) {
+
+						this.hideAllMouse();
+
+					}
+
+				}
+
+			} else {
+
+				if (((event.x + 1) >= qwertyLayerWidth) || (event.y >= qwertyLayerHeight) || event.y <= 0) {
+
+					this.hideAllMouse();
+
+				}
+
+			}
+
+		} else if (debugMsg == 'single') {
+
+			if (e) {
+
+				var osMouseDivObj = document.getElementById(this.name + '_osMouseDiv');
+
+				if (isFireFox == true) {
+
+					if (((e.layerX + 1) >= singleLayerWidth) || (e.layerY >= singleLayerHeight)) {
+
+						this.hideAllMouse();
+
+					}
+
+				} else {
+
+					if ((parseInt(osMouseDivObj.style.left) + (e.layerX + 1) >= singleLayerWidth) || (parseInt(osMouseDivObj.style.top) + e.layerY >= singleLayerHeight)) {
+
+						this.hideAllMouse();
+
+					}
+
+				}
+
+			} else {
+
+				if (((event.x + 1) >= singleLayerWidth) || (event.y >= singleLayerHeight)) {
+
+					this.hideAllMouse();
+
+				}
+
+			}
+
+		}
+
+	};
+
+
+
+	this.visibleLayout = function(event, isBlankOver) {
+
+		if (this.layoutLower != null && this.layoutLower.style.visibility == "visible") {
+
+			if (this.layoutLower.filters)
+
+				this.layoutLower.style.filter = "alpha(opacity:" + 100 + ")";
+
+			else
+
+				this.layoutLower.style.opacity = 1.0;
+
+		} else if (this.layoutUpper != null && this.layoutUpper.style.visibility == "visible") {
+
+			if (this.layoutUpper.filters)
+
+				this.layoutUpper.style.filter = "alpha(opacity:" + 100 + ")";
+
+			else
+
+				this.layoutUpper.style.opacity = 1.0;
+
+		} else {
+
+			if (this.layoutSingle.filters)
+
+				this.layoutSingle.style.filter = "alpha(opacity:" + 100 + ")";
+
+			else
+
+				this.layoutSingle.style.opacity = 1.0;
+
+		}
+
+
+
+		var blankOverDivObj = document.getElementById(this.name + "_blankOverDiv");
+
+		var blankOverChromeDivObj = document.getElementById(this.name + "_blankOverChromeDiv");
+
+
+
+		if (isChrome == true) {
+
+			if (blankOverChromeDivObj != null && isBlankOver == 'blankOverChromeDiv') {
+
+				blankOverChromeDivObj.style.visibility = "hidden";
+
+			}
+
+		} else {
+
+			if (blankOverDivObj != null && isBlankOver == 'blankOverDiv') {
+
+				blankOverDivObj.style.visibility = "hidden";
+
+			}
+
+		}
+
+	};
+
+
+
+	this.setMultiMouse = function(isMultiMouse) {
+
+		if (isMultiMouse) {
+
+			nIsMultiMouse = true;
+
+		} else {
+
+			nIsMultiMouse = false;
+
+		}
+
+	};
+
+
+
+	this.setMouseInfo = function(event, isMultiMouse) {
+
+		if (isMultiMouse == 'close') {
+
+			this.setVisible('callIndex', 'false');
+
+			this.onClose();
+
+		} else {
+
+			if (isMultiMouse == 'normalMouse') {
+
+				this.singleMouseTypeDivObj.style.visibility = "hidden";
+
+				if (navigator.appName == 'Opera'||transkeyisMobile==true) {
+
+					this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+				} else {
+
+					this.multiMouseTypeDivObj.style.visibility = "visible";
+
+				}
+
+
+
+				this.setMultiMouse(false);
+
+
+
+				// **********************//
+
+				this.singleMouseTypeDivObj.style.cursor = "default";
+
+				this.multiMouseTypeDivObj.style.cursor = "default";
+
+				if (isChrome) {
+
+					this.blankChromeDivObj.style.cursor = "default";
+
+					this.blankOverChromeDivObj.style.cursor = "default";
+
+				} else {
+
+					this.blankDivObj.style.cursor = "default";
+
+					this.blankOverDivObj.style.cursor = "default";
+
+				}
+
+
+
+				if (this.layoutLower != null || this.layoutUpper != null) {
+
+					this.layoutUpper.style.cursor = "default";
+
+					this.layoutLower.style.cursor = "default";
+
+				} else if (this.layoutSingle != null) {
+
+					this.layoutSingle.style.cursor = "default";
+
+				}
+
+				// **********************//
+
+			} else {
+
+				this.osMouseDivObj = document.getElementById(this.name + '_osMouseDiv');
+
+				this.fakeMouseDivObj = document.getElementById(this.name + '_fakeMouseDiv');
+
+				this.blankDivObj = document.getElementById(this.name + "_blankDiv");
+
+				// *********************************************//
+
+				this.blankOverDivObj = document.getElementById(this.name + "_blankOverDiv");
+
+				// *********************************************//
+
+//				this.btnClickDivObj = document.getElementById(this.name + "_btnClickDiv");
+
+//				this.fakeBtnClickDivObj = document.getElementById(this.name + "_fakeBtnClickDiv");
+
+				if (isOpera == true) {
+
+					alert("Opera can not support using multimouse");
+
+				} else {
+
+					this.multiMouseTypeDivObj.style.visibility = "hidden";
+
+					this.singleMouseTypeDivObj.style.visibility = "visible";
+
+					this.singleMouseTypeDivObj.style.zIndex = "1011";
+
+					this.setMultiMouse(true);
+
+					// **********************//
+
+					if (isChrome) {
+
+						if ((this.layoutLower != null && this.layoutLower.style.visibility == "visible") || (this.layoutUpper != null && this.layoutUpper.style.visibility == "visible")) {
+
+							// if(isMac == true){
+
+							// this.singleMouseTypeDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.multiMouseTypeDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.blankChromeDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.blankOverChromeDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.osMouseDivObj.style.cursor = "url(''),none";
+
+							// this.fakeMouseDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.btnClickDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.fakeBtnClickDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// this.layoutLower.style.cursor = "url(''),none";
+
+							// this.layoutUpper.style.cursor = "url(''),none";
+
+							//
+
+							// //
+
+							// ***************************************************//
+
+							// this.singleMouseTypeDivObj.style.cursor =
+
+							// "url(''),none";
+
+							// //
+
+							// ***************************************************//
+
+							// }else{
+
+							this.singleMouseTypeDivObj.style.cursor = "none";
+
+							this.multiMouseTypeDivObj.style.cursor = "none";
+
+							// ***************************************************//
+
+							this.blankChromeDivObj.style.cursor = "none";
+
+							this.blankOverChromeDivObj = document.getElementById(name + '_blankOverChromeDiv');
+
+							this.blankOverChromeDivObj.style.cursor = "none";
+
+							// ***************************************************//
+
+							this.osMouseDivObj.style.cursor = "none";
+
+							this.fakeMouseDivObj.style.cursor = "none";
+
+//							this.btnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible_ch.gif'),auto";
+
+//							this.fakeBtnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible_ch.gif'),auto";
+
+							this.layoutLower.style.cursor = "none";
+
+							this.layoutUpper.style.cursor = "none";
+
+							// ***************************************************//
+
+							this.singleMouseTypeDivObj.style.cursor = "none";
+
+							// ***************************************************//
+
+							// }
+
+						} else {
+
+							this.singleMouseTypeDivObj.style.cursor = "none";
+
+							this.multiMouseTypeDivObj.style.cursor = "none";
+
+							// ***************************************************//
+
+							this.blankChromeDivObj.style.cursor = "none";
+
+							this.blankOverChromeDivObj = document.getElementById(name + '_blankOverChromeDiv');
+
+							this.blankOverChromeDivObj.style.cursor = "none";
+
+							// ***************************************************//
+
+							this.osMouseDivObj.style.cursor = "none";
+
+							this.fakeMouseDivObj.style.cursor = "none";
+
+//							this.btnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible_ch.gif'),auto";
+
+//							this.fakeBtnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible_ch.gif'),auto";
+
+							this.layoutSingle.style.cursor = "none";
+
+							// ***************************************************//
+
+							this.singleMouseTypeDivObj.style.cursor = "none";
+
+							// ***************************************************//
+
+						}
+
+					} else {
+
+						var blankDivObj = document.getElementById(this.name + "_blankDiv");
+
+						if ((this.layoutLower != null && this.layoutLower.style.visibility == "visible") || (this.layoutUpper != null && this.layoutUpper.style.visibility == "visible")) {
+
+							if (isFireFox == true) {
+
+								this.singleMouseTypeDivObj.style.cursor = "none";
+
+								this.multiMouseTypeDivObj.style.cursor = "none";
+
+								this.blankDivObj.style.cursor = "none";
+
+								this.blankOverDivObj.style.cursor = "none";
+
+								this.osMouseDivObj.style.cursor = "none";
+
+								this.fakeMouseDivObj.style.cursor = "none";
+
+//								this.btnClickDivObj.style.cursor = "none";
+
+//								this.fakeBtnClickDivObj.style.cursor = "url(''),none";
+
+								this.layoutLower.style.cursor = "none";
+
+								this.layoutUpper.style.cursor = "none";
+
+							} else if (isSafari == true) {
+
+								this.singleMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.multiMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.blankDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.blankOverDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.osMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.fakeMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+//								this.btnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+//								this.fakeBtnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.layoutLower.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.layoutUpper.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+							} else {
+
+								this.singleMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.multiMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.blankDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.blankOverDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.osMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.fakeMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+//								this.btnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+//								this.fakeBtnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.layoutLower.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.layoutUpper.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+							}
+
+						} else {
+
+							if (isFireFox == true) {
+
+								this.singleMouseTypeDivObj.style.cursor = "none";
+
+								this.multiMouseTypeDivObj.style.cursor = "none";
+
+								this.blankDivObj.style.cursor = "none";
+
+								this.blankOverDivObj.style.cursor = "none";
+
+								this.osMouseDivObj.style.cursor = "none";
+
+								this.fakeMouseDivObj.style.cursor = "none";
+
+//								this.btnClickDivObj.style.cursor = "url(''),none";
+
+//								this.fakeBtnClickDivObj.style.cursor = "url(''),none";
+
+								this.layoutSingle.style.cursor = "none";
+
+							} else if (isSafari == true) {
+
+								this.singleMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.multiMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.blankDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.blankOverDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.osMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.fakeMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+//								this.btnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+//								this.fakeBtnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+								this.layoutSingle.style.cursor = "url('" + transkey_url + "/images/invisible.gif'),auto";
+
+							} else {
+
+								this.singleMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.multiMouseTypeDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.blankDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.blankOverDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.osMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.fakeMouseDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+//								this.btnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+//								this.fakeBtnClickDivObj.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+								this.layoutSingle.style.cursor = "url('" + transkey_url + "/images/invisible.cur'),auto";
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	};
+
+
+
+	this.hideAllMouse = function(event, msg) {
+
+		if(transKeyObj != null){
+
+			this.osMouseDivObj = document.getElementById(name + '_osMouseDiv');
+
+			this.fakeMouseDivObj = document.getElementById(name + '_fakeMouseDiv');
+
+			this.fakeMouseDivObj.style.visibility = "hidden";
+
+			this.osMouseDivObj.style.visibility = "hidden";
+
+	}
+
+	};
+
+
+
+	this.showAllMouse = function(e, debugMsg, keyboardStyle) {
+
+		// console.log(this.osMouseDivObj.style.left+","+this.osMouseDivObj.style.top);
+
+		if (nIsMultiMouse == true) {
+
+			if ((this.layoutLower != null && this.layoutLower.style.visibility == "visible") || (this.layoutUpper != null && this.layoutUpper.style.visibility == "visible")
+
+					|| (this.layoutSingle != null && this.layoutSingle.style.visibility == "visible")) {
+
+				if (nIsMultiMouse == true) {
+
+					this.osMouseDivObj.style.zIndex = "1010";
+
+					this.fakeMouseDivObj.style.zIndex = "1010";
+
+					this.blankDivObj.style.zIndex = "1011";
+
+					if (e) {
+
+
+
+						var pointX = e.offsetX;
+
+						var pointY = e.offsetY;
+
+
+
+						if (e.offsetX == null || e.offsetY == null) {
+
+							pointX = e.layerX;
+
+							pointY = e.layerY;
+
+						}
+
+
+
+						if (nIsMultiMouse == true) {
+
+							if (debugMsg == 'mouseMoveOnOsMouseDiv') {
+
+								if (isFireFox == true && this.isMousePressed == true) {
+
+								} else {
+
+									if (keyboardStyle == 'twin')
+
+										this.fakeMouseDivObj.style.left = qwertyLayerX + (qwertyLayerX - (parseInt(this.osMouseDivObj.style.left) + pointX)) + 'px'; // 90
+
+									else
+
+										this.fakeMouseDivObj.style.left = singleLayerX + (singleLayerX - (parseInt(this.osMouseDivObj.style.left) + pointX)) + 'px';  90
+
+
+
+									this.fakeMouseDivObj.style.top = parseInt(this.fakeMouseDivObj.style.top) + pointY + 'px';
+
+									this.fakeMouseDivObj.style.visibility = "visible";
+
+								}
+
+							} else if (debugMsg == 'mouseMoveOnFakeMouseDiv') {
+
+								if (keyboardStyle == 'twin') {
+
+									this.fakeMouseDivObj.style.left = qwertyLayerX + (qwertyLayerX - (parseInt(this.fakeMouseDivObj.style.left) + pointX)) + 'px'; // 90
+
+								} else
+
+									this.fakeMouseDivObj.style.left = singleLayerX + (singleLayerX - (parseInt(this.fakeMouseDivObj.style.left) + pointX)) + 'px'; // 90
+
+
+
+								this.fakeMouseDivObj.style.top = parseInt(this.fakeMouseDivObj.style.top) + pointY + 'px';
+
+								this.fakeMouseDivObj.style.visibility = "visible";
+
+							} else if (debugMsg == 'mouseOverOnBtnClickDiv') {
+
+//								if (isFireFox == true) {
+
+//									this.fakeMouseDivObj.style.visibility = "visible";
+
+//								} else {
+
+//									if (keyboardStyle == 'twin')
+
+//										this.fakeMouseDivObj.style.left = qwertyLayerX + (qwertyLayerX - (parseInt(this.btnClickDivObj.style.left) + pointX)) + 'px'; // 90
+
+//									else
+
+//										this.fakeMouseDivObj.style.left = singleLayerX + (singleLayerX - (parseInt(this.btnClickDivObj.style.left) + pointX)) + 'px'; // 90
+
+//
+
+//									this.fakeMouseDivObj.style.top = parseInt(this.fakeBtnClickDivObj.style.top) + pointY + 'px';
+
+//									this.fakeMouseDivObj.style.visibility = "visible";
+
+//								}
+
+							} else {
+
+								if (keyboardStyle == 'twin')
+
+									this.fakeMouseDivObj.style.left = qwertyLayerX + (qwertyLayerX - pointX) + 'px';
+
+								else
+
+									this.fakeMouseDivObj.style.left = singleLayerX + (singleLayerX - pointX) + 'px';
+
+
+
+								this.fakeMouseDivObj.style.top = pointY + 'px';
+
+								this.fakeMouseDivObj.style.visibility = "visible";
+
+							}
+
+						}
+
+
+
+						if (debugMsg == 'mouseMoveOnOsMouseDiv') {
+
+							if (isFireFox == true && this.isMousePressed == true) {
+
+
+
+							} else {
+
+								this.osMouseDivObj.style.left = parseInt(this.osMouseDivObj.style.left) + pointX + 2 + 'px';
+
+								this.osMouseDivObj.style.top = parseInt(this.osMouseDivObj.style.top) + pointY + 'px';
+
+								this.osMouseDivObj.style.visibility = "visible";
+
+							}
+
+						} else if (debugMsg == 'mouseMoveOnFakeMouseDiv') {
+
+							this.osMouseDivObj.style.left = parseInt(this.fakeMouseDivObj.style.left) + pointX + 2 + 'px';
+
+							this.osMouseDivObj.style.top = parseInt(this.osMouseDivObj.style.top) + pointY + 'px';
+
+							this.osMouseDivObj.style.visibility = "visible";
+
+						} else if (debugMsg == 'mouseOverOnBtnClickDiv') {
+
+//							if (isFireFox == true) {
+
+//								this.osMouseDivObj.style.visibility = "visible";
+
+//							} else {
+
+//								this.osMouseDivObj.style.left = parseInt(this.btnClickDivObj.style.left) + pointX + 1 + 'px';
+
+//								this.osMouseDivObj.style.top = parseInt(this.btnClickDivObj.style.top) + pointY + 'px';
+
+//								this.osMouseDivObj.style.visibility = "visible";
+
+//							}
+
+						} else {
+
+							this.osMouseDivObj.style.left = pointX + 2 + 'px';
+
+							this.osMouseDivObj.style.top = pointY + 'px';
+
+							this.osMouseDivObj.style.visibility = "visible";
+
+						}
+
+
+
+						if (isIE9) {
+
+							if (debugMsg == 'mouseMoveOnLayoutLowerDiv' && this.isMousePressed == true) {
+
+								if (nIsMultiMouse == true) {
+
+									if (keyboardStyle == 'twin')
+
+										this.fakeMouseDivObj.style.pixelLeft = qwertyLayerX + (qwertyLayerX - pointX + 2);
+
+									else
+
+										this.fakeMouseDivObj.style.pixelLeft = singleLayerX + (singleLayerX - pointX + 2);
+
+									this.fakeMouseDivObj.style.pixelTop = pointY;
+
+									this.fakeMouseDivObj.style.visibility = "visible";
+
+								}
+
+
+
+								this.osMouseDivObj.style.pixelLeft = pointX + 2;
+
+								this.osMouseDivObj.style.pixelTop = pointY;
+
+								this.osMouseDivObj.style.visibility = "visible";
+
+							}
+
+						}
+
+					} else {
+
+						if (debugMsg == 'mouseMoveOnLayoutLowerDiv') {
+
+							if (nIsMultiMouse == true) {
+
+								if (keyboardStyle == 'twin')
+
+									this.fakeMouseDivObj.style.pixelLeft = qwertyLayerX + (qwertyLayerX - event.offsetX + 2);
+
+								else
+
+									this.fakeMouseDivObj.style.pixelLeft = singleLayerX + (singleLayerX - event.offsetX + 2);
+
+								this.fakeMouseDivObj.style.pixelTop = event.offsetY;
+
+								this.fakeMouseDivObj.style.visibility = "visible";
+
+							}
+
+
+
+							this.osMouseDivObj.style.pixelLeft = event.offsetX + 2;
+
+							this.osMouseDivObj.style.pixelTop = event.offsetY;
+
+							this.osMouseDivObj.style.visibility = "visible";
+
+						} else if (debugMsg == 'mouseMoveOnOsMouseDiv') {
+
+							if (nIsMultiMouse == true) {
+
+								if (keyboardStyle == 'twin')
+
+									this.fakeMouseDivObj.style.pixelLeft = qwertyLayerX + (qwertyLayerX - (parseInt(this.osMouseDivObj.style.left) + event.offsetX) + 2); // 90
+
+								else
+
+									this.fakeMouseDivObj.style.pixelLeft = singleLayerX + (singleLayerX - (parseInt(this.osMouseDivObj.style.left) + event.offsetX) + 2); // 90
+
+
+
+								this.fakeMouseDivObj.style.pixelTop = parseInt(this.osMouseDivObj.style.top) + event.offsetY;
+
+								this.fakeMouseDivObj.style.visibility = "visible";
+
+							}
+
+
+
+							this.osMouseDivObj.style.pixelLeft = parseInt(this.osMouseDivObj.style.left) + event.offsetX + 2;
+
+							this.osMouseDivObj.style.pixelTop = parseInt(this.osMouseDivObj.style.top) + event.offsetY;
+
+							this.osMouseDivObj.style.visibility = "visible";
+
+						} else if (debugMsg == 'mouseMoveOnFakeMouseDiv') {
+
+							// no:101
+
+							if (nIsMultiMouse == true) {
+
+								if (keyboardStyle == 'twin')
+
+									this.fakeMouseDivObj.style.pixelLeft = qwertyLayerX + (qwertyLayerX - (parseInt(this.fakeMouseDivObj.style.left) + event.offsetX) + 2);
+
+								else
+
+									this.fakeMouseDivObj.style.pixelLeft = singleLayerX + (singleLayerX - (parseInt(this.fakeMouseDivObj.style.left) + event.offsetX) + 2);
+
+
+
+								this.fakeMouseDivObj.style.pixelTop = parseInt(this.fakeMouseDivObj.style.top) + event.offsetY;
+
+								this.fakeMouseDivObj.style.visibility = "visible";
+
+							}
+
+							this.osMouseDivObj.style.pixelLeft = parseInt(this.fakeMouseDivObj.style.left) + event.offsetX + 2;
+
+							this.osMouseDivObj.style.pixelTop = parseInt(this.fakeMouseDivObj.style.top) + event.offsetY;
+
+							this.osMouseDivObj.style.visibility = "visible";
+
+
+
+						} else {
+
+							// no:102
+
+							if (!(event.srcElement.id == 'osMouseImg' || event.srcElement.id == 'btnClickImg')) {
+
+								if (nIsMultiMouse == true) {
+
+									if (keyboardStyle == 'twin')
+
+										this.fakeMouseDivObj.style.pixelLeft = qwertyLayerX + (qwertyLayerX - event.x + 2);
+
+									else
+
+										this.fakeMouseDivObj.style.pixelLeft = singleLayerX + (singleLayerX - event.x + 2);
+
+									this.fakeMouseDivObj.style.pixelTop = event.y;
+
+									this.fakeMouseDivObj.style.visibility = "visible";
+
+								}
+
+
+
+								this.osMouseDivObj.style.pixelLeft = event.x + 2;
+
+								this.osMouseDivObj.style.pixelTop = event.y;
+
+								this.osMouseDivObj.style.visibility = "visible";
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+	};
+
+
+
+	this.getCipherData_xc = function(xecureRandomData) {
+
+		var aCipher = null;
+
+		var aCipherArray = null;
+
+		var aInputValue = null;
+
+		var encXecureRanData = null;
+
+		var aRequest = null;
+
+
+
+		aInputValue = document.getElementById("transkey_" + this.name).value;
+
+		if (aInputValue == null || aInputValue == "") {
+
+			aCipher = "";
+
+			return aCipher;
+
+		}
+
+
+
+		encXecureRanData = encryptedString(rsaKey, xecureRandomData);
+
+		
+
+		var sPort = location.port;
+
+		if(sPort.length<=0)
+
+			sPort = '80';
+
+
+
+		aRequest = new XMLHttpRequest();
+
+		aRequest.open("POST", url, false);
+
+		aRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		aRequest.send("op=getPlainText&name=" + this.name + "&value=" + aInputValue + "&encXecureRanData=" + encXecureRanData + "&transkeyUuid=" + transkeyUuid + "&sPort=" + sPort);
+
+
+
+		if (aRequest.readyState != 4 || aRequest.status != 200) {
+
+			aCipher = "";
+
+			return aCipher;
+
+		}
+
+
+
+		aCipher = aRequest.responseText.replace(/\n/gi, '');
+
+		aCipherArray = aCipher.split(',');
+
+
+
+		aCipher = "";
+
+		for ( var i = 0; i < aCipherArray.length - 1; i++) {
+
+			if (aCipherArray[i].length == 1) {
+
+				aCipher += '0';
+
+			}
+
+
+
+			aCipher += aCipherArray[i];
+
+		}
+
+
+
+		return aCipher;
+
+	};
+
+
+
+	this.setMode = function(isMouse) {
+
+	};
+
+
+
+	this.dummy = function(value) {
+
+		return value.length % 2 == 0 ? "0" : "0";
+
+	};
+
+
+
+	this.onClose = function() {
+
+	};
+
+
+
+	this.onClick = function(x, y) {
+
+	};
+
+
+
+	this.onEnter = function(idx, encrypted) {
+
+	};
+
+
+
+	this.onBackspace = function(idx) {
+
+	};
+
+
+
+	this.onClear = function() {
+
+	};
+
+	
+
+	this.onClickToggle = function(){
+
+		if(this.useTransKey){
+
+			var el = document.getElementById(this.name+'_toggle');
+
+			var isChecked = el.src.substring(el.src.length - 'btn_m_mouse.gif'.length) == 'btn_m_mouse.gif'; 
+
+			el.src = isChecked ? transkey_url+'/images/btn_m_keyboard.gif' : transkey_url+'/images/btn_m_mouse.gif'; 
+
+			this.clear(); 
+
+			if(isChecked){
+
+				this.setVisible(isChecked, 'temp');
+
+				this.setMultiMouse(false);
+
+				} 
+
+			if(!isChecked)
+
+				this.close(); 
+
+			this.setMode(isChecked); 
+
+//			if(!isChecked) 
+
+//				_d.getElementById(this.input.id).focus();
+
+		}
+
+		
+
+	};
+
+	
+
+	this.onClickCheckbox = function(eventObj){
+
+		var inputObj = eventObj.target ? eventObj.target : eventObj.srcElement;
+
+		var isChecked = inputObj.checked; 
+
+		this.useTransKey = isChecked;
+
+		//multi OS checkbox checklogic KJS
+
+		//if(navigator.platform.match('Win') != 'Win'){
+
+		
+
+//		if(navigator.platform.match('Win') != 'Win' || (navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 )){
+		if((navigator.platform.match('Win') != 'Win' || (navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 )) || onlyuseTransKey){
+			if(!isChecked){
+
+				inputObj.checked = true;
+
+				isChecked=true;
+
+				this.useTransKey = isChecked;
+
+				_d.getElementById(this.input.id).readOnly=true;
+
+				alert("키보드보안 프로그램이 지원되지 않는 환경에서는안전한 거래를 위해 가상키패드를반드시 사용하셔야 합니다.");
+
+			}
+
+		}
+
+		document.getElementById(this.name+"_check").value = isChecked==true?"transkey":"e2e";
+
+		if(isChecked) {
+			document.getElementById(this.input.id).readOnly=true;
+			$("#" + this.input.id).trigger('focus');
+		} else{
+			document.getElementById(this.input.id).readOnly=false;
+		}
+
+		// NOS 연계시 E2E 필드 초기화 추가
+		if (typeof npPfsCtrl != "undefined") {
+			if (typeof npPfsCtrl.ResetField == "function") {
+				try {					
+					npPfsCtrl.ResetField(null, this.input.name);
+				} catch (e) {}
+			}
+		}
+		
+		showTransKeyBtn("transkey."+this.name);
+
+		if(navigator.platform.match('Win') == 'Win'){
+
+			if(!isChecked) 
+
+    	{
+
+      	this.clear();
+
+       	this.close();
+
+      }
+
+    }
+
+   
+
+};
+
+	
+
+	this.addEvent = function(addEvent, attachEvent){
+
+		if(!this.setTkEvent){
+
+			var input = _d.getElementById(this.input.id);
+
+			if (input.addEventListener) {
+
+				input.addEventListener(addEvent, showTransKey, false);
+
+			} else if (input.attachEvent) {
+
+				input.attachEvent(attachEvent, showTransKey);
+
+			}
+
+			this.setTkEvent = true;
+
+		}
+
+	};
+
+	
+
+	this.removeEvent = function(removeEvent, dettachEvent){
+
+		if(this.setTkEvent){
+
+			var input = _d.getElementById(this.input.id);
+
+			if (input.removeEventListener) {
+
+				input.removeEventListener (removeEvent, showTransKey, false);
+
+			} else if (input.detachEvent) {
+
+				input.detachEvent(dettachEvent, showTransKey);
+
+			}
+
+			this.setTkEvent = false;
+
+		}
+
+	};
+
+	
+
+	this.addButton = function(){
+
+		if(this.selectIMG=="0"){
+
+				var divObj = _d.getElementById(this.name);
+
+				var inputObj = _d.getElementById(this.input.id);
+
+				var btn = document.createElement("span");
+
+				btn.id = this.name+"_button";
+
+				var onClick = ""; 
+
+					if(this.isCrt =="number_crt"||this.isCrt =="qwerty_crt"){
+
+						onClick = this.name+".onClickToggle();";
+
+					}else{
+
+						onClick = "transkey."+this.name+".onClickToggle();";
+
+					}
+
+				btn.innerHTML = "<img class='TranskeyToggle' alt='' style='vertical-align:middle; cursor:pointer;' id='"
+
+					+this.name+"_toggle' onclick='"
+
+					+onClick+"' src='"
+
+					+transkey_url+"/images/btn_m_mouse.gif' border='0'>";		
+
+				divObj.insertBefore(btn, inputObj.nextSibling);
+
+				this.selectIMG="1";
+
+		}
+
+	};
+
+	
+
+	this.removeButton = function(){
+
+		if(this.selectIMG=="1"){
+
+			var divObj = _d.getElementById(this.name);
+
+			var btn = _d.getElementById(this.name+"_button");
+
+			divObj.removeChild(btn);
+
+			this.selectIMG="0";
+
+			
+
+		}	
+
+	};
+
+	
+
+	this.setPosition = function(x, y){
+		
+		if(transkey_isIE6 == true && this.isCrt!="qwerty_crt"&&this.isCrt!="number_crt"){
+			var inputObj = _d.getElementById(this.input.id);
+			this.layout = _d.getElementById(this.name+"_layout");
+			this.layout.style.position="relative";
+			if(this.keyboardType == 'qwerty'){
+				this.layout.style.left = -inputObj.offsetWidth+x+"px";
+			}else if(this.keyboardType == 'number'){
+				this.layout.style.left = -inputObj.offsetWidth+x+"px";
+			}else {
+				this.layout.style.left = x+"px";
+			}
+			this.layout.style.top = 12+y+"px";
+		}else{
+			var inputObj = _d.getElementById(this.input.id);
+	
+			if(isPlainTextMode == '1'){
+	
+				if (this.input.type == "text")
+	
+					inputObj = _d.getElementById(this.name + "_layoutText");
+	
+			}
+	
+			var p = getOffsetPoint(inputObj);
+			
+			p.x=p.x+x;
+	
+			p.y=p.y+inputObj.offsetHeight+y;
+			this.layout = _d.getElementById(this.name+"_layout");
+	
+			//opera position bug
+	
+			this.layout.style.position = "absolute";
+	
+			//opera position bug
+
+	
+			this.layout.style.left = p.x+"px";
+			this.layout.style.top = p.y+"px";
+//		    if(navigator.userAgent.indexOf("MSIE 6")>0){
+//		    	if(inputObj.id=="ACTPWNO_8"){
+//					this.layout.style.top = "360px";
+//		    	} 	    	
+//		    }
+			
+		}
+
+		
+
+		
+
+	};
+
+	if(this.isCrt=="number_crt"||this.isCrt=="qwerty_crt")
+
+		this.load();
+
+
+
+};
+
+
+
+
+
+function showTransKey(eventObj) {
+
+
+
+		var inputObj;
+
+		if (eventObj.type == "text" || eventObj.type == "password") {
+
+			inputObj = event;
+
+		} else {
+
+			eventObj = eventObj ? eventObj : window.event;
+
+			inputObj = eventObj.target ? eventObj.target : eventObj.srcElement;
+
+		}
+
+			
+
+			var tid = "transkey."+inputObj.parentNode.id;
+
+		if(eval(tid)==null)
+
+			tid = inputObj.parentNode.id;
+
+		if(eval(tid+".useTransKey")){
+
+			if(eval("transkey."+inputObj.parentNode.id)==null||eval("transkey."+inputObj.parentNode.id)=="undefined")
+
+				tid = inputObj.parentNode.id;
+
+			if (eval(tid + ".isDisabled") != false) {
+
+				return true;
+
+			}
+
+			
+
+			
+
+			
+
+			if(transKeyObj==null){
+
+			    eval(tid + ".clear();");
+
+			}else{
+
+			    if(transKeyObj.input.id != inputObj.id)
+
+					 eval(tid + ".clear();");
+
+			}
+
+		
+
+				
+
+	
+
+
+
+		    
+
+				eval(tid + ".setMode(true);");
+
+				if (isFirstUseMultyCusor == 1) {
+
+					eval(tid + ".setMultiMouse(true);");
+
+					eval(tid + ".setVisible(true, 'temp');");
+
+					eval(tid + ".setMouseInfo(null, 'multiMouse');");
+
+				} else {
+
+					eval(tid + ".setMultiMouse(false);");
+
+					eval(tid + ".setVisible(true, 'temp');");
+
+				}
+
+
+
+				//window.focus();
+
+		}
+
+	
+
+}
+
+
+
+function showTransKeyBtn(TranKeyId) {
+
+		var tid = eval(TranKeyId);
+
+		if(tid.useTransKey){
+
+			if (tid.isDisabled != false) {
+
+				return true;
+
+			}
+
+	
+
+			tid.clear();
+
+			tid.setMode(true);
+
+			if (isFirstUseMultyCusor == 1) {
+
+				tid.setMultiMouse(true);
+
+				tid.setVisible(true, 'temp');
+
+				tid.setMouseInfo(null, 'multiMouse');
+
+			} else {
+
+				tid.setMultiMouse(false);
+
+				tid.setVisible(true, 'temp');
+
+			}
+
+			//window.focus();
+
+		}
+
+	
+
+}
+
+
+
+function hideTransKey(nsEvent) {
+
+	var inputObj;
+
+	if (nsEvent.type == "text" || nsEvent.type == "password") {
+
+		inputObj = event;
+
+	} else {
+
+		nsEvent = nsEvent ? nsEvent : window.event;
+
+		inputObj = nsEvent.target ? nsEvent.target : nsEvent.srcElement;
+
+	}
+
+	var tid = "transkey."+inputObj.parentNode.id;
+
+	eval(tid + ".setVisible(false, 'temp');");
+
+	eval(tid + ".setMode(false);");
+
+}
+
+
+
+function getElementById(parentObj, childId) {
+
+	var children = parentObj.children;
+
+	var count = children.length;
+
+
+
+	for ( var i = 0; i < count; i++) {
+
+		var item = children.item(i);
+
+		if (item.id == childId)
+
+			return item;
+
+	}
+
+	return null;
+
+}
+
+
+
+function disableKeyOnTranskey(nsEvent) {
+
+
+
+		
+
+	var inputObj;
+
+	if (nsEvent.type == "text" || nsEvent.type == "password") {
+
+		inputObj = event;
+
+	} else {
+
+		nsEvent = nsEvent ? nsEvent : window.event;
+
+		inputObj = nsEvent.target ? nsEvent.target : nsEvent.srcElement;
+
+	}
+
+	
+
+		if (transKeyObj == null)
+
+		return;
+
+	
+
+	if(inputObj.id==transKeyObj.input.id){
+
+
+
+	
+
+		if (nsEvent.preventDefault)
+
+			nsEvent.preventDefault();
+
+		if (nsEvent.stopPropagation)
+
+			nsEvent.stopPropagation();
+
+	
+
+		nsEvent.returnValue = false;
+
+		nsEvent.cancelBubble = true;
+
+	}
+
+}
+
+
+
+function eventKeyOnTranskey(nsEvent) {
+
+	if (transKeyObj == null)
+
+		return;
+
+
+
+	nsEvent = nsEvent ? nsEvent : window.event;
+
+	
+
+	if(nsEvent.keyCode==27){
+
+		transKeyObj.close();
+
+		return;
+
+	}else if(nsEvent.keyCode==16){
+
+		transKeyObj.caps();
+
+		return false;
+
+	}else if(nsEvent.keyCode==9){
+
+	var tkObj = document.getElementById("Tk_"+transKeyObj.input.id+"_checkbox");
+
+    var isChecked = tkObj.checked;
+
+	   transKeyObj.input.readOnly=false;
+
+	   tkObj.checked=false;
+
+    document.getElementById(transKeyObj.name+"_check").value = isChecked==true?"transkey":"e2e";
+
+    var tkObjfocus = document.getElementById(transKeyObj.input.id);
+
+    tkObjfocus.focus();
+
+    transKeyObj.useTransKey=false;
+
+	transKeyObj.close();
+
+	transKeyObj = null;
+
+    return;
+
+	}
+
+	
+
+	if (nsEvent.preventDefault)
+
+		nsEvent.preventDefault();
+
+	if (nsEvent.stopPropagation)
+
+		nsEvent.stopPropagation();
+
+
+
+	nsEvent.returnValue = false;
+
+	nsEvent.cancelBubble = true;
+
+//	else if(nsEvent.keyCode==9){
+
+//	var tkObj = transKeyObj;
+
+//	tkObj.useTransKey=false;
+
+//	document.getElementById(transKeyObj.input.id).focus();
+
+//	tkObj.close();
+
+//	tkObj.useTransKey=true;
+
+//	return;
+
+//}
+
+}
+
+
+
+function setTransKeyUuid(){
+	
+	var _d = document;
+	
+	var form = _d.forms;// getElementsByTagName("form");
+
+	for ( var i = 0; i < form.length; i++) {
+		var f = form.item(i);
+
+		var transkeyUuidInput = getElementById(f, "transkeyUuid");
+
+		if (transkeyUuidInput == null) {
+			transkeyUuidInput = _d.createElement("input");
+
+			transkeyUuidInput.type = "hidden";
+
+			transkeyUuidInput.name = "transkeyUuid";
+
+			transkeyUuidInput.id = "transkeyUuid";
+
+			transkeyUuidInput.value = transkeyUuid;
+
+			f.appendChild(transkeyUuidInput);
+		} else {
+			transkeyUuidInput.value = transkeyUuid;
+		}
+
+	}
+	
+}
+
+
+function initFormTransKey(input_names, transkey_n){
+
+	
+
+	var _d = document;
+
+	
+
+	var form = _d.forms;// getElementsByTagName("form");
+
+
+
+	for ( var i = 0; i < form.length; i++) {
+
+		var frma = form.item(i);
+
+		var input = getElementById(frma, "transkey_i");
+
+		if (input == null) {
+
+			input = _d.createElement("input");
+
+
+
+			input.type = "hidden";
+
+
+
+			input.name = "transkey_i";
+
+
+
+			input.id = "transkey_i";
+
+
+
+			input.value = transkey_n;
+
+
+
+			frma.appendChild(input);
+
+			setCheckbox(frma);
+			
+			setCheckboxReInput(frma);
+			
+			//setCheckbox_Opera(f);
+
+		} else {
+
+			input.value = transkey_n;
+
+		}
+
+
+
+		var input2 = getElementById(frma, "transkey_inputs");
+
+
+
+		if (input2 == null) {
+
+			input2 = _d.createElement("input");
+
+
+
+			input2.type = "hidden";
+
+
+
+			input2.name = "transkey_inputs";
+
+
+
+			input2.id = "transkey_inputs";
+
+
+
+			input2.value = input_names;
+
+
+
+			form.item(i).appendChild(input2);
+
+		} else {
+
+			input2.value = input_names;
+
+		}
+
+
+
+		var transkeyUuidInput = getElementById(frma, "transkeyUuid");
+
+
+
+		if (transkeyUuidInput == null) {
+
+			transkeyUuidInput = _d.createElement("input");
+
+
+
+			transkeyUuidInput.type = "hidden";
+
+
+
+			transkeyUuidInput.name = "transkeyUuid";
+
+
+
+			transkeyUuidInput.id = "transkeyUuid";
+
+
+
+			transkeyUuidInput.value = transkeyUuid;
+
+
+
+			frma.appendChild(transkeyUuidInput);
+
+		} else {
+
+			transkeyUuidInput.value = transkeyUuid;
+
+		}
+
+	
+
+	}
+
+	if (onlyuseTransKey) {
+		setOnlyuseTransKey(true);
+	}
+	
+	//20130904 start
+	if(typeof depOpn_PSDEP0115 == 'undefined') //빠른예금신규시 initTransKey funtion 초기화 안함. form을 새로 생성하는 소스인 경우 동적 hidden필드 생성
+		initFormTransKey = function(){};
+	//20130904 end
+
+	
+
+}
+
+
+
+function setFormTransKey(formElement, transkey_n, input_names){
+
+	var _d = document;
+
+	
+
+	var input = getElementById(formElement, "transkey_i");
+
+
+
+	if (input == null) {
+
+		input = _d.createElement("input");
+
+
+
+		input.type = "hidden";
+
+
+
+		input.name = "transkey_i";
+
+
+
+		input.id = "transkey_i";
+
+
+
+		input.value = transkey_n;
+
+
+
+		formElement.appendChild(input);
+
+	} else {
+
+		input.value = transkey_n;
+
+	}
+
+
+
+	var input2 = getElementById(formElement, "transkey_inputs");
+
+
+
+	if (input2 == null) {
+
+		input2 = _d.createElement("input");
+
+
+
+		input2.type = "hidden";
+
+
+
+		input2.name = "transkey_inputs";
+
+
+
+		input2.id = "transkey_inputs";
+
+
+
+		input2.value = input_names;
+
+
+
+		formElement.appendChild(input2);
+
+	} else {
+
+		input2.value = input_names;
+
+	}
+
+	
+
+}
+
+
+
+
+
+function setFormTransKey_reload(formElement, transkey_n, input_names){
+
+	setCheckbox(formElement);	
+
+	//setCheckbox_Opera(formElement);
+
+	var _d = document;
+
+	var input = getElementById(formElement, "transkey_i");
+
+
+
+	if (input == null) {
+
+		input = _d.createElement("input");
+
+
+
+		input.type = "hidden";
+
+
+
+		input.name = "transkey_i";
+
+
+
+		input.id = "transkey_i";
+
+
+
+		input.value = transkey_n;
+
+
+
+		formElement.appendChild(input);
+
+	} else {
+
+		input.value = transkey_n;
+
+	}
+
+
+
+	var input2 = getElementById(formElement, "transkey_inputs");
+
+
+
+	if (input2 == null) {
+
+		input2 = _d.createElement("input");
+
+
+
+		input2.type = "hidden";
+
+
+
+		input2.name = "transkey_inputs";
+
+
+
+		input2.id = "transkey_inputs";
+
+
+
+		input2.value = input_names;
+
+
+
+		formElement.appendChild(input2);
+
+	} else {
+
+		input2.value = input_names;
+
+	}
+
+	var transkeyUuidInput = getElementById(formElement, "transkeyUuid");
+
+
+
+		if (transkeyUuidInput == null) {
+
+			transkeyUuidInput = _d.createElement("input");
+
+
+
+			transkeyUuidInput.type = "hidden";
+
+
+
+			transkeyUuidInput.name = "transkeyUuid";
+
+
+
+			transkeyUuidInput.id = "transkeyUuid";
+
+
+
+			transkeyUuidInput.value = transkeyUuid;
+
+
+
+			formElement.appendChild(transkeyUuidInput);
+
+		} else {
+
+			transkeyUuidInput.value = transkeyUuid;
+
+		}
+
+		if (onlyuseTransKey) {
+			setOnlyuseTransKey(true);
+		}
+			
+
+}
+
+
+
+
+
+// NYS
+
+var transkey = {};
+
+transkey["transkey_inputs"]="";
+
+transkey["transkey_i"]=0;
+
+var transkeyIdArray = {};
+
+var setInputTranskey = [];
+
+
+
+
+
+
+
+function initTransKey() {
+
+	//generateSessionKey(transkey_surl);
+
+
+
+	var input_names = "";
+
+	var _d = document;
+
+
+
+//	var o = document.getElementsByTagName("input");
+
+	var transkey_n = 0;
+
+
+
+	for ( var i = 0; i < setInputTranskey.length; i++) {
+
+		
+
+		transkey_n++;
+
+		var tkObj = setInputTranskey[i];
+
+		var obj = _d.getElementById(tkObj.id);
+
+		var objParentNodeId = obj.parentNode.id + '';
+
+		if (objParentNodeId.indexOf('Tk_') > -1) {
+
+			var tempDiv = obj.parentNode;
+
+			var tempParentDiv = tempDiv.parentNode;
+
+			tempParentDiv.replaceChild(obj, tempDiv);
+
+
+
+		}
+
+
+
+		input_names += "Tk_" + obj.id+":"+obj.name + ",";
+
+
+
+		var max = obj.getAttribute('maxLength')==null?obj.getAttribute('maxlength'):obj.getAttribute('maxLength');
+
+		
+
+		var kbdx = tkObj.x==null?0:Number(tkObj.x);
+
+		
+
+		var kbdy = tkObj.y==null?0:Number(tkObj.y);
+
+
+
+		if (max > 100||max == null) {
+
+			max = 100;
+
+		}
+
+		
+
+		var keybd = tkObj.kbd;
+
+ 
+
+		var divElement = document.createElement('div');
+
+
+
+		transkeyIdArray[obj.id] = 'Tk_' + obj.id;
+
+
+
+		divElement.setAttribute('id', 'Tk_' + obj.id);
+
+
+
+		// TODO:table size
+
+		if(navigator.appName.indexOf("Internet Explorer")>0) {
+
+			divElement.style.display = "inline";
+
+			divElement.style.zoom = "1";
+
+		} else {
+
+			divElement.style.display = "inline-table";
+
+			divElement.style.verticalAlign = "bottom";
+
+		}
+
+		
+
+		var objParent = obj.parentNode;
+
+
+
+		objParent.insertBefore(divElement, obj);
+
+
+
+		divElement.appendChild(obj);
+
+		
+
+		transkey["Tk_"+obj.id] = new TransKey("Tk_"+obj.id, kbdx, kbdy, transkey_surl, keybd, max , obj.type, obj);
+
+
+
+	
+
+
+
+	}
+
+
+
+	input_names = input_names.substring(0, input_names.length - 1);
+
+	if(setInputTranskey.length > 0){
+
+		initFormTransKey(input_names, transkey_n);
+
+	}
+
+	
+
+	if (document.addEventListener) {
+
+		document.addEventListener("keydown", disableKeyOnTranskey, true);
+
+		document.addEventListener("keypress", disableKeyOnTranskey, true);
+
+		document.addEventListener("keypup", disableKeyOnTranskey, true);
+
+	} else if (document.attachEvent) {
+
+		document.attachEvent("onkeydown", disableKeyOnTranskey);
+
+		document.attachEvent("onkeypress", disableKeyOnTranskey);
+
+		document.attachEvent("onkeyup", disableKeyOnTranskey);
+
+	}
+
+	//20130904 start
+	if(typeof depOpn_PSDEP0115 == 'undefined' ) //빠른예금신규시 initTransKey funtion 초기화 안함. form을 새로 생성하는 소스인 경우 동적 hidden필드 생성
+		initTransKey = function() {};
+	//20130904 end
+
+}
+ 
+/*
+ * 20140715-gridinsert페이지 키보드 동적 사용을 위한 함수 추가
+ */
+function initTransKey2() {
+	var input_names = "";
+	var _d = document;
+	var transkey_n = 0;
+	if (document.addEventListener) {
+		document.addEventListener("keydown", disableKeyOnTranskey, true);
+		document.addEventListener("keypress", disableKeyOnTranskey, true);
+		document.addEventListener("keypup", disableKeyOnTranskey, true);
+	} else if (document.attachEvent) {
+		document.attachEvent("onkeydown", disableKeyOnTranskey);
+		document.attachEvent("onkeypress", disableKeyOnTranskey);
+		document.attachEvent("onkeyup", disableKeyOnTranskey);
+	}
+}
+
+function addTransKey(inputObject, enc, keyboardType, kbdx, kbdy) {
+
+	
+
+	var x = kbdx;
+
+	var y =  kbdy;
+
+	if(arguments.length==3){
+
+		x = 0; y = 0;
+
+	}
+
+
+
+	var formElement = inputObject.form;
+
+
+
+	var input_names = getElementById(formElement, "transkey_inputs").value;
+
+
+
+	var transkey_n = getElementById(formElement, "transkey_i").value;
+
+
+
+	if (inputObject.type == "password" && enc == "on" || inputObject.type == "text" && enc == "on") {
+
+		transkey_n++;
+
+
+
+		var objParentNodeId = inputObject.parentNode.id + '';
+
+		if (objParentNodeId.indexOf('Tk_') > -1) {
+
+			var tempDiv = inputObject.parentNode;
+
+			var tempParentDiv = tempDiv.parentNode;
+
+			tempParentDiv.replaceChild(inputObject, tempDiv);
+
+
+
+		}
+
+		
+
+		var objId = inputObject.id.length>0?inputObject.id:transkey_n;
+
+
+
+		input_names += "," + "Tk_" + objId+":"+inputObject.name;
+
+
+
+		var max = inputObject.getAttribute('maxlength');
+
+
+
+		if (max == null)
+
+			max = 12;
+
+
+
+		if (max > 100) {
+
+			max = 100;
+
+		}
+
+
+
+		if (keyboardType == null) {
+
+			keyboardType = 'number';
+
+		}
+
+
+
+		var divElement = document.createElement('div');
+
+
+
+		transkeyIdArray[inputObject.id] = 'Tk_' + objId;
+
+
+
+		divElement.setAttribute('id', 'Tk_' + objId);
+
+
+
+		// TODO:table size
+
+		if(navigator.appName.indexOf("Internet Explorer")>0) {
+
+			divElement.style.display = "inline";
+
+			divElement.style.zoom = "1";
+
+		} else {
+
+			divElement.style.display = "inline-table";
+
+			divElement.style.verticalAlign = "bottom";
+
+		}
+
+
+
+		var objParent = inputObject.parentNode;
+
+
+
+		objParent.insertBefore(divElement, inputObject);
+
+
+
+		divElement.appendChild(inputObject);
+
+		
+
+		transkey["Tk_"+objId] = new TransKey("Tk_"+objId, x, y, transkey_surl, keyboardType, max, inputObject.type, inputObject);
+
+
+
+	}
+
+	
+
+	setFormTransKey(formElement, transkey_n, input_names);
+
+
+
+
+
+}
+
+
+
+function setTransKey(transkeyId, inputObject, enc, keyboardType, kbdx, kbdy) {
+
+	
+
+	var x = kbdx;
+
+	var y =  kbdy;
+
+	if(arguments.length==4){
+
+		x = 0; y = 0;
+
+	}
+
+
+
+	var formElement = inputObject.form;
+
+
+
+	var input_names = getElementById(formElement, "transkey_inputs").value;
+
+
+
+	var transkey_n = getElementById(formElement, "transkey_i").value;
+
+
+
+	if (inputObject.type == "password" && enc == "on" || inputObject.type == "text" && enc == "on") {
+
+		transkey_n++;
+
+
+
+		var objParentNodeId = inputObject.parentNode.id + '';
+
+		if (objParentNodeId.indexOf(transkeyId) > -1) {
+
+			var tempDiv = inputObject.parentNode;
+
+			var tempParentDiv = tempDiv.parentNode;
+
+			tempParentDiv.replaceChild(inputObject, tempDiv);
+
+
+
+		}
+
+
+
+		input_names += "," +transkeyId+":"+inputObject.name;
+
+
+
+		var max = inputObject.getAttribute('maxLength')==null?inputObject.getAttribute('maxlength'):inputObject.getAttribute('maxLength');
+
+
+
+		if (max == null)
+
+			max = 12;
+
+
+
+		if (max > 100) {
+
+			max = 100;
+
+		}
+
+
+
+		if (keyboardType == null) {
+
+			keyboardType = 'number';
+
+		}
+
+
+
+		var divElement = document.createElement('div');
+
+
+
+		transkeyIdArray[inputObject.id] = transkeyId;
+
+		
+
+
+
+		divElement.setAttribute('id', transkeyId);
+
+		
+
+		// TODO:table size
+
+		if(navigator.appName.indexOf("Internet Explorer")>0) {
+
+			divElement.style.display = "inline";
+
+			divElement.style.zoom = "1";
+
+		} else {
+
+			divElement.style.display = "inline-table";
+
+			divElement.style.verticalAlign = "bottom";
+
+		}
+
+
+
+		var objParent = inputObject.parentNode;
+
+
+
+		objParent.insertBefore(divElement, inputObject);
+
+
+
+		divElement.appendChild(inputObject);
+
+		
+
+		transkey[transkeyId] = new TransKey(transkeyId, x, y, transkey_surl, keyboardType, max, inputObject.type, inputObject);
+
+
+
+	}
+
+	
+
+	setFormTransKey(formElement, transkey_n, input_names);
+
+
+
+}
+
+
+
+function setTransKeyJstl(transkeyId, x, y, keyboardType, max, type, inputId, tkCheck, group){
+
+	var inputObj = document.getElementById(inputId);
+
+	var formElement = inputObj.form;
+
+	var input_names = getElementById(formElement, "transkey_inputs").value;
+
+	var transkey_n = getElementById(formElement, "transkey_i").value;
+
+	transkey[transkeyId] =  new TransKey(transkeyId, x, y, transkey_surl, keyboardType, max, type, inputId);
+
+	transkey[transkeyId].useTransKey = tkCheck;
+
+	transkey[transkeyId].addEvent("focus","onfocus");
+
+	input_names = input_names + ","+transkeyId+":"+inputObj.name;
+
+	transkey_n = Number(transkey_n) + 1;
+
+	setFormTransKey(formElement, transkey_n, input_names);
+
+	if(inputObj.type=="text"){
+
+		transkey[transkeyId].setMode = function(isMouse) {
+
+		};
+
+		transkey[transkeyId].onEnter = function(index, encrypted) {
+
+			var request = new XMLHttpRequest();
+
+			request.open("POST", transkey_surl+"?op=letter&transkeyUuid="+transkeyUuid+"&name="+transkeyId+"&value=" +encrypted, false);
+
+			request.send();
+
+			if (request.readyState == 4 && request.status == 200) {
+
+				var input = document.getElementById(this.input.id);input.value = input.value + request.responseText;}
+
+		};
+
+		transkey[transkeyId].onClear = function() {
+
+		};
+
+		transkey[transkeyId].onBackspace = function(idx) {
+
+		};
+
+		transkey[transkeyId].onClose = function() {
+
+		};
+
+	}
+
+	if(group.length>0){
+
+		if(transkey[group]==null)
+
+			transkey[group] = new Array();
+
+		transkey[group][transkey[group].length] = transkey[transkeyId];
+
+	}
+
+	setCheckbox_Opera_JSTL(inputId);
+
+}
+
+
+
+function contains(parent, child, deep)
+
+
+
+{
+
+	if (parent == child)
+
+		return true;
+
+
+
+	var items = parent.children;
+
+	var count = items.length;
+
+
+
+	for ( var i = 0; i < count; i++) {
+
+		if (items[i] == child)
+
+			return true;
+
+		if (deep == true && contains(items[i], child, deep))
+
+			return true;
+
+	}
+
+	return false;
+
+}
+
+
+
+function checkTransKey(nsEvent) {
+
+
+
+	if (transKeyObj == null)
+
+		return;
+
+
+
+	var inputObj;
+
+
+
+	if (nsEvent.type == "text" || nsEvent.type == "password") {
+
+		inputObj = event;
+
+	} else {
+
+		nsEvent = nsEvent ? nsEvent : window.event;
+
+		inputObj = nsEvent.target ? nsEvent.target : nsEvent.srcElement;
+
+	}
+
+
+
+	var transkeyLayout = document.getElementById(transKeyObj.name + "_layout");
+
+	var transkeyDiv = document.getElementById(transKeyObj.name);
+
+
+
+	if (contains(transkeyLayout, inputObj, true) == false && contains(transkeyDiv, inputObj, true) == false) {
+
+		if(transKeyObj.selectIMG=="1")
+
+			transKeyObj.onClickToggle();
+
+		else
+
+			//transKeyObj.close(); //focus out 일때 keyboard no close // woorifis 김국현 차장 요청
+
+		 
+
+		transKeyObj = null;
+
+	}
+
+}
+
+
+
+function offsetPoint() {
+
+	this.x = 0;
+
+	this.y = 0;
+
+}
+
+
+
+function getPositionStyle(obj) {
+
+	var value = null;
+
+	var property = "position";
+
+
+
+	if (obj == null)
+
+		return null;
+
+
+
+	if (obj.currentStyle) {
+
+		value = obj.currentStyle[property];
+
+	}
+
+	if (document.defaultView) {
+
+		var dv = document.defaultView;
+
+		if (dv.getComputedStyle(obj, "").getPropertyValue(property)) {
+
+			value = dv.getComputedStyle(obj, "").getPropertyValue(property);
+
+		}
+
+	}
+
+	if(navigator.userAgent.match('Opera') != 'Opera'){
+
+		if(obj.tagName=='TBODY' || obj.tagName=='tbody'){
+
+			value = 'static';
+
+		}
+
+	}
+
+	
+
+	if(transkey_isIE6 == true){
+
+		if(obj.tagName=='BODY' || obj.tagName=='body'){
+
+			value = 'relative';
+
+		}
+
+	}
+	
+
+
+	return value;
+
+}
+
+
+
+function getOffsetPoint(Element) {
+
+
+
+	var point = new offsetPoint();
+
+//	var positionElement;
+
+
+
+	point.x = 0;
+
+	point.y = 0;
+	
+	
+	var certElement = "";
+	if(Element.id == "certselectwide_tk1_input"){
+		certElement = Element.id;
+	}
+
+
+
+		while (Element) {
+	
+			point.x += Element.offsetLeft;
+	
+			point.y += Element.offsetTop;
+	
+	//		if(navigator.userAgent.indexOf("MSIE 6") > 0){
+	//			alert("Ele:"+Element.tagName+" x:"+point.x+" y:"+point.y);
+	//		}
+	
+			if(transkey_isIE6 == true){
+	
+	
+				Element = Element.parentElement;
+	
+			}else{
+				Element = Element.offsetParent;
+			}
+	
+			if (getPositionStyle(Element) != "static"){
+	
+				positionElement = Element;
+	
+				break;
+	
+			}
+			
+	
+				
+	
+		}
+	
+
+	if($(".pop-content").length>0)
+
+
+		resizeLayerPopup(point, certElement);
+
+
+
+	return point;
+
+}
+
+
+
+function checkTranskeyGroup(eventObj, groupId){
+
+	if(transkey[groupId]==null)
+
+		return false;
+
+
+
+	var checkGroup = transkey[groupId];
+
+	var inputObj = eventObj.target ? eventObj.target : eventObj.srcElement;
+
+	var isChecked = inputObj.checked;
+
+	var _d = document;
+	
+	if(navigator.platform.match('Win') != 'Win' || (navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 ) || onlyuseTransKey){
+
+		if(!isChecked){
+
+			inputObj.checked = true;
+
+			isChecked=true;
+
+			alert("키보드보안 프로그램이 지원되지 않는 환경에서는 안전한 거래를 위해 가상키패드를반드시 사용하셔야 합니다.");
+
+			for (var i=0; transkey[groupId].length>i; i++){
+
+				transkey[checkGroup[i].name].clear();
+
+				transkey[checkGroup[i].name].useTransKey = isChecked;
+
+				transkey[checkGroup[i].name].input.readOnly=true;
+
+				_d.getElementById(checkGroup[i].name+"_check").value = isChecked==true?"transkey":"e2e";
+
+			}
+
+			
+
+		}
+
+	}
+
+	for (var i=0; transkey[groupId].length>i; i++){
+
+		transkey[checkGroup[i].name].useTransKey = isChecked;
+
+		_d.getElementById(checkGroup[i].name+"_check").value = isChecked==true?"transkey":"e2e";
+
+	}
+
+	for (var i=0; transkey[groupId].length>i; i++){
+
+		if(isChecked) {
+
+			transkey[checkGroup[i].name].input.readOnly=true;
+
+			showTransKeyBtn("transkey.Tk_"+transkey[checkGroup[0].name].input.id);
+
+			
+
+		} else{
+
+			transkey[checkGroup[i].name].input.readOnly=false;
+
+			transkey[checkGroup[i].name].clear();
+
+			transkey[checkGroup[i].name].close();
+
+		}
+
+	}
+
+}
+
+function initTransKeylayer(frm){
+
+	var formElement = document.getElementById(frm);
+
+	var transkey_n = transkey.transkey_i;
+
+	var input_names = transkey.transkey_inputs.substring(0, transkey.transkey_inputs.length - 1);
+
+	setFormTransKey_reload(formElement, transkey_n, input_names);
+
+}
+
+function removeTransKeylayer() {
+	//2014-07-15 팝업에서 가상키보드 닫지 않고 레이어팝업이 닫힐 경우 키보드 객체가 사라지지 않는 문제 수정 
+	if (transKeyObj != null) {
+		transKeyObj = null;
+	}
+	transkey.transkey_inputs="";
+
+	transkey.transkey_i=0;
+
+}
+
+function setCheckbox(frmName){
+
+	if(setCheckBox_multi_check==true){
+
+		if(navigator.platform.match('Win') != 'Win' || (navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 ) ){
+
+			var frm = frmName;
+
+		 	var elelength = frm.elements.length;
+
+			var name = new Array(elelength);
+
+			for (var j=0;j < elelength;j++) {    	
+
+				if(frm.elements[j].tagName == "INPUT" && (frm.elements[j].type == "text" || frm.elements[j].type == "password")) {	  
+
+					var elename = frm.elements[j].name;
+
+					var checkboxElement = document.getElementById('Tk_' +elename+'_groupcheckbox');
+
+					if(checkboxElement != null){
+
+							checkboxElement.checked = 'true';
+
+					}
+
+				}
+
+			}
+
+	 	}//KJS
+
+	}
+
+}
+
+function setCheckboxReInput(frmName){
+	if(navigator.platform.match('Win') != 'Win' || (navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 ) ){
+		return;
+	}
+	if(setCheckBox_multi_check==true){
+		var frm = frmName;
+	 	var elelength = frm.elements.length;
+		var name = new Array(elelength);
+		for (var j=0;j < elelength;j++) {    	
+			if(frm.elements[j].tagName == "INPUT" && (frm.elements[j].type == "text" || frm.elements[j].type == "password")) {	  
+				var elename = frm.elements[j].name;
+				var checkboxElement2 = document.getElementById('Tk_' +elename+'_checkbox');
+				var checkElement = document.getElementById('Tk_' +elename+'_check');
+
+				if(checkboxElement2 != null){
+						checkboxElement2.checked = false;
+						checkElement.value = 'e2e';
+				}
+			}
+		}
+	}
+}
+
+
+
+function setCheckbox_Opera(frmName){
+
+	if(setCheckBox_multi_check==true){
+
+		//if(navigator.platform.match('Win') != 'Win'){
+
+		if(navigator.platform.match('Win') != 'Win' || (navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 ) ){
+
+			var frm = frmName;
+
+		 	var elelength = frm.elements.length;
+
+			var fieldCnt = 0;	
+
+			var name = new Array(elelength);
+
+			for (var j=0;j < elelength;j++) {    	
+
+				if(frm.elements[j].tagName == "INPUT" && (frm.elements[j].type == "text" || frm.elements[j].type == "password")) {	  
+
+					var elename = frm.elements[j].name;
+
+					var checkboxElement = document.getElementById('Tk_' +elename+'_checkbox');
+
+					if(checkboxElement != null){
+
+							checkboxElement.checked = 'true';
+
+					}
+
+					transkey['Tk_' +elename].useTransKey = 'true';
+
+					document.getElementById("Tk_"+elename+"_check").value = "transkey";
+
+				}
+
+			}
+
+	 	}//KJS
+
+	}
+
+}
+
+function setCheckbox_Opera_JSTL(elename){
+
+	if(navigator.userAgent.indexOf("Opera") > -1 && navigator.userAgent.indexOf("Version/12.") > -1 ){
+
+		var checkboxElement = document.getElementById('Tk_' +elename+'_checkbox');
+
+		var groupcheckboxElement = document.getElementById('Tk_' +elename+'_groupcheckbox');
+
+		if(checkboxElement != null ){
+
+			checkboxElement.checked = 'true';
+
+		}
+
+		if(groupcheckboxElement != null ){
+
+			groupcheckboxElement.checked = 'true';
+
+		}
+
+		transkey['Tk_' +elename].useTransKey = 'true';
+
+		document.getElementById("Tk_"+elename+"_check").value = "transkey";
+
+	}
+
+}
+
+
+
+function resizeLayerPopup(point, certElement){
+	if(typeof _IS_POPUP !="undefined") {
+		return;
+	}
+	var transkeyWidth, transkeyHeight;
+
+	var LayerWidth = $('.pop-content').width();
+
+	var LayerHeight  = $('.pop-inner').height();
+
+	if(transKeyObj.keyboardType =='number'){
+
+		transkeyWidth = singleLayerWidth;
+
+		transkeyHeight = singleLayerHeight;
+
+		}
+
+		else if(transKeyObj.keyboardType =='qwerty'){
+
+			transkeyWidth = qwertyLayerWidth;
+
+			transkeyHeight = qwertyLayerHeight;
+
+		} else if(transKeyObj.isCrt =='qwerty_crt'){
+
+			transkeyWidth = 692;
+
+			transkeyHeight = 317;
+
+		}
+
+		
+		var x = 0;
+		var y = 0;
+		
+		
+		if(certElement == "certselectwide_tk1_input"){
+			x = 0;
+			y = 257;
+		}else{
+			x = (point.x + transkeyWidth + 20 ) - LayerWidth;
+			y = (point.y + transkeyHeight + 40 )- LayerHeight;
+		}
+		
+	 
+
+		if(x > 0){
+
+			  $('.pop-inner').data('oriWidth_transkey', $('.pop-content').width());
+
+			  $('.pop-inner').css({width:$('.pop-content').width()+ x});
+
+			  $('.pop-inner').wbUI('repositionPopup');
+
+			
+
+		}
+
+		
+
+		if(y > 0){
+
+				$('.pop-inner').data('oriHeight_transkey', $('.pop-inner').height());
+
+			  $('.pop-inner').css({height:$('.pop-inner').height()+ y});
+
+			  $('.pop-inner').wbUI('repositionPopup');
+
+			  if(!transkeyisMobile){
+				  $('.pop-content').scrollTop(400);
+				}
+		}
+
+}
+
+
+
+function closeTransKeyPopinner() {
+	if(transkeyisMobile)
+		return;
+	if(typeof _IS_POPUP !="undefined") {
+		return;
+	}
+
+
+  $('.pop-inner').css({height:$('.pop-inner').data('oriHeight_transkey')}).wbUI('repositionPopup');
+
+  $('.pop-inner').css({width:$('.pop-inner').data('oriWidth_transkey')}).wbUI('repositionPopup');
+
+}
+
+
+/*
+ * 20140715-gridinsert페이지 키보드 동적 사용을 위한 함수 추가
+ */
+function initFormTransKey2(frmID ,input_names, transkey_n){
+	var frma = document.getElementById(frmID);
+	var input = frma.transkey_i; 
+	if (input == null) {
+		input = document.createElement("input");
+		input.type = "hidden";
+		input.name = "transkey_i";
+		input.id = "transkey_i";
+		input.value = transkey_n;
+		frma.appendChild(input);
+		setCheckbox(frma);
+		setCheckboxReInput(frma);
+	} else {
+		input.value = transkey_n;
+	}
+	var input2 = frma.transkey_inputs;
+	if (input2 == null) {
+		input2 = document.createElement("input");
+		input2.type = "hidden";
+		input2.name = "transkey_inputs";
+		input2.id = "transkey_inputs";
+		input2.value = input_names;
+		frma.appendChild(input2);
+	} else {
+		input2.value = input_names;
+	}
+	var transkeyUuidInput = frma.transkeyUuid;
+	if (transkeyUuidInput == null) {
+		transkeyUuidInput = document.createElement("input");
+		transkeyUuidInput.type = "hidden";
+		transkeyUuidInput.name = "transkeyUuid";
+		transkeyUuidInput.id = "transkeyUuid";
+		transkeyUuidInput.value = transkeyUuid;
+		frma.appendChild(transkeyUuidInput);
+	} else {
+		transkeyUuidInput.value = transkeyUuid;
+	}
+}
+
+function setOnlyuseTransKey(mode){
+	
+	onlyuseTransKey= mode;
+	var str = "transkey_Tk_";
+
+	$("input:hidden").each(function(){
+		if(this.id.indexOf(str) > -1){
+			var tmp2 = this.id.substring(str.length-3);
+
+			var $ckbox = $('#' + tmp2 + '_checkbox');
+			var $groupCkbox = $('#' + tmp2 + '_groupcheckbox');
+			
+			if (mode) {
+				$ckbox.attr('checked', 'true');
+				$groupCkbox.attr('checked', 'true');
+				$('#' + this.id.substring(str.length)).attr("readOnly", "true");
+			} else {
+				$ckbox.removeAttr('checked');
+				$groupCkbox.removeAttr('checked');
+				$('#' + this.id.substring(str.length)).removeAttr("readOnly");
+			}
+			transkey[tmp2].useTransKey = mode ? 'true' : false;
+			$('#' + tmp2 + '_check').val(mode ? "transkey" : "e2e");
+			
+		}
+	});	
+} 
+
+$(function() {
+
+   initTransKey();
+
+   var inputs = transkey.transkey_inputs.substring(0, transkey.transkey_inputs.length - 1);
+   initFormTransKey(inputs, transkey.transkey_i);
+
+});
+
+
+
+
+

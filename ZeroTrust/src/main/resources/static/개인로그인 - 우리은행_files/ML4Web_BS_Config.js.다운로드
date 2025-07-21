@@ -1,0 +1,45 @@
+var BankSign_BaseUrl = window.location.protocol + "//" + window.location.hostname + ":"+window.location.port+ "/pib/Dream?withyou=CMCOM0414&cmd=";        //http://localhost:8080/BankSign/ML4Web_BS/sample
+var BankSign_SystemLang = "KOR"; 
+
+var BSConfig = {
+	    usePolling			: true,		//true : polling 사용  , false : polling 미사용
+	    pollingInterval 	: 2, 			//sec
+	    timeout 			: 300,			//sec
+	    tabType 			: 1,			//0 : PUSH화면 출력 , 1: QR화면 출력 
+	    serviceUrl 			: BankSign_BaseUrl,
+	    preFix 				: "",
+	    bankCode			: "0020",
+	    useAuthWay			: 0,            //0:PUSH & QR, 1: PUSH만 사용 ,  2:QR&인증번호만 사용
+	    useSavePhone		: false,        //true : 휴대폰번호 저장 사용  , false : 휴대폰번호 저장 미사용(휴대폰번호를 암호화할 경우에만 사용 가능함)
+	    usePushRepeat		: true,				//PUSH 재전송 버튼 사용 여부       true : 사용 ,  false : 미사용
+	    pushRepeatInterval	: 5,				//PUSH 재전송 버튼 클릭 후 다시 활성화 되는 시간 sec
+	    
+	    /*info text setting*/
+	    push_info_1 		: ["푸시알람 미동의 고객은 뱅크사인 앱에서 푸시알람 수신동의를 선행하여 주시기 바랍니다.", "[경로 : 뱅크사인 앱 > 뱅크사인 로그인 > 동의절차 자동진행]"],
+	    push_info_2 		: ["1. 뱅크사인 앱 실행 후 인증번호 확인","2. 인증(로그인/이체)", "3. 거래내역 확인 후 비밀번호 입력"],
+	    push_info_3 		: ["1. 뱅크사인 앱 실행 후 인증번호 확인","2. 인증(로그인/이체)", "3. 거래내역 확인 후 비밀번호 입력","4. 푸시가 발송되지 않으면 푸시재전송 버튼을 눌러주세요."],
+	    qr_info_1   		: ["1. 뱅크사인 앱 실행 후 인증방식 선택","2. 비밀번호를 입력하여 로그인"],
+	    qr_info_2			: ["1. 뱅크사인 앱 실행 후 인증번호 확인","2. 인증(로그인/이체)","3. 거래내역 확인 후 비밀번호 입력"],
+	    checkMoveText		: "푸시 인증이 진행중입니다. QR코드 & 인증번호 인증으로 이동하시겠습니까?",
+	    serverErrorText 	: "서버오류입니다. 관리자에게 문의하시기 바랍니다.",
+	    networkErrorText 	: "네트워크오류입니다. 관리자에게 문의하시기 바랍니다.",
+	    serverError3300 	: "전자서명 대기중입니다. 종료하시겠습니까?",
+	    serverError3100 	: "뱅크사인 인증이 완료되지 않았습니다. 취소하시겠습니까?",
+	    message3300			: "전자서명 대기중입니다. 잠시후에 확인버튼을 눌러주세요.",
+	    pushMessage3700		: "등록되지 않은 사용자 입니다.",
+	    pushMessage3800		: "푸시 인증을 사용할 수 없습니다. QR코드 & 인증번호 인증을 사용하시겠습니까?",
+	    message3100	     	: "뱅크사인 인증이 완료되지 않았습니다. 취소하시겠습니까?",
+	    message1000			: "뱅크사인 인증이 완료되지 않았습니다. 취소하시겠습니까?",
+	    httpContentType		: "application/json;text/plan;charset=utf-8",
+	    iframeUrl			: "/pib/Dream?withyou=CMLGN0107",
+	    serverCode			: 0,						//서버 통신 리턴 코드 : 수정 불가
+	    useTempPhoneNum		: true,						//업무 페이지에서 입력받은 휴대폰 번호를 뱅크사인 PUSH 휴대폰 번호로 사용 여부  true : 사용, false : 미사용
+	    tempPhoneNum		: "",						//업무 페이지에서 입력받은 휴대폰 번호를 PUSH 휴대폰번호로 사용하기 위한 변수 : 수정불가  *제공된 함수로 PUSH 휴대폰 번호로 사용 가능
+	    createTId    		: "createTId",				//TR Key생성 함수이며, 해당 함수가 변경되는 경우 인터넷 뱅킹에 제공된 API도 함께 변경 진행되어야 함
+	    sendPush    		: "sendPush",				//Push발송요청 함수이며, 해당 함수가 변경되는 경우 인터넷 뱅킹에 제공된 API도 함께 변경 진행되어야 함	
+	    certificationRequest: "certificationRequest",	//인증요청 함수이며, 해당 함수가 변경되는 경우 인터넷 뱅킹에 제공된 API도 함께 변경 진행되어야 함
+	    certificationCancel : "certificationCancel",	//인증취소 함수이며, 해당 함수가 변경되는 경우 인터넷 뱅킹에 제공된 API도 함께 변경 진행되어야 함
+	    signDocFromServer   : "signDocFromServer",		//서명데이터 전달 함수이며, 해당 함수가 변경되는 경우 인터넷 뱅킹에 제공된 API도 함께 변경 진행되어야 함  
+	    sendPushRepeat   	: "sendPushRepeat"			//푸시 재전송 함수이며, 해당 함수가 변경되는 경우 인터넷 뱅킹에 제공된 API도 함께 변경 진행되어야 함  
+	    
+	}
