@@ -1,27 +1,39 @@
 package com.example.ZeroTrust.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
+import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = "employee")  // DB의 테이블명
-public class User {
+@Table(name = "employee")
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "employeeid")   // ✅ PK 컬럼과 매핑
+    @Column(name = "employeeid")
     private String userID;
 
-    @Column(name = "employee_name")  // ✅ 이름 컬럼과 매핑
+    @Column(name = "employee_name")
     private String userName;
 
-    @Column(name = "email")          // ✅ 이메일 컬럼과 매핑
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "password")       // ✅ 비밀번호 컬럼과 매핑
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "role")           // ✅ 역할 컬럼과 매핑
+    @Column(name = "role")
     private String role;
+
+    public String getPassword() {
+        return this.password;
+    }
+    
+    public String getRole() {
+        return this.role;
+    }
+    
 }
+

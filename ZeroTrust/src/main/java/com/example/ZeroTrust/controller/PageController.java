@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 public class PageController {
@@ -29,26 +31,52 @@ public class PageController {
     @PostMapping("/login")
     public String doLogin(@RequestParam String userID,
                           @RequestParam String password,
-                          Model model) {
-                                // 🔥 입력값 확인
+                          Model model,
+                          HttpSession session) {
+    
         System.out.println("[DEBUG] 입력된 ID: " + userID);
         System.out.println("[DEBUG] 입력된 PW: " + password);
-
+    
         User user = userService.loginUser(userID, password);
+    
         if (user == null) {
             model.addAttribute("error", "ID 또는 비밀번호가 잘못되었습니다.");
-            return "login_page";
+            return "login"; // 잘못된 이름 수정
         }
-
-        // 관리자면 Kibana로 리다이렉트
+    
+        session.setAttribute("loginUser", user); // Redis에 세션 저장됨
+        session.setMaxInactiveInterval(1800);    // 세션 유효시간 30분 (선택)
+        
+        System.out.println("[DEBUG] 세션 ID: " + session.getId());
+        
+        System.out.println("[DEBUG] 로그인 성공! 세션 ID: " + session.getId());
+    
         if ("ADMIN".equalsIgnoreCase(user.getRole())) {
-            System.out.println("[DEBUG] 관리자 로그인 → Kibana 리다이렉트");
-            return "dashboard";  // Kibana로 이동
+            return "redirect:/admin/dashboard";
         } else {
-            System.out.println("[DEBUG] 일반 사용자 로그인 → userpage 이동");
-
-            model.addAttribute("user", user);
-            return "userpage"; // 일반 사용자 페이지
+            return "redirect:/user/mypage";
         }
+    }
+
+    // 관리자 페이지
+    @GetMapping("/admin/dashboard")
+    public String adminDashboard(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null || !"ADMIN".equalsIgnoreCase(user.getRole())) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", user);
+        return "dashboard";  // dashboard.html
+    }
+
+    // 사용자 페이지
+    @GetMapping("/user/mypage")
+    public String userPage(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null || "ADMIN".equalsIgnoreCase(user.getRole())) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", user);
+        return "userpage";  // userpage.html
     }
 }
