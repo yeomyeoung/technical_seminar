@@ -161,16 +161,16 @@ Master DB ↔ Slave DB (GTID Replication)
 - **결과**: VIP가 Backup LB로 이동, 서비스 무중단 유지
 <img width="934" height="289" alt="image 3" src="https://github.com/user-attachments/assets/424462c9-1269-4d4c-9fce-59fa77309e40" />
 
-- **결과**: VIP가 Backup LB로 이동, 서비스 무중단 유지 VRRP 스크립트(check_haproxy)가 성공적으로 실행되어 서비스 정상 상태를 확인합니다.
+- **결과**: VIP가 Backup LB로 이동, 서비스 무중단 유지 VRRP 스크립트(check_haproxy)가 성공적으로 실행되어 서비스 정상 상태를 확인함.
 <img width="934" height="289" alt="image 4" src="https://github.com/user-attachments/assets/0e5c6464-94af-4a67-9b26-def44cf4140a" />
 
-- **결과**: 새로운 Master가 가상 IP(VIP)의 소유권을 네트워크에 알려(Gratuitous ARP) 트래픽을 인계받습니다.
+- **결과**: 새로운 Master가 가상 IP(VIP)의 소유권을 네트워크에 알려(Gratuitous ARP) 트래픽을 인계받음.
 <img width="934" height="289" alt="image 5" src="https://github.com/user-attachments/assets/8ed89513-2940-4011-a4ed-73b924e17e0b" />
 
-- **결과**: 정상 상태의 Master 서버는 자신의 물리 IP와 가상 IP(192.168.0.100)를 모두 소유합니다.
+- **결과**: 정상 상태의 Master 서버는 자신의 물리 IP와 가상 IP(192.168.0.100)를 모두 소유함.
 <img width="934" height="289" alt="image 6" src="https://github.com/user-attachments/assets/bf0bbed6-3baf-40af-9834-c8cdacecee62" />
 
-- **결과**: 정상 상태의 Backup 서버는 자신의 물리 IP만 소유한 채 대기합니다.
+- **결과**: 정상 상태의 Backup 서버는 자신의 물리 IP만 소유한 채 대기함.
 
 ---
 
