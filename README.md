@@ -179,8 +179,8 @@ Master DB ↔ Slave DB (GTID Replication)
 **방법**: Master MySQL 서비스 중지
 <img width="803" height="415" alt="image 7" src="https://github.com/user-attachments/assets/3ea9ade8-eac8-4d4e-a061-dc04eab572be" />
 
-
-**정상 상황을 나타낸 다이어그램 
+<br>
+**정상 상황을 나타낸 다이어그램**
 <img width="807" height="463" alt="image 8" src="https://github.com/user-attachments/assets/b853c4f7-b714-4de9-a250-b3340f9875ff" />
 
 
@@ -199,7 +199,7 @@ Master DB ↔ Slave DB (GTID Replication)
 
 @ MASTER DB
 <img width="861" height="299" alt="image 9" src="https://github.com/user-attachments/assets/ca133366-c946-47ac-8423-7bd681f7c187" />
-
+<br>
 - **Master Running**
 <img width="867" height="100" alt="image 10" src="https://github.com/user-attachments/assets/05f247b1-d49f-447d-b9e8-8f1860982a2c" />
 
@@ -207,7 +207,7 @@ Master DB ↔ Slave DB (GTID Replication)
 
 @ SLAVE DB
 <img width="823" height="352" alt="image 11" src="https://github.com/user-attachments/assets/26dfcaee-2f94-4a53-86ba-65cc6af0cd54" />
-
+<br>
 - **Slave Running**
 <img width="822" height="49" alt="image 12" src="https://github.com/user-attachments/assets/bfd97a5e-00c3-4a1d-826d-c75f56a6be54" />
 
@@ -215,7 +215,7 @@ Master DB ↔ Slave DB (GTID Replication)
 
 @ MASTER DB
 <img width="954" height="399" alt="image 13" src="https://github.com/user-attachments/assets/d9608de2-093b-4023-a88d-6d3af567a815" />
-
+<br>
 - **Master 종료**
 <img width="945" height="103" alt="image 14" src="https://github.com/user-attachments/assets/7107f6fe-269f-4634-b1e9-9de4cd9fa789" />
 
