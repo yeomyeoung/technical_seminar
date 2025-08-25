@@ -146,12 +146,12 @@ Master DB ↔ Slave DB (GTID Replication)
 
 ### PoC 1: Load Balancer 장애
 
-**방법**: Master LB 컨테이너 중지
+**장애 발생 시나리오**: Master LB 컨테이너 중지
 
 <img width="985" height="392" alt="image 1" src="https://github.com/user-attachments/assets/756dbffd-9c61-4b7f-a060-1c5d507f24d4" />
 
 <br>
-
+**기대 결과 시나리오**
 <img width="1005" height="406" alt="image 2" src="https://github.com/user-attachments/assets/245f3452-21fd-477b-8bcc-fbb213a8bca4" />
 
 
